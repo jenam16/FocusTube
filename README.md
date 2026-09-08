@@ -162,4 +162,27 @@ Implemented:
 * Video list displaying positions (`01`, `02`), titles, duration, and availability status (unavailable videos handled gracefully without crashing)
 * Client-side playlist URL validation with sanitized user-facing error messages
 
+---
+
+## Phase 4 — YouTube Video Player
+Status: Complete
+
+Implemented:
+* Official YouTube IFrame Player integration via `YouTubePlayer` component (16:9 aspect ratio, loading & error states)
+* Video selection directly on `/courses/:id` without page reloads or navigating away to YouTube
+* Dual desktop layout: 2-column side-by-side (Player + Syllabus) and expandable Theater Mode ("Big Screen")
+* Fullscreen mode support via native controls and browser Fullscreen API
+* Dynamic video navigation (`Previous` and `Next` buttons) with automatic skipping of unavailable videos
+* Boundaries enforced: `Previous` disabled on first playable video, `Next` disabled on last playable video
+* Current video status header (`Currently watching: 03 — Title`) and active playing indicator in syllabus
+* Graceful handling of unavailable videos (`isAvailable === false` disabled, non-crashing)
+* Refresh-resilient state deriving default video as first playable video (`position ASC`)
+
+Upcoming Future Phases:
+* Progress tracking & watch time persistence (Phase 5)
+* Resume learning from saved timestamp (Phase 5)
+* Automatic video completion logic (Phase 6)
+* Distraction-free Focus Mode (Phase 7)
+
+
 

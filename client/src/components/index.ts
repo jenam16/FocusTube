@@ -5,4 +5,5 @@ export * from './EmptyState';
 export * from './LoadingState';
 export * from './ErrorState';
 export * from './ImportCourseModal';
+export * from './YouTubePlayer';
 export * from './courses';

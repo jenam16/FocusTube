@@ -1,4 +1,3 @@
-import { Link } from 'react-router-dom';
 import { PlaySquare, CheckCircle2, AlertCircle, Play } from 'lucide-react';
 import { VideoItem } from '../../types';
 import { formatLessonNumber, formatVideoDuration } from '../../utils';
@@ -7,28 +6,36 @@ interface LessonItemProps {
   courseId: string;
   video: VideoItem;
   isSelected?: boolean;
+  onSelect?: (video: VideoItem) => void;
 }
 
 export const LessonItem = ({
-  courseId,
   video,
   isSelected = false,
+  onSelect,
 }: LessonItemProps) => {
   const isAvailable = video.isAvailable !== false;
 
+  const handleClick = () => {
+    if (!isAvailable) return;
+    if (onSelect) {
+      onSelect(video);
+    }
+  };
+
   const content = (
     <div
-      className={`group flex items-center gap-3.5 p-3.5 sm:gap-4 sm:p-4 transition-colors ${
+      className={`group flex items-center gap-3.5 p-3 sm:gap-4 sm:p-3.5 transition-all text-left w-full rounded-xl ${
         !isAvailable
-          ? 'opacity-55 cursor-not-allowed bg-gray-950/20'
+          ? 'opacity-50 cursor-not-allowed bg-gray-950/20'
           : isSelected
-            ? 'bg-red-500/10 border-l-4 border-red-500'
-            : 'hover:bg-gray-800/50'
+            ? 'bg-red-600/15 border border-red-500/40 text-white shadow-sm'
+            : 'hover:bg-gray-800/60 text-gray-200'
       }`}
     >
       {/* Lesson Number Badge */}
       <div
-        className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-xs font-bold transition-colors ${
+        className={`flex h-7 w-7 sm:h-8 sm:w-8 shrink-0 items-center justify-center rounded-lg text-xs font-bold transition-colors ${
           !isAvailable
             ? 'bg-gray-800 text-gray-500'
             : isSelected
@@ -44,7 +51,7 @@ export const LessonItem = ({
       </div>
 
       {/* Video Thumbnail */}
-      <div className="relative aspect-video w-20 shrink-0 overflow-hidden rounded-lg border border-gray-800 bg-gray-950 sm:w-28 shadow-sm">
+      <div className="relative aspect-video w-16 sm:w-24 shrink-0 overflow-hidden rounded-lg border border-gray-800 bg-gray-950 shadow-sm">
         {video.thumbnail ? (
           <img
             src={video.thumbnail}
@@ -56,22 +63,22 @@ export const LessonItem = ({
           />
         ) : (
           <div className="flex h-full w-full items-center justify-center text-gray-600">
-            <PlaySquare className="h-6 w-6" />
+            <PlaySquare className="h-5 w-5" />
           </div>
         )}
         {video.durationSeconds > 0 && (
-          <div className="absolute bottom-1 right-1 rounded bg-black/85 px-1.5 py-0.5 text-[10px] font-medium text-white backdrop-blur-sm">
+          <div className="absolute bottom-1 right-1 rounded bg-black/85 px-1 py-0.5 text-[9px] font-medium text-white backdrop-blur-sm">
             {formatVideoDuration(video.durationSeconds)}
           </div>
         )}
       </div>
 
-      {/* Title & Metadata */}
+      {/* Title & Availability */}
       <div className="min-w-0 flex-1">
         <h4
-          className={`line-clamp-2 text-sm font-medium transition-colors ${
+          className={`line-clamp-2 text-xs sm:text-sm font-medium transition-colors ${
             !isAvailable
-              ? 'text-gray-400 line-through'
+              ? 'text-gray-500 line-through'
               : isSelected
                 ? 'font-semibold text-red-400'
                 : 'text-gray-200 group-hover:text-white'
@@ -79,7 +86,7 @@ export const LessonItem = ({
         >
           {video.title}
         </h4>
-        <div className="mt-1 flex items-center gap-3 text-xs text-gray-400">
+        <div className="mt-1 flex items-center gap-2.5 text-[11px] text-gray-400">
           {video.durationSeconds > 0 && (
             <span>{formatVideoDuration(video.durationSeconds)}</span>
           )}
@@ -91,31 +98,39 @@ export const LessonItem = ({
           ) : (
             <span className="inline-flex items-center gap-1 text-[11px] text-amber-400">
               <AlertCircle className="h-3 w-3" />
-              <span>Unavailable video</span>
+              <span>Video unavailable</span>
             </span>
           )}
         </div>
       </div>
 
-      {/* Action Indicator */}
-      {isAvailable && (
-        <div className="hidden shrink-0 items-center justify-center text-gray-500 group-hover:text-red-400 sm:flex">
-          <span className="text-xs font-semibold">Start →</span>
-        </div>
+      {/* Selected Indicator */}
+      {isSelected && (
+        <span className="hidden sm:inline-flex items-center rounded-full bg-red-600/20 px-2 py-0.5 text-[10px] font-semibold text-red-400 border border-red-500/30">
+          Playing
+        </span>
       )}
     </div>
   );
 
   if (!isAvailable) {
-    return <div className="block cursor-not-allowed select-none">{content}</div>;
+    return (
+      <div
+        className="block cursor-not-allowed select-none"
+        title="This video is currently unavailable"
+      >
+        {content}
+      </div>
+    );
   }
 
   return (
-    <Link
-      to={`/watch/${courseId}/${video._id}`}
-      className="block focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-inset"
+    <button
+      type="button"
+      onClick={handleClick}
+      className="block w-full focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500 rounded-xl text-left"
     >
       {content}
-    </Link>
+    </button>
   );
 };

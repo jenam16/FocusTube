@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import {
@@ -7,11 +7,19 @@ import {
   ChevronRight,
   Clock,
   AlertCircle,
-  Film,
   Layers,
+  Maximize,
+  Minimize,
 } from 'lucide-react';
 import { courseService } from '../services';
-import { formatDuration, formatLessonNumber, formatVideoDuration } from '../utils';
+import { YouTubePlayer } from '../components';
+import {
+  formatDuration,
+  formatLessonNumber,
+  formatVideoDuration,
+  getNextPlayableVideo,
+  getPreviousPlayableVideo,
+} from '../utils';
 
 export const WatchPage = () => {
   const { courseId, videoId } = useParams<{
@@ -19,8 +27,9 @@ export const WatchPage = () => {
     videoId: string;
   }>();
   const navigate = useNavigate();
+  const [isTheaterMode, setIsTheaterMode] = useState(false);
 
-  // Fetch course and its videos via TanStack Query (leveraging cache from course detail)
+  // Fetch course and its videos via TanStack Query
   const { data, isLoading, error } = useQuery({
     queryKey: ['course', courseId],
     queryFn: () => courseService.getCourseById(courseId!),
@@ -35,15 +44,10 @@ export const WatchPage = () => {
     return [...rawVideos].sort((a, b) => a.position - b.position);
   }, [data?.videos]);
 
-  // Identify current video, previous video, and next video
-  const { currentVideo, currentIndex, previousVideo, nextVideo } = useMemo(() => {
+  // Identify current video
+  const { currentVideo, currentIndex } = useMemo(() => {
     if (sortedVideos.length === 0) {
-      return {
-        currentVideo: null,
-        currentIndex: -1,
-        previousVideo: null,
-        nextVideo: null,
-      };
+      return { currentVideo: null, currentIndex: -1 };
     }
 
     const idx = sortedVideos.findIndex(
@@ -51,22 +55,26 @@ export const WatchPage = () => {
     );
 
     if (idx === -1) {
-      // Default to first video if not found
       return {
         currentVideo: sortedVideos[0],
         currentIndex: 0,
-        previousVideo: null,
-        nextVideo: sortedVideos.length > 1 ? sortedVideos[1] : null,
       };
     }
 
     return {
       currentVideo: sortedVideos[idx],
       currentIndex: idx,
-      previousVideo: idx > 0 ? sortedVideos[idx - 1] : null,
-      nextVideo: idx < sortedVideos.length - 1 ? sortedVideos[idx + 1] : null,
     };
   }, [sortedVideos, videoId]);
+
+  // Get previous and next playable videos (skipping unavailable)
+  const previousVideo = useMemo(() => {
+    return getPreviousPlayableVideo(sortedVideos, currentVideo?._id);
+  }, [sortedVideos, currentVideo]);
+
+  const nextVideo = useMemo(() => {
+    return getNextPlayableVideo(sortedVideos, currentVideo?._id);
+  }, [sortedVideos, currentVideo]);
 
   if (isLoading) {
     return (
@@ -107,7 +115,11 @@ export const WatchPage = () => {
   const totalLessons = sortedVideos.length;
 
   return (
-    <div className="mx-auto max-w-5xl space-y-6">
+    <div
+      className={`mx-auto space-y-6 transition-all duration-300 ${
+        isTheaterMode ? 'max-w-7xl' : 'max-w-5xl'
+      }`}
+    >
       {/* Top Bar: Back to Course Navigation */}
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-gray-800 pb-4">
         <Link
@@ -124,59 +136,67 @@ export const WatchPage = () => {
       </div>
 
       {/* Lesson Header Information */}
-      <div className="space-y-1.5">
-        <div className="flex items-center gap-2 text-xs font-semibold text-red-400">
-          <span>
-            Lesson {lessonNumber} of {totalLessons}
-          </span>
-          {currentVideo.durationSeconds > 0 && (
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <div className="space-y-1.5">
+          <div className="flex items-center gap-2 text-xs font-semibold text-red-400">
+            <span>
+              Lesson {lessonNumber} of {totalLessons}
+            </span>
+            {currentVideo.durationSeconds > 0 && (
+              <>
+                <span className="text-gray-600">•</span>
+                <span className="flex items-center gap-1 text-gray-400 font-normal">
+                  <Clock className="h-3 w-3" />
+                  {formatVideoDuration(currentVideo.durationSeconds)}
+                </span>
+              </>
+            )}
+          </div>
+          <h1 className="text-xl font-bold tracking-tight text-white sm:text-2xl">
+            {currentVideo.title}
+          </h1>
+        </div>
+
+        {/* Big Screen / Theater Mode Option */}
+        <button
+          type="button"
+          onClick={() => setIsTheaterMode((prev) => !prev)}
+          className="hidden sm:inline-flex items-center gap-1.5 rounded-xl border border-gray-700 bg-gray-800 px-3 py-1.5 text-xs font-medium text-gray-300 hover:bg-gray-700 hover:text-white transition-colors self-start sm:self-auto shrink-0"
+        >
+          {isTheaterMode ? (
             <>
-              <span className="text-gray-600">•</span>
-              <span className="flex items-center gap-1 text-gray-400 font-normal">
-                <Clock className="h-3 w-3" />
-                {formatVideoDuration(currentVideo.durationSeconds)}
-              </span>
+              <Minimize className="h-3.5 w-3.5" />
+              <span>Default Size</span>
+            </>
+          ) : (
+            <>
+              <Maximize className="h-3.5 w-3.5" />
+              <span>Big Screen</span>
             </>
           )}
-        </div>
-        <h1 className="text-xl font-bold tracking-tight text-white sm:text-2xl">
-          {currentVideo.title}
-        </h1>
+        </button>
       </div>
 
-      {/* VIDEO PLAYER PLACEHOLDER (Phase 3 Shell ONLY - No iframe/API as instructed) */}
-      <div className="relative aspect-video w-full overflow-hidden rounded-2xl border border-gray-800 bg-gray-950 shadow-2xl">
-        {/* Subtle background thumbnail blur if available */}
-        {currentVideo.thumbnail && (
-          <img
-            src={currentVideo.thumbnail}
-            alt=""
-            aria-hidden="true"
-            className="absolute inset-0 h-full w-full object-cover opacity-15 blur-sm"
-          />
-        )}
-
-        <div className="relative z-10 flex h-full w-full flex-col items-center justify-center p-6 text-center">
-          <div className="flex h-16 w-16 items-center justify-center rounded-2xl border border-red-500/20 bg-red-600/10 text-red-500 mb-4 shadow-lg shadow-red-600/10">
-            <Film className="h-8 w-8" />
-          </div>
-
-          <div className="inline-flex items-center gap-1.5 rounded-full border border-gray-800 bg-gray-900/80 px-3 py-1 text-[11px] font-semibold uppercase tracking-wider text-gray-400 mb-2 backdrop-blur-sm">
-            <span className="h-1.5 w-1.5 rounded-full bg-red-500 animate-ping" />
-            Video Player Shell
-          </div>
-
-          <h3 className="text-base font-bold text-white sm:text-lg">
-            Phase 4 Placeholder
-          </h3>
-          <p className="mt-1 max-w-md text-xs text-gray-400 sm:text-sm">
-            The official YouTube IFrame Player, playback controls, and progress
-            tracking will be integrated in Phase 4.
+      {/* Official YouTube IFrame Player */}
+      {currentVideo.isAvailable !== false && Boolean(currentVideo.youtubeVideoId) ? (
+        <YouTubePlayer
+          key={currentVideo._id}
+          videoId={currentVideo.youtubeVideoId}
+          title={currentVideo.title}
+          isTheaterMode={isTheaterMode}
+          onToggleTheater={() => setIsTheaterMode((prev) => !prev)}
+        />
+      ) : (
+        <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-gray-800 bg-gray-900/40 p-12 text-center aspect-video">
+          <AlertCircle className="h-10 w-10 text-amber-500 mb-3" />
+          <h3 className="text-base font-bold text-white">Video unavailable</h3>
+          <p className="mt-1 max-w-sm text-xs text-gray-400">
+            This video cannot be played because it has been removed or set to private on YouTube.
           </p>
         </div>
-      </div>
+      )}
 
-      {/* Navigation Buttons: Previous & Next Lesson */}
+      {/* Navigation Buttons: Previous & Next Lesson (Skips unavailable) */}
       <div className="flex items-center justify-between gap-4 rounded-xl border border-gray-800 bg-gray-900/50 p-4">
         {/* Previous Lesson Button */}
         {previousVideo ? (
@@ -238,15 +258,23 @@ export const WatchPage = () => {
         <div className="divide-y divide-gray-800/60 max-h-80 overflow-y-auto rounded-xl border border-gray-800/80 bg-gray-950/40">
           {sortedVideos.map((vid, idx) => {
             const isCurrent = vid._id === currentVideo._id;
+            const isAvailable = vid.isAvailable !== false;
             return (
               <button
                 key={vid._id}
                 type="button"
-                onClick={() => navigate(`/watch/${course._id}/${vid._id}`)}
+                disabled={!isAvailable}
+                onClick={() => {
+                  if (isAvailable) {
+                    navigate(`/watch/${course._id}/${vid._id}`);
+                  }
+                }}
                 className={`flex w-full items-center gap-3 p-3 text-left transition-colors focus:outline-none ${
-                  isCurrent
-                    ? 'bg-red-500/10 border-l-4 border-red-500'
-                    : 'hover:bg-gray-800/40'
+                  !isAvailable
+                    ? 'opacity-40 cursor-not-allowed'
+                    : isCurrent
+                      ? 'bg-red-500/10 border-l-4 border-red-500'
+                      : 'hover:bg-gray-800/40'
                 }`}
               >
                 <span
@@ -260,9 +288,11 @@ export const WatchPage = () => {
                 </span>
                 <span
                   className={`flex-1 truncate text-xs ${
-                    isCurrent
-                      ? 'font-semibold text-red-400'
-                      : 'text-gray-300'
+                    !isAvailable
+                      ? 'text-gray-500 line-through'
+                      : isCurrent
+                        ? 'font-semibold text-red-400'
+                        : 'text-gray-300'
                   }`}
                 >
                   {vid.title}
@@ -270,6 +300,11 @@ export const WatchPage = () => {
                 {vid.durationSeconds > 0 && (
                   <span className="shrink-0 text-[11px] text-gray-500">
                     {formatVideoDuration(vid.durationSeconds)}
+                  </span>
+                )}
+                {!isAvailable && (
+                  <span className="shrink-0 text-[10px] text-amber-500 font-medium">
+                    Unavailable
                   </span>
                 )}
               </button>
