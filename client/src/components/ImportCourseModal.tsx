@@ -3,17 +3,17 @@ import { X, PlaySquare, AlertCircle, Loader2, CheckCircle2 } from 'lucide-react'
 import { courseService } from '../services';
 import { Course } from '../types';
 
-interface ImportPlaylistModalProps {
+interface ImportCourseModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess: (course: Course, isExisting: boolean) => void;
 }
 
-export const ImportPlaylistModal = ({
+export const ImportCourseModal = ({
   isOpen,
   onClose,
   onSuccess,
-}: ImportPlaylistModalProps) => {
+}: ImportCourseModalProps) => {
   const [playlistUrl, setPlaylistUrl] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -21,25 +21,44 @@ export const ImportPlaylistModal = ({
 
   if (!isOpen) return null;
 
+  // Basic client-side URL validation mandated by Section 11
+  const validateUrl = (url: string): boolean => {
+    const trimmed = url.trim();
+    if (!trimmed) return false;
+
+    // Accept URLs containing youtube.com/playlist?list= and variations
+    const hasPlaylistPattern =
+      trimmed.includes('youtube.com/playlist?list=') ||
+      trimmed.includes('youtu.be/') ||
+      trimmed.includes('&list=') ||
+      trimmed.includes('?list=') ||
+      /^[a-zA-Z0-9_-]{12,64}$/.test(trimmed);
+
+    return Boolean(hasPlaylistPattern);
+  };
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    if (isLoading) return; // Prevent duplicate submissions
+
     setError(null);
     setSuccessInfo(null);
 
     const trimmed = playlistUrl.trim();
-    if (!trimmed) {
-      setError('Please enter a YouTube playlist URL or ID.');
+    if (!trimmed || !validateUrl(trimmed)) {
+      setError('Please enter a valid YouTube playlist URL.');
       return;
     }
 
     try {
       setIsLoading(true);
       const res = await courseService.importCourse(trimmed);
-      setSuccessInfo(
-        res.isExisting
-          ? 'Course already exists in your library! Opening...'
-          : `Successfully imported "${res.course.title}" with ${res.course.totalVideos} videos!`
-      );
+
+      if (res.isExisting) {
+        setSuccessInfo('This playlist is already in your courses.');
+      } else {
+        setSuccessInfo(`Successfully imported "${res.course.title}"!`);
+      }
 
       setTimeout(() => {
         setIsLoading(false);
@@ -47,13 +66,30 @@ export const ImportPlaylistModal = ({
         setSuccessInfo(null);
         onSuccess(res.course, res.isExisting);
         onClose();
-      }, 1200);
+      }, 1000);
     } catch (err: unknown) {
       setIsLoading(false);
-      if (err instanceof Error) {
-        setError(err.message);
+      const rawMessage = err instanceof Error ? err.message : '';
+
+      // User-facing sanitized error messages according to Section 13
+      if (rawMessage.includes('already exists') || rawMessage.includes('duplicate')) {
+        setError('This playlist is already in your courses.');
+      } else if (
+        rawMessage.includes('not found') ||
+        rawMessage.includes('404') ||
+        rawMessage.includes('Invalid')
+      ) {
+        setError('Playlist not found. Please check the URL.');
+      } else if (
+        rawMessage.includes('private') ||
+        rawMessage.includes('forbidden') ||
+        rawMessage.includes('403')
+      ) {
+        setError('This playlist is private or unavailable.');
+      } else if (rawMessage.includes('quota')) {
+        setError('YouTube API quota exceeded. Please try again later.');
       } else {
-        setError('Failed to import playlist. Please check the URL and try again.');
+        setError('Something went wrong. Please try again.');
       }
     }
   };
@@ -62,11 +98,11 @@ export const ImportPlaylistModal = ({
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-black/70 backdrop-blur-sm transition-opacity"
+        className="fixed inset-0 bg-black/75 backdrop-blur-sm transition-opacity"
         onClick={isLoading ? undefined : onClose}
       />
 
-      {/* Dialog */}
+      {/* Modal Dialog */}
       <div className="relative w-full max-w-lg overflow-hidden rounded-2xl border border-gray-800 bg-gray-900 p-6 shadow-2xl transition-all sm:p-8">
         <div className="flex items-center justify-between pb-4 border-b border-gray-800">
           <div className="flex items-center gap-2.5">
@@ -75,7 +111,9 @@ export const ImportPlaylistModal = ({
             </div>
             <div>
               <h3 className="text-lg font-bold text-white">Import YouTube Playlist</h3>
-              <p className="text-xs text-gray-400">Convert an educational playlist into a course</p>
+              <p className="text-xs text-gray-400">
+                Turn any educational playlist into a structured course
+              </p>
             </div>
           </div>
           <button
@@ -83,6 +121,7 @@ export const ImportPlaylistModal = ({
             disabled={isLoading}
             onClick={onClose}
             className="rounded-lg p-1.5 text-gray-400 hover:bg-gray-800 hover:text-white transition-colors disabled:opacity-50"
+            aria-label="Close"
           >
             <X className="h-5 w-5" />
           </button>
@@ -108,7 +147,7 @@ export const ImportPlaylistModal = ({
               htmlFor="playlistUrl"
               className="block text-xs font-semibold uppercase tracking-wider text-gray-300"
             >
-              Playlist URL or ID
+              YouTube Playlist URL
             </label>
             <input
               id="playlistUrl"
@@ -116,12 +155,15 @@ export const ImportPlaylistModal = ({
               required
               disabled={isLoading}
               value={playlistUrl}
-              onChange={(e) => setPlaylistUrl(e.target.value)}
-              placeholder="https://www.youtube.com/playlist?list=PL..."
+              onChange={(e) => {
+                setPlaylistUrl(e.target.value);
+                if (error) setError(null);
+              }}
+              placeholder="https://www.youtube.com/playlist?list=..."
               className="mt-1.5 block w-full rounded-xl border border-gray-700 bg-gray-950 px-4 py-3 text-sm text-white placeholder-gray-500 transition-colors focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500 disabled:opacity-60"
             />
             <p className="mt-1.5 text-[11px] text-gray-400">
-              Supports public or unlisted YouTube playlist URLs or raw IDs.
+              Provide a public or unlisted YouTube playlist link.
             </p>
           </div>
 
@@ -142,7 +184,7 @@ export const ImportPlaylistModal = ({
               {isLoading ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin" />
-                  <span>Importing Playlist...</span>
+                  <span>Importing...</span>
                 </>
               ) : (
                 <>
@@ -157,3 +199,6 @@ export const ImportPlaylistModal = ({
     </div>
   );
 };
+
+// Re-export as ImportPlaylistModal for backwards compatibility
+export const ImportPlaylistModal = ImportCourseModal;

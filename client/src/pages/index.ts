@@ -4,4 +4,5 @@ export * from './RegisterPage';
 export * from './DashboardPage';
 export * from './CoursesPage';
 export * from './CourseDetailPage';
+export * from './WatchPage';
 export * from './PlaceholderPage';

@@ -8,6 +8,7 @@ export interface Course {
   channelName: string;
   totalVideos: number;
   totalDurationSeconds: number;
+  progressPercentage?: number;
   createdAt: string;
   updatedAt: string;
 }
@@ -35,4 +36,13 @@ export interface ImportCourseResponse {
 export interface CourseDetailResponse {
   course: Course;
   videos: VideoItem[];
+}
+
+export interface WatchVideoResponse {
+  course: Course;
+  video: VideoItem;
+  previousVideo: VideoItem | null;
+  nextVideo: VideoItem | null;
+  currentIndex: number;
+  totalVideos: number;
 }

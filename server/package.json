@@ -8,7 +8,7 @@
     "dev": "tsx watch src/server.ts",
     "build": "tsc",
     "start": "node dist/server.js",
-    "test": "tsx src/tests/verifyPhase2.ts",
+    "test": "tsx src/tests/verifyPhase2.ts && tsx src/tests/verifyPhase3.ts",
     "lint": "eslint .",
     "format": "prettier --write \"src/**/*.ts\""
   },

@@ -1,4 +1,5 @@
 import { Response } from 'express';
+import mongoose from 'mongoose';
 import { AuthenticatedRequest } from '../middleware/auth.js';
 import { Course } from '../models/Course.js';
 import { Video } from '../models/Video.js';
@@ -133,6 +134,11 @@ export const getCourseById = async (
       return;
     }
 
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      res.status(404).json({ message: 'Course not found' });
+      return;
+    }
+
     const course = await Course.findOne({ _id: id, userId });
     if (!course) {
       res.status(404).json({ message: 'Course not found' });
@@ -147,5 +153,103 @@ export const getCourseById = async (
   } catch (error) {
     console.error('Get course by id error:', error);
     res.status(500).json({ message: 'Failed to retrieve course details' });
+  }
+};
+
+export const getCourseVideos = async (
+  req: AuthenticatedRequest,
+  res: Response
+): Promise<void> => {
+  try {
+    const userId = req.userId;
+    const { courseId } = req.params;
+
+    if (!userId) {
+      res.status(401).json({ message: 'Authentication required' });
+      return;
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(courseId)) {
+      res.status(404).json({ message: 'Course not found' });
+      return;
+    }
+
+    const course = await Course.findOne({ _id: courseId, userId });
+    if (!course) {
+      res.status(404).json({ message: 'Course not found' });
+      return;
+    }
+
+    const videos = await Video.find({ courseId: course._id }).sort({
+      position: 1,
+    });
+
+    res.status(200).json({ videos });
+  } catch (error) {
+    console.error('Get course videos error:', error);
+    res.status(500).json({ message: 'Failed to retrieve course videos' });
+  }
+};
+
+export const getCourseVideoById = async (
+  req: AuthenticatedRequest,
+  res: Response
+): Promise<void> => {
+  try {
+    const userId = req.userId;
+    const { courseId, videoId } = req.params;
+
+    if (!userId) {
+      res.status(401).json({ message: 'Authentication required' });
+      return;
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(courseId)) {
+      res.status(404).json({ message: 'Course not found' });
+      return;
+    }
+
+    const course = await Course.findOne({ _id: courseId, userId });
+    if (!course) {
+      res.status(404).json({ message: 'Course not found' });
+      return;
+    }
+
+    const videoQuery = mongoose.Types.ObjectId.isValid(videoId)
+      ? {
+          $or: [{ _id: videoId }, { youtubeVideoId: videoId }],
+          courseId: course._id,
+        }
+      : { youtubeVideoId: videoId, courseId: course._id };
+
+    const video = await Video.findOne(videoQuery);
+    if (!video) {
+      res.status(404).json({ message: 'Video not found' });
+      return;
+    }
+
+    const allVideos = await Video.find({ courseId: course._id }).sort({
+      position: 1,
+    });
+
+    const currentIndex = allVideos.findIndex(
+      (v) => v._id.toString() === video._id.toString()
+    );
+    const previousVideo =
+      currentIndex > 0 ? allVideos[currentIndex - 1] : null;
+    const nextVideo =
+      currentIndex < allVideos.length - 1 ? allVideos[currentIndex + 1] : null;
+
+    res.status(200).json({
+      course,
+      video,
+      previousVideo,
+      nextVideo,
+      currentIndex,
+      totalVideos: allVideos.length,
+    });
+  } catch (error) {
+    console.error('Get course video by id error:', error);
+    res.status(500).json({ message: 'Failed to retrieve lesson details' });
   }
 };

@@ -1,15 +1,21 @@
 import { useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { BookOpen, PlusCircle, Search } from 'lucide-react';
+import { PlusCircle, Search } from 'lucide-react';
 import { courseService } from '../services';
-import { CourseCard, ImportPlaylistModal } from '../components';
+import {
+  CourseGrid,
+  ImportCourseModal,
+  EmptyState,
+  LoadingState,
+  ErrorState,
+} from '../components';
 
 export const CoursesPage = () => {
   const queryClient = useQueryClient();
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, error, refetch, isRefetching } = useQuery({
     queryKey: ['courses'],
     queryFn: courseService.getCourses,
   });
@@ -46,7 +52,7 @@ export const CoursesPage = () => {
       </div>
 
       {/* Search Bar (if courses exist) */}
-      {courses.length > 0 && (
+      {!isLoading && !error && courses.length > 0 && (
         <div className="relative max-w-md">
           <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
           <input
@@ -60,56 +66,42 @@ export const CoursesPage = () => {
       )}
 
       {/* Loading Skeleton */}
-      {isLoading && (
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {[1, 2, 3].map((i) => (
-            <div
-              key={i}
-              className="h-64 animate-pulse rounded-2xl border border-gray-800 bg-gray-900/40"
-            />
-          ))}
-        </div>
+      {isLoading && <LoadingState type="grid" count={4} />}
+
+      {/* Error State */}
+      {!isLoading && error && (
+        <ErrorState
+          title="Unable to load your courses"
+          message="Failed to retrieve your courses. Please check your network and try again."
+          onRetry={() => refetch()}
+          isRetrying={isRefetching}
+        />
       )}
 
       {/* Empty State */}
-      {!isLoading && courses.length === 0 && (
-        <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-gray-800 bg-gray-900/40 px-6 py-16 text-center">
-          <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl border border-red-500/20 bg-red-500/10 text-red-500">
-            <BookOpen className="h-7 w-7" />
-          </div>
-          <h2 className="text-lg font-semibold text-white">No courses imported yet</h2>
-          <p className="mt-2 max-w-sm text-sm text-gray-400">
-            Paste any YouTube playlist link to convert it into a structured course with lessons.
-          </p>
-          <button
-            type="button"
-            onClick={() => setIsImportModalOpen(true)}
-            className="mt-6 flex items-center gap-2 rounded-xl bg-red-600 px-5 py-2.5 text-xs font-semibold text-white shadow-lg shadow-red-600/25 hover:bg-red-500"
-          >
-            <PlusCircle className="h-4 w-4" />
-            <span>Import First Playlist</span>
-          </button>
-        </div>
+      {!isLoading && !error && courses.length === 0 && (
+        <EmptyState
+          title="No courses yet"
+          description="Import a YouTube playlist to start learning."
+          actionLabel="Import Playlist"
+          onAction={() => setIsImportModalOpen(true)}
+        />
       )}
 
       {/* Filtered empty state */}
-      {!isLoading && courses.length > 0 && filteredCourses.length === 0 && (
+      {!isLoading && !error && courses.length > 0 && filteredCourses.length === 0 && (
         <div className="py-12 text-center text-sm text-gray-400">
           No courses matching &quot;{searchTerm}&quot;
         </div>
       )}
 
-      {/* Grid */}
-      {!isLoading && filteredCourses.length > 0 && (
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {filteredCourses.map((course) => (
-            <CourseCard key={course._id} course={course} />
-          ))}
-        </div>
+      {/* Course Grid */}
+      {!isLoading && !error && filteredCourses.length > 0 && (
+        <CourseGrid courses={filteredCourses} />
       )}
 
-      {/* Modal */}
-      <ImportPlaylistModal
+      {/* Reusable Import Modal */}
+      <ImportCourseModal
         isOpen={isImportModalOpen}
         onClose={() => setIsImportModalOpen(false)}
         onSuccess={() => {

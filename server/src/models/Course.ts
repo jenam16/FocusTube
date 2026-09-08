@@ -10,6 +10,7 @@ export interface ICourse extends Document {
   channelName: string;
   totalVideos: number;
   totalDurationSeconds: number;
+  progressPercentage: number;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -52,6 +53,12 @@ const courseSchema = new Schema<ICourse>(
     totalDurationSeconds: {
       type: Number,
       default: 0,
+    },
+    progressPercentage: {
+      type: Number,
+      default: 0,
+      min: 0,
+      max: 100,
     },
   },
   {

@@ -1,8 +1,10 @@
 import { request } from './api';
 import {
   Course,
+  VideoItem,
   ImportCourseResponse,
   CourseDetailResponse,
+  WatchVideoResponse,
 } from '../types';
 
 export const courseService = {
@@ -23,5 +25,23 @@ export const courseService = {
     return request<CourseDetailResponse>(`/courses/${id}`, {
       method: 'GET',
     });
+  },
+
+  async getCourseVideos(courseId: string): Promise<{ videos: VideoItem[] }> {
+    return request<{ videos: VideoItem[] }>(`/courses/${courseId}/videos`, {
+      method: 'GET',
+    });
+  },
+
+  async getCourseVideoById(
+    courseId: string,
+    videoId: string
+  ): Promise<WatchVideoResponse> {
+    return request<WatchVideoResponse>(
+      `/courses/${courseId}/videos/${videoId}`,
+      {
+        method: 'GET',
+      }
+    );
   },
 };

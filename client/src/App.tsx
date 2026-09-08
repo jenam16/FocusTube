@@ -10,6 +10,7 @@ import {
   DashboardPage,
   CoursesPage,
   CourseDetailPage,
+  WatchPage,
   StudyPlanPage,
   FocusPage,
   AnalyticsPage,
@@ -47,7 +48,12 @@ export default function App() {
               <Route element={<AppLayout />}>
                 <Route path="/dashboard" element={<DashboardPage />} />
                 <Route path="/courses" element={<CoursesPage />} />
+                <Route path="/courses/:courseId" element={<CourseDetailPage />} />
                 <Route path="/courses/:id" element={<CourseDetailPage />} />
+                <Route
+                  path="/watch/:courseId/:videoId"
+                  element={<WatchPage />}
+                />
                 <Route path="/study-plan" element={<StudyPlanPage />} />
                 <Route path="/focus" element={<FocusPage />} />
                 <Route path="/analytics" element={<AnalyticsPage />} />

@@ -147,3 +147,19 @@ npm run dev
 - Preview production build: `npm run preview`
 - Lint code: `npm run lint`
 - Format code: `npm run format`
+
+---
+
+## Phase 3 — Course Library + Dashboard
+Status: Complete
+
+Implemented:
+* Dashboard (`/dashboard`) with real course counts, preview section, and shared import modal
+* Course library (`/courses`) with search filtering, responsive grid, and real-time refresh
+* Reusable UI components: `CourseCard`, `CourseGrid`, `ProgressBar`, `EmptyState`, `LoadingState`, `ErrorState`, `ImportCourseModal`
+* Course cards with thumbnail fallbacks, human-readable duration (`45m`, `1h 20m`), completion percentage (`0% complete`), and progress bar
+* Course detail page (`/courses/:id`) displaying course metadata, creator channel, total lessons, duration, progress bar, and ordered video syllabus (`position ASC`)
+* Video list displaying positions (`01`, `02`), titles, duration, and availability status (unavailable videos handled gracefully without crashing)
+* Client-side playlist URL validation with sanitized user-facing error messages
+
+
