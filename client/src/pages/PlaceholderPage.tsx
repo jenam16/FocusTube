@@ -23,13 +23,6 @@ export const PlaceholderPage = ({
   );
 };
 
-export const CoursesPage = () => (
-  <PlaceholderPage
-    title="My Courses"
-    description="Your imported YouTube courses and progress."
-  />
-);
-
 export const StudyPlanPage = () => (
   <PlaceholderPage
     title="Study Plan"
