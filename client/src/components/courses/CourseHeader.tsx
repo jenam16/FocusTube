@@ -9,14 +9,25 @@ import {
 import { Course, VideoItem } from '../../types';
 import { formatDuration } from '../../utils';
 import { ProgressBar } from '../ProgressBar';
+import { CompletedBadge } from '../CompletedBadge';
 
 interface CourseHeaderProps {
   course: Course;
   firstVideo?: VideoItem;
+  completedVideos?: number;
+  totalAvailableVideos?: number;
+  courseCompleted?: boolean;
 }
 
-export const CourseHeader = ({ course, firstVideo }: CourseHeaderProps) => {
+export const CourseHeader = ({
+  course,
+  firstVideo,
+  completedVideos,
+  totalAvailableVideos,
+  courseCompleted,
+}: CourseHeaderProps) => {
   const progress = course.progressPercentage || 0;
+  const isFinished = courseCompleted || progress >= 100;
 
   return (
     <div className="space-y-6">
@@ -79,9 +90,14 @@ export const CourseHeader = ({ course, firstVideo }: CourseHeaderProps) => {
             {/* Course Progress Section */}
             <div className="rounded-xl border border-gray-800/80 bg-gray-950/40 p-3.5">
               <div className="mb-2 flex items-center justify-between text-xs">
-                <span className="text-gray-400 font-medium">Course Progress</span>
+                <div className="flex items-center gap-2">
+                  <span className="text-gray-400 font-medium">Course Progress</span>
+                  {isFinished && <CompletedBadge size="xs" />}
+                </div>
                 <span className="font-bold text-gray-200">
-                  {progress}% complete
+                  {completedVideos !== undefined
+                    ? `${completedVideos} of ${totalAvailableVideos ?? course.totalVideos} completed (${progress}%)`
+                    : `${progress}% complete`}
                 </span>
               </div>
               <ProgressBar progress={progress} size="md" />
@@ -95,7 +111,13 @@ export const CourseHeader = ({ course, firstVideo }: CourseHeaderProps) => {
                   className="inline-flex items-center gap-2 rounded-xl bg-red-600 px-5 py-2.5 text-xs font-semibold text-white shadow-lg shadow-red-600/25 transition-all hover:bg-red-500 hover:shadow-red-600/35"
                 >
                   <Play className="h-3.5 w-3.5 fill-current" />
-                  <span>Start Learning</span>
+                  <span>
+                    {isFinished
+                      ? 'Review Course'
+                      : progress > 0
+                        ? 'Continue Learning'
+                        : 'Start Learning'}
+                  </span>
                 </Link>
               )}
 

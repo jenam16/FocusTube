@@ -37,26 +37,6 @@ export const FocusPage = () => (
   />
 );
 
-export const AnalyticsPage = () => (
-  <PlaceholderPage
-    title="Analytics"
-    description="Track your watch time, streaks, and course completion rates."
-  />
-);
-
-export const BookmarksPage = () => (
-  <PlaceholderPage
-    title="Bookmarks"
-    description="Saved video timestamps and key moments."
-  />
-);
-
-export const NotesPage = () => (
-  <PlaceholderPage
-    title="Notes"
-    description="Your notes synchronized with video timestamps."
-  />
-);
 
 export const SettingsPage = () => (
   <PlaceholderPage

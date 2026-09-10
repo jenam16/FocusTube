@@ -8,6 +8,8 @@ export interface IVideoProgress extends Document {
   watchedSeconds: number;
   durationSeconds: number;
   progressPercentage: number;
+  completed: boolean;
+  completedAt: Date | null;
   lastWatchedAt: Date;
   createdAt: Date;
   updatedAt: Date;
@@ -52,6 +54,16 @@ const videoProgressSchema = new Schema<IVideoProgress>(
       max: 100,
       default: 0,
     },
+    completed: {
+      type: Boolean,
+      required: true,
+      default: false,
+      index: true,
+    },
+    completedAt: {
+      type: Date,
+      default: null,
+    },
     lastWatchedAt: {
       type: Date,
       default: Date.now,
@@ -69,6 +81,10 @@ videoProgressSchema.index({ user: 1, course: 1, video: 1 }, { unique: true });
 // Query index for quick recent watch resolution
 videoProgressSchema.index({ user: 1, lastWatchedAt: -1 });
 
+// Query index for filtering completed course videos
+videoProgressSchema.index({ user: 1, course: 1, completed: 1 });
+
 export const VideoProgress: Model<IVideoProgress> =
   mongoose.models.VideoProgress ||
   mongoose.model<IVideoProgress>('VideoProgress', videoProgressSchema);
+

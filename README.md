@@ -178,11 +178,65 @@ Implemented:
 * Graceful handling of unavailable videos (`isAvailable === false` disabled, non-crashing)
 * Refresh-resilient state deriving default video as first playable video (`position ASC`)
 
-Upcoming Future Phases:
-* Progress tracking & watch time persistence (Phase 5)
-* Resume learning from saved timestamp (Phase 5)
-* Automatic video completion logic (Phase 6)
-* Distraction-free Focus Mode (Phase 7)
+---
 
+## Phase 5 — Progress Tracking + Resume Learning
+Status: Complete
 
+Implemented:
+* Real-time watch time tracking and periodic throttled syncing (every 10s or 10s position jump)
+* Single-collection progress model (`VideoProgress`) with compound index `{ user: 1, course: 1, video: 1 }`
+* Exact resume from last watched timestamp with smart threshold rules (skip if $\le 2$s or $\ge \text{duration} - 5$s)
+* Unmount and lesson-switch flush guarantees
+* Live course-level progress percentage aggregation
+* "Continue Learning" dashboard card with recent course and video
 
+---
+
+## Phase 6 — Automatic Video Completion
+Status: Complete
+
+Implemented:
+* **Automatic Video Completion Criteria**:
+  - $\ge 90\%$ watched threshold rule (`clampedWatched / duration >= 0.90`)
+  - Official player `ENDED` event (`onEnded`) triggering instant progress flush with `{ isEnded: true }`
+* **Completion Immutability**:
+  - Once `completed = true`, the video remains completed permanently for that user/video even if rewound or replayed to $<90\%$
+  - `completedAt` timestamp is set once upon completion and never overwritten
+* **Server-Authoritative Validation**:
+  - Server evaluates watch time against video duration and sets `completed` & `completedAt`
+* **Unavailable Video Exclusion**:
+  - Course completion denominator excludes unavailable videos (`isAvailable !== false`)
+  - Course marked completed (`courseCompleted = true`) when all available videos are completed
+* **Next Lesson Advancement**:
+  - "Continue Learning" automatically advances to the next incomplete available video in position order
+  - If entire course is finished, "Continue Learning" displays "Course Completed" with review options
+* **Visual Completion Badges**:
+  - `CompletedBadge` component with green checkmark styling
+  - Lesson syllabus shows checkmark badges, emerald progress bar, and "Completed" indicators
+  - Course header & cards display completed lesson counts and "✓ Completed" badges
+
+---
+
+## Phase 7 — Focus Mode
+Status: Complete
+
+Implemented:
+* **Distraction-Free Full-Screen Experience**:
+  - Eliminates all peripheral distractions (navigation bar, footer, search, metadata, secondary sidebars)
+  - Dedicated focus view with enlarged YouTube IFrame player centered in maximum readable viewport (`max-w-5xl`)
+  - Deep dark theme (`bg-gray-950`) designed for extended focus sessions
+* **No Player Remounting Guarantee**:
+  - Seamless toggle between standard course view and Focus Mode without restarting playback, buffering, re-fetching video, or losing player state
+  - Preserves exact YouTube IFrame instance in DOM reconciliation
+* **Compact Header & Syllabus Drawer**:
+  - `FocusModeHeader`: Minimal top bar with `Exit Focus Mode` button, course title, lesson progress stats, and drawer trigger
+  - `FocusSyllabusDrawer`: Slide-over lesson drawer overlay allowing seamless syllabus inspection and lesson switching without leaving Focus Mode
+  - `FocusModeControls`: Streamlined player footer with current lesson indicator, duration, completion badge, and Previous / Next lesson navigation
+* **Keyboard & Fullscreen Controls**:
+  - `Esc` key exits Focus Mode gracefully, intelligently respecting native browser fullscreen first if active
+  - Locks background document scrolling while Focus Mode is active with strict unmount/exit cleanup
+  - URL synchronization via `?focus=true` query parameter using `{ replace: true }` so browser navigation is preserved
+* **Full Phase 0–6 Compatibility**:
+  - Video progress tracking (Phase 5) and automatic completion (Phase 6) remain fully operational during Focus Mode
+  - Seamlessly supported on both Course Detail (`/courses/:courseId`) and dedicated Watch (`/watch/:courseId/:videoId`) routes

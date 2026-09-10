@@ -1,0 +1,206 @@
+import React, { useEffect, useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { X, FileText, Plus, Loader2 } from 'lucide-react';
+import { noteService } from '../../services';
+import { NoteItem } from './NoteItem';
+import { NoteEditor } from './NoteEditor';
+
+interface FocusNotesDrawerProps {
+  isOpen: boolean;
+  onClose: () => void;
+  courseId: string;
+  videoId: string;
+  videoTitle: string;
+  currentPlaybackSeconds?: number;
+  onSeekTo?: (seconds: number) => void;
+}
+
+export const FocusNotesDrawer: React.FC<FocusNotesDrawerProps> = ({
+  isOpen,
+  onClose,
+  courseId,
+  videoId,
+  videoTitle,
+  currentPlaybackSeconds = 0,
+  onSeekTo,
+}) => {
+  const queryClient = useQueryClient();
+  const [isAddingNote, setIsAddingNote] = useState(false);
+
+  // Close drawer on Escape
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.stopPropagation();
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
+
+  const { data, isLoading } = useQuery({
+    queryKey: ['notes', videoId],
+    queryFn: () => noteService.getVideoNotes(videoId),
+    enabled: isOpen && Boolean(videoId),
+  });
+
+  const notes = data?.notes || [];
+
+  const createMutation = useMutation({
+    mutationFn: (payload: { content: string; timestampSeconds: number | null }) =>
+      noteService.createNote({
+        courseId,
+        videoId,
+        content: payload.content,
+        timestampSeconds: payload.timestampSeconds,
+      }),
+    onSuccess: () => {
+      setIsAddingNote(false);
+      queryClient.invalidateQueries({ queryKey: ['notes', videoId] });
+      queryClient.invalidateQueries({ queryKey: ['all-notes'] });
+    },
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: ({
+      noteId,
+      content,
+      timestampSeconds,
+    }: {
+      noteId: string;
+      content: string;
+      timestampSeconds: number | null;
+    }) =>
+      noteService.updateNote(noteId, {
+        content,
+        timestampSeconds,
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['notes', videoId] });
+      queryClient.invalidateQueries({ queryKey: ['all-notes'] });
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (noteId: string) => noteService.deleteNote(noteId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['notes', videoId] });
+      queryClient.invalidateQueries({ queryKey: ['all-notes'] });
+    },
+  });
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 overflow-hidden">
+      {/* Backdrop */}
+      <div
+        className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
+        onClick={onClose}
+      />
+
+      <div className="fixed inset-y-0 right-0 flex max-w-full pl-10">
+        <aside
+          role="dialog"
+          aria-label="Focus Mode Lesson Notes"
+          className="w-screen max-w-md bg-gray-900 border-l border-gray-800 shadow-2xl flex flex-col"
+        >
+          {/* Drawer Header */}
+          <div className="flex items-center justify-between border-b border-gray-800 p-4">
+            <div className="flex items-center gap-2 min-w-0 pr-2">
+              <FileText className="h-5 w-5 text-red-400 shrink-0" />
+              <div className="min-w-0">
+                <h3 className="text-sm font-bold text-white truncate">
+                  Notes ({notes.length})
+                </h3>
+                <p className="text-xs text-gray-400 truncate">{videoTitle}</p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2">
+              {!isAddingNote && (
+                <button
+                  type="button"
+                  onClick={() => setIsAddingNote(true)}
+                  className="inline-flex items-center gap-1 rounded-lg bg-red-600 px-2.5 py-1 text-xs font-semibold text-white hover:bg-red-500"
+                >
+                  <Plus className="h-3 w-3" />
+                  <span>Add</span>
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={onClose}
+                className="rounded-lg p-1.5 text-gray-400 hover:bg-gray-800 hover:text-white"
+                aria-label="Close notes drawer"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+          </div>
+
+          {/* Drawer Body */}
+          <div className="flex-1 overflow-y-auto p-4 space-y-4">
+            {isAddingNote && (
+              <NoteEditor
+                currentPlaybackSeconds={currentPlaybackSeconds}
+                isSubmitting={createMutation.isPending}
+                onSubmit={async (content, timestampSeconds) => {
+                  await createMutation.mutateAsync({ content, timestampSeconds });
+                }}
+                onCancel={() => setIsAddingNote(false)}
+              />
+            )}
+
+            {isLoading ? (
+              <div className="flex items-center justify-center py-10 text-xs text-gray-500">
+                <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                Loading notes...
+              </div>
+            ) : notes.length === 0 ? (
+              <div className="rounded-xl border border-dashed border-gray-800 p-8 text-center space-y-2">
+                <p className="text-xs text-gray-400">No notes for this lesson yet.</p>
+                {!isAddingNote && (
+                  <button
+                    type="button"
+                    onClick={() => setIsAddingNote(true)}
+                    className="inline-flex items-center gap-1.5 text-xs font-semibold text-red-400 hover:text-red-300"
+                  >
+                    <Plus className="h-3.5 w-3.5" />
+                    <span>Add your first note</span>
+                  </button>
+                )}
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {notes.map((note) => (
+                  <NoteItem
+                    key={note._id}
+                    note={note}
+                    onSeekTo={(seconds) => {
+                      if (onSeekTo) {
+                        onSeekTo(seconds);
+                      }
+                    }}
+                    onUpdate={async (noteId, content, timestampSeconds) => {
+                      await updateMutation.mutateAsync({
+                        noteId,
+                        content,
+                        timestampSeconds,
+                      });
+                    }}
+                    onDelete={async (noteId) => {
+                      await deleteMutation.mutateAsync(noteId);
+                    }}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+        </aside>
+      </div>
+    </div>
+  );
+};

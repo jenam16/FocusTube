@@ -1,12 +1,14 @@
-import { PlaySquare, CheckCircle2, AlertCircle, Play } from 'lucide-react';
+import { PlaySquare, CheckCircle2, AlertCircle, Play, Bookmark } from 'lucide-react';
 import { VideoItem, VideoProgress } from '../../types';
 import { formatLessonNumber, formatVideoDuration } from '../../utils';
+import { CompletedBadge } from '../CompletedBadge';
 
 interface LessonItemProps {
   courseId: string;
   video: VideoItem;
   progress?: VideoProgress;
   isSelected?: boolean;
+  isBookmarked?: boolean;
   onSelect?: (video: VideoItem) => void;
 }
 
@@ -14,6 +16,7 @@ export const LessonItem = ({
   video,
   progress,
   isSelected = false,
+  isBookmarked = false,
   onSelect,
 }: LessonItemProps) => {
 
@@ -43,11 +46,15 @@ export const LessonItem = ({
             ? 'bg-gray-800 text-gray-500'
             : isSelected
               ? 'bg-red-600 text-white shadow-md shadow-red-600/30'
-              : 'bg-gray-800 text-gray-400 group-hover:bg-gray-700 group-hover:text-white'
+              : progress?.completed
+                ? 'bg-emerald-950/80 text-emerald-400 border border-emerald-700/50'
+                : 'bg-gray-800 text-gray-400 group-hover:bg-gray-700 group-hover:text-white'
         }`}
       >
         {isSelected ? (
           <Play className="h-3.5 w-3.5 fill-current" />
+        ) : progress?.completed ? (
+          <CheckCircle2 className="h-4 w-4 text-emerald-400" />
         ) : (
           formatLessonNumber(video.position)
         )}
@@ -75,11 +82,15 @@ export const LessonItem = ({
           </div>
         )}
         {/* Playback progress bar at bottom of thumbnail */}
-        {progress && progress.progressPercentage > 0 && (
+        {progress && (progress.progressPercentage > 0 || progress.completed) && (
           <div className="absolute bottom-0 left-0 right-0 h-1 bg-gray-800/80">
             <div
-              className="h-full bg-red-600 transition-all duration-300"
-              style={{ width: `${Math.min(100, Math.max(0, progress.progressPercentage))}%` }}
+              className={`h-full transition-all duration-300 ${
+                progress.completed ? 'bg-emerald-500' : 'bg-red-600'
+              }`}
+              style={{
+                width: `${progress.completed ? 100 : Math.min(100, Math.max(0, progress.progressPercentage))}%`,
+              }}
             />
           </div>
         )}
@@ -102,18 +113,25 @@ export const LessonItem = ({
           {video.durationSeconds > 0 && (
             <span>{formatVideoDuration(video.durationSeconds)}</span>
           )}
-          {progress && progress.progressPercentage > 0 && (
+          {progress?.completed ? (
+            <>
+              <span className="text-gray-600">•</span>
+              <span className="text-emerald-400 font-semibold inline-flex items-center gap-1">
+                <CheckCircle2 className="h-3 w-3" />
+                Completed
+              </span>
+            </>
+          ) : progress && progress.progressPercentage > 0 ? (
             <>
               <span className="text-gray-600">•</span>
               <span className="text-red-400 font-medium">
                 {progress.progressPercentage}% watched
               </span>
             </>
-          )}
+          ) : null}
           <span className="text-gray-600">•</span>
           {isAvailable ? (
-            <span className="inline-flex items-center gap-1 text-[11px] text-emerald-400">
-              <CheckCircle2 className="h-3 w-3" />
+            <span className="inline-flex items-center gap-1 text-[11px] text-gray-400">
               <span>Available</span>
             </span>
           ) : (
@@ -125,13 +143,23 @@ export const LessonItem = ({
         </div>
       </div>
 
-      {/* Selected Indicator */}
-      {isSelected && (
-        <span className="hidden sm:inline-flex items-center rounded-full bg-red-600/20 px-2 py-0.5 text-[10px] font-semibold text-red-400 border border-red-500/30">
-          Playing
-        </span>
-      )}
-
+      {/* Badges */}
+      <div className="flex items-center gap-1.5 shrink-0">
+        {isBookmarked && (
+          <Bookmark
+            className="h-3.5 w-3.5 fill-amber-400 text-amber-400"
+            aria-label="Bookmarked lesson"
+          />
+        )}
+        {progress?.completed && !isSelected && (
+          <CompletedBadge size="xs" />
+        )}
+        {isSelected && (
+          <span className="inline-flex items-center rounded-full bg-red-600/20 px-2 py-0.5 text-[10px] font-semibold text-red-400 border border-red-500/30">
+            Playing
+          </span>
+        )}
+      </div>
     </div>
   );
 

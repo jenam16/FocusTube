@@ -3,6 +3,10 @@ import authRoutes from './authRoutes.js';
 import userRoutes from './userRoutes.js';
 import courseRoutes from './courseRoutes.js';
 import progressRoutes from './progressRoutes.js';
+import taskRoutes from './taskRoutes.js';
+import analyticsRoutes from './analyticsRoutes.js';
+import noteRoutes from './noteRoutes.js';
+import bookmarkRoutes from './bookmarkRoutes.js';
 
 const router = Router();
 
@@ -17,6 +21,11 @@ router.use('/auth', authRoutes);
 router.use('/users', userRoutes);
 router.use('/courses', courseRoutes);
 router.use('/progress', progressRoutes);
+router.use('/tasks', taskRoutes);
+router.use('/analytics', analyticsRoutes);
+router.use('/notes', noteRoutes);
+router.use('/bookmarks', bookmarkRoutes);
 
 export default router;
+
 

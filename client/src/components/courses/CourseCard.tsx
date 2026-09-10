@@ -3,13 +3,15 @@ import { PlaySquare, Clock, Video, User, ArrowRight } from 'lucide-react';
 import { Course } from '../../types';
 import { formatDuration } from '../../utils';
 import { ProgressBar } from '../ProgressBar';
+import { CompletedBadge } from '../CompletedBadge';
 
 interface CourseCardProps {
   course: Course;
 }
 
 export const CourseCard = ({ course }: CourseCardProps) => {
-  const progress = course.progressPercentage || 0;
+  const progress = Math.min(100, Math.max(0, Math.round(course.progressPercentage || 0)));
+  const isCompleted = progress >= 100;
 
   return (
     <div className="group flex flex-col overflow-hidden rounded-2xl border border-gray-800 bg-gray-900/60 transition-all duration-200 hover:-translate-y-1 hover:border-gray-700 hover:shadow-xl hover:shadow-red-600/5">
@@ -29,6 +31,13 @@ export const CourseCard = ({ course }: CourseCardProps) => {
         ) : (
           <div className="flex h-full w-full items-center justify-center bg-gray-900 text-gray-600">
             <PlaySquare className="h-12 w-12" />
+          </div>
+        )}
+
+        {/* Completed Badge Top-Left Overlay */}
+        {isCompleted && (
+          <div className="absolute top-2.5 left-2.5">
+            <CompletedBadge size="xs" />
           </div>
         )}
 
@@ -79,8 +88,12 @@ export const CourseCard = ({ course }: CourseCardProps) => {
         <div className="mt-4 pt-3 border-t border-gray-800/80">
           <div className="mb-1.5 flex items-center justify-between text-xs text-gray-400">
             <span>Progress</span>
-            <span className="font-semibold text-gray-300">
-              {progress}% complete
+            <span
+              className={`font-semibold ${
+                isCompleted ? 'text-emerald-400' : 'text-gray-300'
+              }`}
+            >
+              {isCompleted ? '✓ Completed' : `${progress}% complete`}
             </span>
           </div>
           <ProgressBar progress={progress} size="sm" />

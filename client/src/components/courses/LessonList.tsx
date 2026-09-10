@@ -7,6 +7,7 @@ interface LessonListProps {
   courseId: string;
   videos: VideoItem[];
   progressMap?: Record<string, VideoProgress>;
+  bookmarkedVideoIds?: string[];
   activeVideoId?: string;
   onSelectVideo?: (video: VideoItem) => void;
   maxHeightClass?: string;
@@ -16,6 +17,7 @@ export const LessonList = ({
   courseId,
   videos,
   progressMap,
+  bookmarkedVideoIds,
   activeVideoId,
   onSelectVideo,
   maxHeightClass = '',
@@ -25,6 +27,23 @@ export const LessonList = ({
   const sortedVideos = useMemo(() => {
     return [...videos].sort((a, b) => a.position - b.position);
   }, [videos]);
+
+  const { completedCount, availableCount } = useMemo(() => {
+    let completed = 0;
+    let available = 0;
+    for (const v of sortedVideos) {
+      if (v.isAvailable !== false) {
+        available++;
+        const p = progressMap
+          ? progressMap[v._id] || progressMap[v.youtubeVideoId]
+          : undefined;
+        if (p?.completed) {
+          completed++;
+        }
+      }
+    }
+    return { completedCount: completed, availableCount: available };
+  }, [sortedVideos, progressMap]);
 
   if (sortedVideos.length === 0) {
     return (
@@ -42,10 +61,18 @@ export const LessonList = ({
           <BookOpen className="h-4 w-4 text-red-400" />
           <h3 className="text-base font-bold text-white">Course Syllabus</h3>
         </div>
-        <span className="text-xs text-gray-400">
-          {sortedVideos.length}{' '}
-          {sortedVideos.length === 1 ? 'Lesson' : 'Lessons'}
-        </span>
+        <div className="flex items-center gap-2 text-xs text-gray-400">
+          {completedCount > 0 && (
+            <span className="text-emerald-400 font-medium">
+              {completedCount}/{availableCount} completed
+            </span>
+          )}
+          {completedCount > 0 && <span>•</span>}
+          <span>
+            {sortedVideos.length}{' '}
+            {sortedVideos.length === 1 ? 'Lesson' : 'Lessons'}
+          </span>
+        </div>
       </div>
 
       {/* Lesson List Container */}
@@ -63,6 +90,7 @@ export const LessonList = ({
                 : undefined
             }
             isSelected={video._id === activeVideoId}
+            isBookmarked={bookmarkedVideoIds?.includes(video._id)}
             onSelect={onSelectVideo}
           />
         ))}
