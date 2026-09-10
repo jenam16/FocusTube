@@ -1,11 +1,12 @@
 import { useMemo } from 'react';
 import { BookOpen } from 'lucide-react';
-import { VideoItem } from '../../types';
+import { VideoItem, VideoProgress } from '../../types';
 import { LessonItem } from './LessonItem';
 
 interface LessonListProps {
   courseId: string;
   videos: VideoItem[];
+  progressMap?: Record<string, VideoProgress>;
   activeVideoId?: string;
   onSelectVideo?: (video: VideoItem) => void;
   maxHeightClass?: string;
@@ -14,10 +15,12 @@ interface LessonListProps {
 export const LessonList = ({
   courseId,
   videos,
+  progressMap,
   activeVideoId,
   onSelectVideo,
   maxHeightClass = '',
 }: LessonListProps) => {
+
   // Sort strictly by position ASC
   const sortedVideos = useMemo(() => {
     return [...videos].sort((a, b) => a.position - b.position);
@@ -54,10 +57,16 @@ export const LessonList = ({
             key={video._id}
             courseId={courseId}
             video={video}
+            progress={
+              progressMap
+                ? progressMap[video._id] || progressMap[video.youtubeVideoId]
+                : undefined
+            }
             isSelected={video._id === activeVideoId}
             onSelect={onSelectVideo}
           />
         ))}
+
       </div>
     </div>
   );

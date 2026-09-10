@@ -1,19 +1,22 @@
 import { PlaySquare, CheckCircle2, AlertCircle, Play } from 'lucide-react';
-import { VideoItem } from '../../types';
+import { VideoItem, VideoProgress } from '../../types';
 import { formatLessonNumber, formatVideoDuration } from '../../utils';
 
 interface LessonItemProps {
   courseId: string;
   video: VideoItem;
+  progress?: VideoProgress;
   isSelected?: boolean;
   onSelect?: (video: VideoItem) => void;
 }
 
 export const LessonItem = ({
   video,
+  progress,
   isSelected = false,
   onSelect,
 }: LessonItemProps) => {
+
   const isAvailable = video.isAvailable !== false;
 
   const handleClick = () => {
@@ -71,6 +74,15 @@ export const LessonItem = ({
             {formatVideoDuration(video.durationSeconds)}
           </div>
         )}
+        {/* Playback progress bar at bottom of thumbnail */}
+        {progress && progress.progressPercentage > 0 && (
+          <div className="absolute bottom-0 left-0 right-0 h-1 bg-gray-800/80">
+            <div
+              className="h-full bg-red-600 transition-all duration-300"
+              style={{ width: `${Math.min(100, Math.max(0, progress.progressPercentage))}%` }}
+            />
+          </div>
+        )}
       </div>
 
       {/* Title & Availability */}
@@ -86,10 +98,19 @@ export const LessonItem = ({
         >
           {video.title}
         </h4>
-        <div className="mt-1 flex items-center gap-2.5 text-[11px] text-gray-400">
+        <div className="mt-1 flex flex-wrap items-center gap-2 text-[11px] text-gray-400">
           {video.durationSeconds > 0 && (
             <span>{formatVideoDuration(video.durationSeconds)}</span>
           )}
+          {progress && progress.progressPercentage > 0 && (
+            <>
+              <span className="text-gray-600">•</span>
+              <span className="text-red-400 font-medium">
+                {progress.progressPercentage}% watched
+              </span>
+            </>
+          )}
+          <span className="text-gray-600">•</span>
           {isAvailable ? (
             <span className="inline-flex items-center gap-1 text-[11px] text-emerald-400">
               <CheckCircle2 className="h-3 w-3" />
@@ -110,6 +131,7 @@ export const LessonItem = ({
           Playing
         </span>
       )}
+
     </div>
   );
 

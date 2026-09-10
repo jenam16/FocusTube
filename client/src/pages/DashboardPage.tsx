@@ -8,17 +8,20 @@ import {
   Clock,
   Sparkles,
   ArrowRight,
+  Play,
 } from 'lucide-react';
 import { useAuth } from '../hooks';
-import { courseService } from '../services';
+import { courseService, progressService } from '../services';
 import {
   CourseCard,
   ImportCourseModal,
   EmptyState,
   LoadingState,
   ErrorState,
+  ProgressBar,
 } from '../components';
-import { formatDuration } from '../utils';
+import { formatDuration, formatLessonNumber, formatVideoDuration, formatTimeAgo } from '../utils';
+
 
 export const DashboardPage = () => {
   const { user } = useAuth();
@@ -30,7 +33,14 @@ export const DashboardPage = () => {
     queryFn: courseService.getCourses,
   });
 
+  const { data: recentData } = useQuery({
+    queryKey: ['recent-progress'],
+    queryFn: progressService.getRecentProgress,
+  });
+
+  const recent = recentData?.recent;
   const courses = data?.courses || [];
+
   const courseCount = courses.length;
 
   const totalVideosCount = courses.reduce(
@@ -126,8 +136,101 @@ export const DashboardPage = () => {
             </div>
           </div>
 
+          {/* Continue Learning Card */}
+          {recent && recent.course && recent.video && (
+            <div className="overflow-hidden rounded-2xl border border-red-500/30 bg-gradient-to-br from-red-950/20 via-gray-900/80 to-gray-900/40 p-5 sm:p-6 backdrop-blur-md shadow-xl">
+              <div className="flex flex-col gap-5 sm:gap-6 lg:flex-row lg:items-center lg:justify-between">
+                {/* Thumbnail */}
+                <Link
+                  to={`/watch/${recent.course._id}/${recent.video._id}`}
+                  className="group/thumb relative aspect-video w-full shrink-0 overflow-hidden rounded-xl border border-gray-800 bg-gray-950 sm:w-72 lg:w-80 shadow-md block"
+                >
+                  {recent.video.thumbnail || recent.course.thumbnail ? (
+                    <img
+                      src={recent.video.thumbnail || recent.course.thumbnail}
+                      alt={recent.video.title}
+                      className="h-full w-full object-cover transition-transform duration-300 group-hover/thumb:scale-105"
+                    />
+                  ) : (
+                    <div className="flex h-full w-full items-center justify-center bg-gray-900 text-gray-600">
+                      <Play className="h-10 w-10" />
+                    </div>
+                  )}
+                  {/* Play overlay */}
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover/thumb:opacity-100 transition-opacity">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-red-600 text-white shadow-lg shadow-red-600/50">
+                      <Play className="h-5 w-5 fill-current ml-0.5" />
+                    </div>
+                  </div>
+                  {/* Bottom progress bar */}
+                  <div className="absolute bottom-0 left-0 right-0 h-1.5 bg-gray-800">
+                    <div
+                      className="h-full bg-red-600 transition-all duration-300"
+                      style={{
+                        width: `${Math.min(100, Math.max(0, recent.progressPercentage))}%`,
+                      }}
+                    />
+                  </div>
+                </Link>
+
+                {/* Details */}
+                <div className="flex-1 min-w-0 space-y-3">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="inline-flex items-center gap-1 rounded-full bg-red-500/10 px-2.5 py-0.5 text-xs font-semibold text-red-400 border border-red-500/20">
+                      <Play className="h-3 w-3 fill-current" />
+                      Continue Learning
+                    </span>
+                    {recent.lastWatchedAt && (
+                      <span className="text-xs text-gray-500">
+                        Last watched {formatTimeAgo(recent.lastWatchedAt)}
+                      </span>
+                    )}
+                  </div>
+
+                  <div>
+                    <p className="text-xs font-medium text-gray-400 truncate">
+                      {recent.course.title}
+                    </p>
+                    <Link
+                      to={`/watch/${recent.course._id}/${recent.video._id}`}
+                      className="mt-1 block focus:outline-none"
+                    >
+                      <h3 className="line-clamp-2 text-base sm:text-lg font-bold text-white hover:text-red-400 transition-colors">
+                        {formatLessonNumber(recent.video.position)} — {recent.video.title}
+                      </h3>
+                    </Link>
+                  </div>
+
+                  <div className="space-y-1.5 max-w-md">
+                    <div className="flex items-center justify-between text-xs text-gray-400">
+                      <span>{recent.progressPercentage}% watched</span>
+                      {recent.durationSeconds > 0 && (
+                        <span>
+                          {formatVideoDuration(recent.watchedSeconds)} / {formatVideoDuration(recent.durationSeconds)}
+                        </span>
+                      )}
+                    </div>
+                    <ProgressBar progress={recent.progressPercentage} size="sm" />
+                  </div>
+                </div>
+
+                {/* Action button */}
+                <div className="shrink-0 flex items-center pt-2 sm:pt-0">
+                  <Link
+                    to={`/watch/${recent.course._id}/${recent.video._id}`}
+                    className="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-xl bg-red-600 px-5 py-3 text-xs sm:text-sm font-semibold text-white shadow-lg shadow-red-600/30 transition-all hover:bg-red-500 hover:shadow-red-600/45"
+                  >
+                    <Play className="h-4 w-4 fill-current" />
+                    <span>Resume Lesson</span>
+                  </Link>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Dashboard Course Preview Section (Section 16) */}
           <div className="space-y-4">
+
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Sparkles className="h-4 w-4 text-red-400" />

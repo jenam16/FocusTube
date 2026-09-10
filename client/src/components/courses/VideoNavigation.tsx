@@ -1,11 +1,12 @@
 import { ChevronLeft, ChevronRight, Maximize, Minimize } from 'lucide-react';
-import { VideoItem } from '../../types';
+import { VideoItem, VideoProgress } from '../../types';
 import { formatLessonNumber, formatVideoDuration } from '../../utils';
 
 interface VideoNavigationProps {
   currentVideo: VideoItem;
   currentIndex: number;
   totalVideos: number;
+  progress?: VideoProgress;
   hasPrevious: boolean;
   hasNext: boolean;
   onPrevious: () => void;
@@ -18,6 +19,7 @@ export const VideoNavigation = ({
   currentVideo,
   currentIndex,
   totalVideos,
+  progress,
   hasPrevious,
   hasNext,
   onPrevious,
@@ -25,12 +27,13 @@ export const VideoNavigation = ({
   isTheaterMode = false,
   onToggleTheater,
 }: VideoNavigationProps) => {
+
   return (
     <div className="space-y-4">
       {/* Current Watching Header */}
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between border-b border-gray-800/80 pb-3">
         <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-red-400">
+          <div className="flex flex-wrap items-center gap-2 text-xs font-semibold uppercase tracking-wider text-red-400">
             <span>Currently watching</span>
             <span className="text-gray-600">•</span>
             <span className="text-gray-400">
@@ -44,7 +47,16 @@ export const VideoNavigation = ({
                 </span>
               </>
             )}
+            {progress && progress.progressPercentage > 0 && (
+              <>
+                <span className="text-gray-600">•</span>
+                <span className="text-red-400 font-semibold lowercase">
+                  {progress.progressPercentage}% watched
+                </span>
+              </>
+            )}
           </div>
+
           <h2 className="mt-1 line-clamp-2 text-lg font-bold text-white sm:text-xl">
             {formatLessonNumber(currentVideo.position)} — {currentVideo.title}
           </h2>

@@ -9,13 +9,19 @@ import {
 } from 'lucide-react';
 
 export interface YTPlayerInstance {
-  loadVideoById: (id: string) => void;
-  cueVideoById: (id: string) => void;
+  loadVideoById: (
+    args: string | { videoId: string; startSeconds?: number }
+  ) => void;
+  cueVideoById: (
+    args: string | { videoId: string; startSeconds?: number }
+  ) => void;
   destroy: () => void;
   playVideo?: () => void;
   pauseVideo?: () => void;
+  seekTo?: (seconds: number, allowSeekAhead?: boolean) => void;
   getCurrentTime?: () => number;
   getDuration?: () => number;
+  getPlayerState?: () => number;
 }
 
 export interface YTPlayerEvent {
@@ -26,12 +32,15 @@ export interface YTPlayerEvent {
 interface YouTubePlayerProps {
   videoId: string;
   title?: string;
+  initialSeconds?: number;
   isTheaterMode?: boolean;
   onToggleTheater?: () => void;
   onReady?: (player: YTPlayerInstance) => void;
   onStateChange?: (event: YTPlayerEvent) => void;
+  onProgress?: (currentTime: number, duration: number) => void;
   onError?: (event: YTPlayerEvent) => void;
 }
+
 
 interface YTNamespace {
   Player: new (
@@ -101,10 +110,12 @@ const loadYouTubeIframeApi = (callback: () => void) => {
 export const YouTubePlayer = ({
   videoId,
   title,
+  initialSeconds = 0,
   isTheaterMode = false,
   onToggleTheater,
   onReady,
   onStateChange,
+  onProgress,
   onError,
 }: YouTubePlayerProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -115,6 +126,65 @@ export const YouTubePlayer = ({
   const [hasError, setHasError] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
+
+  const progressTimerRef = useRef<number | null>(null);
+  const hasResumedRef = useRef(false);
+
+  const onProgressRef = useRef(onProgress);
+  const onStateChangeRef = useRef(onStateChange);
+  const onReadyRef = useRef(onReady);
+  const onErrorRef = useRef(onError);
+
+  useEffect(() => {
+    onProgressRef.current = onProgress;
+    onStateChangeRef.current = onStateChange;
+    onReadyRef.current = onReady;
+    onErrorRef.current = onError;
+  }, [onProgress, onStateChange, onReady, onError]);
+
+
+  // Reset resume guard whenever videoId changes
+  useEffect(() => {
+    hasResumedRef.current = false;
+  }, [videoId]);
+
+  const clearProgressTimer = useCallback(() => {
+    if (progressTimerRef.current !== null) {
+      window.clearInterval(progressTimerRef.current);
+      progressTimerRef.current = null;
+    }
+  }, []);
+
+  const reportProgress = useCallback(() => {
+    if (!playerInstanceRef.current || !onProgressRef.current) return;
+    try {
+      const currentTime = playerInstanceRef.current.getCurrentTime
+        ? playerInstanceRef.current.getCurrentTime()
+        : 0;
+      const duration = playerInstanceRef.current.getDuration
+        ? playerInstanceRef.current.getDuration()
+        : 0;
+      if (
+        typeof currentTime === 'number' &&
+        !isNaN(currentTime) &&
+        typeof duration === 'number' &&
+        !isNaN(duration)
+      ) {
+        onProgressRef.current(currentTime, duration);
+      }
+    } catch {
+      // Player might be unready or destroying
+    }
+  }, []);
+
+  const startProgressTimer = useCallback(() => {
+    clearProgressTimer();
+    reportProgress();
+    // Report progress periodically every 2.5 seconds while playing
+    progressTimerRef.current = window.setInterval(() => {
+      reportProgress();
+    }, 2500);
+  }, [clearProgressTimer, reportProgress]);
 
   // Monitor browser fullscreen state
   useEffect(() => {
@@ -140,6 +210,47 @@ export const YouTubePlayer = ({
     }
   }, []);
 
+  const handlePlayerStateChange = useCallback(
+    (event: YTPlayerEvent) => {
+      const state = event.data;
+      const YT = window.YT;
+
+      // Check if resume seek is needed when video starts playing or buffering
+      if (
+        YT &&
+        (state === YT.PlayerState.PLAYING || state === YT.PlayerState.BUFFERING) &&
+        !hasResumedRef.current &&
+        initialSeconds > 2
+      ) {
+        hasResumedRef.current = true;
+        try {
+          if (typeof event.target.seekTo === 'function') {
+            event.target.seekTo(initialSeconds, true);
+          }
+        } catch {
+          // ignore
+        }
+      }
+
+      if (YT && state === YT.PlayerState.PLAYING) {
+        startProgressTimer();
+      } else if (
+        YT &&
+        (state === YT.PlayerState.PAUSED || state === YT.PlayerState.ENDED)
+      ) {
+        clearProgressTimer();
+        reportProgress();
+      } else {
+        clearProgressTimer();
+      }
+
+      if (onStateChangeRef.current) {
+        onStateChangeRef.current(event);
+      }
+    },
+    [initialSeconds, startProgressTimer, clearProgressTimer, reportProgress]
+  );
+
   // Initialize or update player
   const initPlayer = useCallback(() => {
     if (!videoId || !playerElementRef.current) return;
@@ -151,13 +262,19 @@ export const YouTubePlayer = ({
     loadYouTubeIframeApi(() => {
       if (!playerElementRef.current) return;
 
+      const startSec = initialSeconds > 2 ? Math.floor(initialSeconds) : 0;
+
       // If player instance exists, load the new video instead of recreating
       if (
         playerInstanceRef.current &&
         typeof playerInstanceRef.current.loadVideoById === 'function'
       ) {
         try {
-          playerInstanceRef.current.loadVideoById(videoId);
+          playerInstanceRef.current.loadVideoById({
+            videoId,
+            startSeconds: startSec,
+          });
+          hasResumedRef.current = startSec > 0;
           setIsLoading(false);
           return;
         } catch (e: unknown) {
@@ -185,16 +302,25 @@ export const YouTubePlayer = ({
               origin: window.location.origin,
               fs: 1,
               playsinline: 1,
+              start: startSec,
             },
             events: {
               onReady: (event: YTPlayerEvent) => {
                 setIsLoading(false);
                 setHasError(false);
-                if (onReady) onReady(event.target);
+                if (startSec > 0 && !hasResumedRef.current) {
+                  hasResumedRef.current = true;
+                  try {
+                    if (typeof event.target.seekTo === 'function') {
+                      event.target.seekTo(startSec, true);
+                    }
+                  } catch {
+                    // ignore
+                  }
+                }
+                if (onReadyRef.current) onReadyRef.current(event.target);
               },
-              onStateChange: (event: YTPlayerEvent) => {
-                if (onStateChange) onStateChange(event);
-              },
+              onStateChange: handlePlayerStateChange,
               onError: (event: YTPlayerEvent) => {
                 setIsLoading(false);
                 setHasError(true);
@@ -210,7 +336,7 @@ export const YouTubePlayer = ({
                   msg = 'Invalid video parameters.';
                 }
                 setErrorMessage(msg);
-                if (onError) onError(event);
+                if (onErrorRef.current) onErrorRef.current(event);
               },
             },
           }
@@ -222,7 +348,7 @@ export const YouTubePlayer = ({
         setErrorMessage('Failed to initialize video player.');
       }
     });
-  }, [videoId, onReady, onStateChange, onError]);
+  }, [videoId, initialSeconds, handlePlayerStateChange]);
 
   // Trigger init / update when videoId changes
   useEffect(() => {
@@ -232,6 +358,8 @@ export const YouTubePlayer = ({
   // Clean up on unmount
   useEffect(() => {
     return () => {
+      clearProgressTimer();
+      reportProgress();
       if (playerInstanceRef.current) {
         try {
           playerInstanceRef.current.destroy();
@@ -241,7 +369,8 @@ export const YouTubePlayer = ({
         playerInstanceRef.current = null;
       }
     };
-  }, []);
+  }, [clearProgressTimer, reportProgress]);
+
 
   return (
     <div

@@ -1,9 +1,9 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import { useParams, useSearchParams, Link } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { ArrowLeft, AlertCircle } from 'lucide-react';
-import { courseService } from '../services';
-import { VideoItem } from '../types';
+import { courseService, progressService } from '../services';
+import { VideoItem, VideoProgress } from '../types';
 import {
   YouTubePlayer,
   CourseHeader,
@@ -23,17 +23,57 @@ export const CourseDetailPage = () => {
   const params = useParams<{ courseId?: string; id?: string }>();
   const [searchParams, setSearchParams] = useSearchParams();
   const courseId = params.courseId || params.id;
+  const queryClient = useQueryClient();
 
   const [selectedVideoId, setSelectedVideoId] = useState<string | null>(null);
   const [isTheaterMode, setIsTheaterMode] = useState(false);
 
+  // Fetch course details & syllabus
   const { data, isLoading, error, refetch, isRefetching } = useQuery({
     queryKey: ['course', courseId],
     queryFn: () => courseService.getCourseById(courseId!),
     enabled: !!courseId,
   });
 
+  // Fetch course-level video progress
+  const { data: progressData } = useQuery({
+    queryKey: ['course-progress', courseId],
+    queryFn: () => progressService.getCourseProgress(courseId!),
+    enabled: !!courseId,
+  });
+
+  // Local optimistic progress cache for real-time UI feedback
+  const [optimisticProgressMap, setOptimisticProgressMap] = useState<
+    Record<string, VideoProgress>
+  >({});
+
+  // Combine server progress data with local optimistic updates
+  const localProgressMap = useMemo(() => {
+    const map: Record<string, VideoProgress> = {};
+    if (progressData?.progress) {
+      for (const p of progressData.progress) {
+        map[p.video] = p;
+      }
+    }
+    return { ...map, ...optimisticProgressMap };
+  }, [progressData, optimisticProgressMap]);
+
+
+
   const course = data?.course;
+
+  // Compute effective course with live progress percentage
+  const effectiveCourse = useMemo(() => {
+    if (!course) return course;
+    const progressPct =
+      progressData?.courseProgressPercentage !== undefined
+        ? progressData.courseProgressPercentage
+        : course.progressPercentage;
+    return {
+      ...course,
+      progressPercentage: progressPct,
+    };
+  }, [course, progressData?.courseProgressPercentage]);
 
   // Sort strictly by position ASC
   const sortedVideos = useMemo(() => {
@@ -61,15 +101,135 @@ export const CourseDetailPage = () => {
     return getFirstPlayableVideo(sortedVideos);
   }, [sortedVideos, searchParams, selectedVideoId]);
 
-  // Handle user explicitly selecting a video
+  // Current video progress
+  const currentVideoProgress = currentVideo
+    ? localProgressMap[currentVideo._id]
+    : undefined;
+
+  // Calculate resume start seconds: skip if <= 2s or >= duration - 5s
+  const initialSeconds = useMemo(() => {
+    if (!currentVideoProgress) return 0;
+    const watched = currentVideoProgress.watchedSeconds || 0;
+    const duration =
+      currentVideoProgress.durationSeconds ||
+      currentVideo?.durationSeconds ||
+      0;
+    if (watched <= 2) return 0;
+    if (duration > 0 && watched >= duration - 5) return 0;
+    return Math.floor(watched);
+  }, [currentVideoProgress, currentVideo?.durationSeconds]);
+
+  // Ref tracking latest playback position for throttled syncing & unmount flush
+  const latestPlaybackRef = useRef<{
+    videoId: string;
+    courseId: string;
+    currentTime: number;
+    duration: number;
+    lastSavedAt: number;
+  }>({
+    videoId: '',
+    courseId: '',
+    currentTime: 0,
+    duration: 0,
+    lastSavedAt: 0,
+  });
+
+  // Flush progress to backend
+  const flushProgress = useCallback(async () => {
+    const { videoId, courseId: cId, currentTime, duration } =
+      latestPlaybackRef.current;
+    if (!videoId || !cId || currentTime <= 0) return;
+
+    try {
+      const res = await progressService.updateVideoProgress(videoId, {
+        courseId: cId,
+        watchedSeconds: currentTime,
+        durationSeconds: duration,
+      });
+
+      setOptimisticProgressMap((prev) => ({
+        ...prev,
+        [videoId]: res.progress,
+      }));
+
+      queryClient.invalidateQueries({ queryKey: ['course-progress', cId] });
+      queryClient.invalidateQueries({ queryKey: ['recent-progress'] });
+      queryClient.invalidateQueries({ queryKey: ['courses'] });
+    } catch {
+      // Non-blocking: playback continues seamlessly on sync error
+    }
+  }, [queryClient]);
+
+  // Handle periodic progress updates from YouTubePlayer
+  const handleProgress = useCallback(
+    (currentTime: number, duration: number) => {
+      if (!currentVideo || !course) return;
+
+      const now = Date.now();
+      const prev = latestPlaybackRef.current;
+
+      latestPlaybackRef.current = {
+        videoId: currentVideo._id,
+        courseId: course._id,
+        currentTime,
+        duration,
+        lastSavedAt: prev.lastSavedAt,
+      };
+
+      // Real-time optimistic update of progress percentage
+      const progressPercentage =
+        duration > 0
+          ? Math.min(100, Math.max(0, Math.round((currentTime / duration) * 100)))
+          : 0;
+
+      setOptimisticProgressMap((map) => ({
+        ...map,
+        [currentVideo._id]: {
+          ...(map[currentVideo._id] || {
+            _id: '',
+            user: '',
+            course: course._id,
+            video: currentVideo._id,
+            createdAt: '',
+          }),
+          watchedSeconds: currentTime,
+          durationSeconds: duration,
+          progressPercentage,
+          lastWatchedAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        },
+      }));
+
+      // Periodic sync every 10s or position seek difference > 10s
+      if (
+        prev.videoId !== currentVideo._id ||
+        now - prev.lastSavedAt >= 10000 ||
+        Math.abs(currentTime - prev.currentTime) >= 10
+      ) {
+        latestPlaybackRef.current.lastSavedAt = now;
+        flushProgress();
+      }
+    },
+    [currentVideo, course, flushProgress]
+  );
+
+  // Flush on unmount
+  useEffect(() => {
+    return () => {
+      flushProgress();
+    };
+  }, [flushProgress]);
+
+  // Handle user explicitly selecting a video (flushing current progress first)
   const handleSelectVideo = (video: VideoItem) => {
     if (video.isAvailable === false) {
-      // Unavailable video clicked: do not attempt playback, keep current playable video
       return;
     }
+    flushProgress();
     setSelectedVideoId(video._id);
     setSearchParams({ v: video._id }, { replace: true });
   };
+
 
   // Previous / Next playable video navigation (skipping unavailable videos)
   const previousVideo = useMemo(() => {
@@ -153,8 +313,10 @@ export const CourseDetailPage = () => {
                   key={currentVideo._id}
                   videoId={currentVideo.youtubeVideoId}
                   title={currentVideo.title}
+                  initialSeconds={initialSeconds}
                   isTheaterMode={isTheaterMode}
                   onToggleTheater={() => setIsTheaterMode((prev) => !prev)}
+                  onProgress={handleProgress}
                 />
 
                 {/* Player Navigation and Current Video Info */}
@@ -162,6 +324,7 @@ export const CourseDetailPage = () => {
                   currentVideo={currentVideo}
                   currentIndex={currentVideoIndex >= 0 ? currentVideoIndex : 0}
                   totalVideos={sortedVideos.length}
+                  progress={currentVideoProgress}
                   hasPrevious={Boolean(previousVideo)}
                   hasNext={Boolean(nextVideo)}
                   onPrevious={handlePrevious}
@@ -194,6 +357,7 @@ export const CourseDetailPage = () => {
             <LessonList
               courseId={course._id}
               videos={sortedVideos}
+              progressMap={localProgressMap}
               activeVideoId={currentVideo?._id}
               onSelectVideo={handleSelectVideo}
               maxHeightClass={isTheaterMode ? 'max-h-96' : 'lg:max-h-[620px]'}
@@ -205,10 +369,14 @@ export const CourseDetailPage = () => {
       <hr className="border-gray-800/80 my-8" />
 
       {/* Course Header Banner & Progress */}
-      <CourseHeader course={course} firstVideo={currentVideo || sortedVideos[0]} />
+      <CourseHeader
+        course={effectiveCourse || course}
+        firstVideo={currentVideo || sortedVideos[0]}
+      />
 
       {/* Course Statistics */}
-      <CourseStats course={course} />
+      <CourseStats course={effectiveCourse || course} />
+
     </div>
   );
 };
