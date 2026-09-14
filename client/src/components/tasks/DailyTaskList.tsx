@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   CheckSquare,
@@ -28,7 +29,7 @@ export const DailyTaskList: React.FC<DailyTaskListProps> = ({ compact = false })
 
   const { data, isLoading } = useQuery({
     queryKey: ['tasks'],
-    queryFn: taskService.getTasks,
+    queryFn: () => taskService.getTasks(),
   });
 
   const tasks = data?.tasks || [];
@@ -104,17 +105,17 @@ export const DailyTaskList: React.FC<DailyTaskListProps> = ({ compact = false })
   };
 
   return (
-    <div className="rounded-2xl border border-gray-800 bg-gray-900/40 p-5 space-y-4">
+    <div className="rounded-2xl border border-white/[0.08] bg-[#111827] p-5 space-y-4 shadow-sm">
       {/* Header with Title and Progress */}
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-2">
-          <ListTodo className="h-5 w-5 text-red-400" />
-          <h3 className="text-base font-bold text-white">Daily Learning Tasks</h3>
+          <ListTodo className="h-5 w-5 text-indigo-400" />
+          <h3 className="text-base font-bold text-white font-heading">Daily Learning Tasks</h3>
         </div>
 
         {summary.totalTasks > 0 && (
           <div className="flex items-center gap-3">
-            <span className="text-xs font-semibold text-gray-300">
+            <span className="text-xs font-semibold text-slate-300">
               {summary.completedTasks} / {summary.totalTasks} completed
             </span>
             <div className="w-24">
@@ -132,12 +133,12 @@ export const DailyTaskList: React.FC<DailyTaskListProps> = ({ compact = false })
           onChange={(e) => setNewTitle(e.target.value)}
           placeholder="e.g. Practice useEffect, Complete lesson 3..."
           maxLength={200}
-          className="flex-1 rounded-xl border border-gray-800 bg-gray-950/60 px-3.5 py-2 text-xs text-gray-200 placeholder-gray-500 focus:border-red-500/50 focus:outline-none focus:ring-1 focus:ring-red-500/50"
+          className="flex-1 rounded-xl border border-white/[0.08] bg-slate-950/60 px-3.5 py-2 text-xs text-slate-200 placeholder-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500/40 transition-colors"
         />
         <button
           type="submit"
           disabled={!newTitle.trim() || createMutation.isPending}
-          className="inline-flex items-center gap-1.5 rounded-xl bg-red-600 px-3.5 py-2 text-xs font-semibold text-white shadow-md shadow-red-600/20 hover:bg-red-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          className="inline-flex items-center gap-1.5 rounded-xl bg-indigo-600 px-3.5 py-2 text-xs font-semibold text-white shadow-sm shadow-indigo-600/20 hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-[0.98]"
         >
           {createMutation.isPending ? (
             <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -149,36 +150,36 @@ export const DailyTaskList: React.FC<DailyTaskListProps> = ({ compact = false })
       </form>
 
       {errorMsg && (
-        <div className="text-xs text-red-400 font-medium">{errorMsg}</div>
+        <div className="text-xs text-rose-400 font-medium">{errorMsg}</div>
       )}
 
       {/* Tasks List */}
       {isLoading ? (
-        <div className="flex items-center justify-center py-6 text-xs text-gray-500">
+        <div className="flex items-center justify-center py-6 text-xs text-slate-500">
           <Loader2 className="h-4 w-4 animate-spin mr-2" />
           Loading tasks...
         </div>
       ) : tasks.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-gray-800 p-6 text-center text-xs text-gray-500">
+        <div className="rounded-xl border border-dashed border-white/[0.08] p-6 text-center text-xs text-slate-400">
           No daily tasks yet. Add what you plan to learn today!
         </div>
       ) : (
         <div
-          className={`divide-y divide-gray-800/50 overflow-y-auto ${
+          className={`divide-y divide-white/[0.06] overflow-y-auto ${
             compact ? 'max-h-56' : 'max-h-80'
           }`}
         >
           {tasks.map((task) => (
             <div
               key={task._id}
-              className="flex items-center justify-between gap-3 py-2.5 px-1 group transition-colors hover:bg-gray-800/20 rounded-lg"
+              className="flex items-center justify-between gap-3 py-2.5 px-1.5 group transition-colors hover:bg-slate-800/40 rounded-xl"
             >
               {/* Checkbox and Title */}
               <div className="flex items-center gap-3 min-w-0 flex-1">
                 <button
                   type="button"
                   onClick={() => handleToggleComplete(task)}
-                  className="shrink-0 text-gray-400 hover:text-white transition-colors focus:outline-none"
+                  className="shrink-0 text-slate-400 hover:text-white transition-colors focus:outline-none"
                   aria-label={
                     task.completed ? 'Mark task incomplete' : 'Mark task complete'
                   }
@@ -186,7 +187,7 @@ export const DailyTaskList: React.FC<DailyTaskListProps> = ({ compact = false })
                   {task.completed ? (
                     <CheckSquare className="h-4 w-4 text-emerald-400" />
                   ) : (
-                    <Square className="h-4 w-4 text-gray-500 hover:text-gray-300" />
+                    <Square className="h-4 w-4 text-slate-500 hover:text-slate-300" />
                   )}
                 </button>
 
@@ -198,12 +199,12 @@ export const DailyTaskList: React.FC<DailyTaskListProps> = ({ compact = false })
                       onChange={(e) => setEditTitle(e.target.value)}
                       maxLength={200}
                       autoFocus
-                      className="flex-1 rounded-lg border border-gray-700 bg-gray-950 px-2 py-1 text-xs text-white focus:outline-none focus:ring-1 focus:ring-red-500"
+                      className="flex-1 rounded-lg border border-white/[0.1] bg-slate-950 px-2 py-1 text-xs text-white focus:outline-none focus:ring-1 focus:ring-indigo-500"
                     />
                     <button
                       type="button"
                       onClick={() => handleSaveEdit(task._id)}
-                      className="rounded p-1 text-emerald-400 hover:bg-gray-800"
+                      className="rounded p-1 text-emerald-400 hover:bg-slate-800"
                       aria-label="Save task edit"
                     >
                       <Check className="h-3.5 w-3.5" />
@@ -211,7 +212,7 @@ export const DailyTaskList: React.FC<DailyTaskListProps> = ({ compact = false })
                     <button
                       type="button"
                       onClick={() => setEditingId(null)}
-                      className="rounded p-1 text-gray-400 hover:bg-gray-800"
+                      className="rounded p-1 text-slate-400 hover:bg-slate-800"
                       aria-label="Cancel task edit"
                     >
                       <X className="h-3.5 w-3.5" />
@@ -221,8 +222,8 @@ export const DailyTaskList: React.FC<DailyTaskListProps> = ({ compact = false })
                   <span
                     className={`text-xs truncate select-none ${
                       task.completed
-                        ? 'line-through text-gray-500'
-                        : 'text-gray-200'
+                        ? 'line-through text-slate-500'
+                        : 'text-slate-200'
                     }`}
                   >
                     {task.title}
@@ -236,7 +237,7 @@ export const DailyTaskList: React.FC<DailyTaskListProps> = ({ compact = false })
                   <button
                     type="button"
                     onClick={() => handleStartEdit(task)}
-                    className="rounded p-1 text-gray-400 hover:text-gray-200 hover:bg-gray-800 transition-colors"
+                    className="rounded p-1 text-slate-400 hover:text-slate-200 hover:bg-slate-800 transition-colors"
                     aria-label="Edit task"
                   >
                     <Edit2 className="h-3.5 w-3.5" />
@@ -244,7 +245,7 @@ export const DailyTaskList: React.FC<DailyTaskListProps> = ({ compact = false })
                   <button
                     type="button"
                     onClick={() => deleteMutation.mutate(task._id)}
-                    className="rounded p-1 text-gray-400 hover:text-red-400 hover:bg-gray-800 transition-colors"
+                    className="rounded p-1 text-slate-400 hover:text-rose-400 hover:bg-slate-800 transition-colors"
                     aria-label="Delete task"
                   >
                     <Trash2 className="h-3.5 w-3.5" />
@@ -253,6 +254,17 @@ export const DailyTaskList: React.FC<DailyTaskListProps> = ({ compact = false })
               )}
             </div>
           ))}
+        </div>
+      )}
+
+      {compact && (
+        <div className="pt-2 border-t border-white/[0.06] flex justify-end">
+          <Link
+            to="/study-plan"
+            className="inline-flex items-center gap-1 text-xs font-semibold text-indigo-400 hover:text-indigo-300 transition-colors"
+          >
+            View Study Plan &rarr;
+          </Link>
         </div>
       )}
     </div>

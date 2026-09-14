@@ -37,7 +37,7 @@ export const BookmarkButton: React.FC<BookmarkButtonProps> = ({
       className={`inline-flex items-center gap-1.5 rounded-xl border transition-all ${
         isBookmarked
           ? 'border-amber-500/40 bg-amber-500/10 text-amber-400 hover:bg-amber-500/20 hover:text-amber-300 shadow-sm shadow-amber-500/15'
-          : 'border-gray-700 bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-gray-200'
+          : 'border-white/[0.08] bg-slate-800/80 text-slate-400 hover:bg-slate-700 hover:text-white'
       } ${
         isSm ? 'px-2.5 py-1 text-xs' : 'px-3 py-1.5 text-xs font-semibold'
       }`}

@@ -503,14 +503,14 @@ export const WatchPage = () => {
         {!isFocusMode && (
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <div className="space-y-1.5">
-              <div className="flex flex-wrap items-center gap-2 text-xs font-semibold text-red-400">
+              <div className="flex flex-wrap items-center gap-2 text-xs font-semibold text-indigo-400">
                 <span>
                   Lesson {lessonNumber} of {totalLessons}
                 </span>
                 {currentVideo.durationSeconds > 0 && (
                   <>
-                    <span className="text-gray-600">•</span>
-                    <span className="flex items-center gap-1 text-gray-400 font-normal">
+                    <span className="text-slate-600">•</span>
+                    <span className="flex items-center gap-1 text-slate-400 font-normal">
                       <Clock className="h-3 w-3" />
                       {formatVideoDuration(currentVideo.durationSeconds)}
                     </span>
@@ -518,19 +518,19 @@ export const WatchPage = () => {
                 )}
                 {currentVideoProgress?.completed ? (
                   <>
-                    <span className="text-gray-600">•</span>
+                    <span className="text-slate-600">•</span>
                     <CompletedBadge size="xs" />
                   </>
                 ) : currentVideoProgress && currentVideoProgress.progressPercentage > 0 ? (
                   <>
-                    <span className="text-gray-600">•</span>
-                    <span className="text-red-400 font-semibold lowercase">
+                    <span className="text-slate-600">•</span>
+                    <span className="text-indigo-400 font-semibold lowercase">
                       {currentVideoProgress.progressPercentage}% watched
                     </span>
                   </>
                 ) : null}
               </div>
-              <h1 className="text-xl font-bold tracking-tight text-white sm:text-2xl">
+              <h1 className="text-xl font-bold tracking-tight text-white sm:text-2xl font-heading">
                 {currentVideo.title}
               </h1>
             </div>
@@ -546,10 +546,10 @@ export const WatchPage = () => {
               <button
                 type="button"
                 onClick={() => handleToggleFocusMode(true)}
-                className="inline-flex items-center gap-1.5 rounded-xl border border-red-500/30 bg-red-500/10 px-3 py-1.5 text-xs font-medium text-red-400 hover:bg-red-500/20 hover:text-red-300 transition-colors"
+                className="inline-flex items-center gap-1.5 rounded-xl border border-indigo-500/30 bg-indigo-500/10 px-3 py-1.5 text-xs font-medium text-indigo-300 hover:bg-indigo-500/20 hover:text-white transition-all active:scale-[0.98]"
                 title="Enter Focus Mode"
               >
-                <Focus className="h-3.5 w-3.5" />
+                <Focus className="h-3.5 w-3.5 text-indigo-400" />
                 <span>Focus Mode</span>
               </button>
 
@@ -557,7 +557,7 @@ export const WatchPage = () => {
               <button
                 type="button"
                 onClick={() => setIsTheaterMode((prev) => !prev)}
-                className="hidden sm:inline-flex items-center gap-1.5 rounded-xl border border-gray-700 bg-gray-800 px-3 py-1.5 text-xs font-medium text-gray-300 hover:bg-gray-700 hover:text-white transition-colors"
+                className="hidden sm:inline-flex items-center gap-1.5 rounded-xl border border-white/[0.08] bg-slate-800/80 px-3 py-1.5 text-xs font-medium text-slate-300 hover:bg-slate-700 hover:text-white transition-colors"
               >
                 {isTheaterMode ? (
                   <>
@@ -593,10 +593,10 @@ export const WatchPage = () => {
             onStateChange={handlePlayerStateChange}
           />
         ) : (
-          <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-gray-800 bg-gray-900/40 p-12 text-center aspect-video">
+          <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-white/[0.08] bg-[#111827]/40 p-12 text-center aspect-video">
             <AlertCircle className="h-10 w-10 text-amber-500 mb-3" />
-            <h3 className="text-base font-bold text-white">Video unavailable</h3>
-            <p className="mt-1 max-w-sm text-xs text-gray-400">
+            <h3 className="text-base font-bold text-white font-heading">Video unavailable</h3>
+            <p className="mt-1 max-w-sm text-xs text-slate-400">
               This video cannot be played because it has been removed or set to private on YouTube.
             </p>
           </div>
@@ -621,13 +621,13 @@ export const WatchPage = () => {
         ) : (
           <>
             {/* Navigation Buttons: Previous & Next Lesson (Skips unavailable) */}
-            <div className="flex items-center justify-between gap-4 rounded-xl border border-gray-800 bg-gray-900/50 p-4">
+            <div className="flex items-center justify-between gap-4 rounded-2xl border border-white/[0.08] bg-[#111827] p-4 shadow-xs">
               {/* Previous Lesson Button */}
               {previousVideo ? (
                 <button
                   type="button"
                   onClick={() => handleNavigateVideo(previousVideo._id)}
-                  className="inline-flex items-center gap-2 rounded-xl border border-gray-700 bg-gray-800 px-4 py-2 text-xs font-semibold text-gray-200 transition-colors hover:border-gray-600 hover:bg-gray-700 hover:text-white"
+                  className="inline-flex items-center gap-2 rounded-xl border border-white/[0.08] bg-slate-800/80 px-4 py-2 text-xs font-semibold text-slate-200 transition-colors hover:border-white/[0.15] hover:bg-slate-700 hover:text-white active:scale-95"
                 >
                   <ChevronLeft className="h-4 w-4" />
                   <span>Previous Lesson</span>
@@ -636,14 +636,14 @@ export const WatchPage = () => {
                 <button
                   type="button"
                   disabled
-                  className="inline-flex items-center gap-2 rounded-xl border border-gray-800 bg-gray-900/40 px-4 py-2 text-xs font-semibold text-gray-600 opacity-40 cursor-not-allowed"
+                  className="inline-flex items-center gap-2 rounded-xl border border-white/[0.04] bg-slate-900/40 px-4 py-2 text-xs font-semibold text-slate-600 opacity-40 cursor-not-allowed"
                 >
                   <ChevronLeft className="h-4 w-4" />
                   <span>Previous Lesson</span>
                 </button>
               )}
 
-              <div className="hidden sm:block text-xs text-gray-500 font-medium">
+              <div className="hidden sm:block text-xs text-slate-400 font-medium">
                 Lesson {lessonNumber} / {totalLessons}
               </div>
 
@@ -652,7 +652,7 @@ export const WatchPage = () => {
                 <button
                   type="button"
                   onClick={() => handleNavigateVideo(nextVideo._id)}
-                  className="inline-flex items-center gap-2 rounded-xl bg-red-600 px-4 py-2 text-xs font-semibold text-white shadow-md shadow-red-600/25 transition-colors hover:bg-red-500"
+                  className="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2 text-xs font-semibold text-white shadow-md shadow-indigo-600/25 transition-all hover:bg-indigo-500 active:scale-95"
                 >
                   <span>Next Lesson</span>
                   <ChevronRight className="h-4 w-4" />
@@ -661,7 +661,7 @@ export const WatchPage = () => {
                 <button
                   type="button"
                   disabled
-                  className="inline-flex items-center gap-2 rounded-xl border border-gray-800 bg-gray-900/40 px-4 py-2 text-xs font-semibold text-gray-600 opacity-40 cursor-not-allowed"
+                  className="inline-flex items-center gap-2 rounded-xl border border-white/[0.04] bg-slate-900/40 px-4 py-2 text-xs font-semibold text-slate-600 opacity-40 cursor-not-allowed"
                 >
                   <span>Next Lesson</span>
                   <ChevronRight className="h-4 w-4" />
@@ -678,18 +678,18 @@ export const WatchPage = () => {
             />
 
             {/* Quick Lesson Navigator / Full Syllabus Below Player */}
-            <div className="mt-8 space-y-3 rounded-2xl border border-gray-800 bg-gray-900/40 p-5">
+            <div className="mt-8 space-y-3 rounded-2xl border border-white/[0.08] bg-[#111827] p-5 shadow-xs">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <Layers className="h-4 w-4 text-red-400" />
-                  <h3 className="text-sm font-bold text-white">All Lessons in this Course</h3>
+                  <Layers className="h-4 w-4 text-indigo-400" />
+                  <h3 className="text-sm font-bold text-white font-heading">All Lessons in this Course</h3>
                 </div>
-                <span className="text-xs text-gray-500 font-medium">
+                <span className="text-xs text-slate-400 font-medium">
                   Total {formatDuration(course.totalDurationSeconds)}
                 </span>
               </div>
 
-              <div className="divide-y divide-gray-800/60 max-h-80 overflow-y-auto rounded-xl border border-gray-800/80 bg-gray-950/40">
+              <div className="divide-y divide-white/[0.06] max-h-80 overflow-y-auto rounded-xl border border-white/[0.08] bg-slate-950/40">
                 {sortedVideos.map((vid, idx) => {
                   const isCurrent = vid._id === currentVideo._id;
                   const isAvailable = vid.isAvailable !== false;
@@ -708,17 +708,17 @@ export const WatchPage = () => {
                         !isAvailable
                           ? 'opacity-40 cursor-not-allowed'
                           : isCurrent
-                            ? 'bg-red-500/10 border-l-4 border-red-500'
-                            : 'hover:bg-gray-800/40'
+                            ? 'bg-indigo-500/10 border-l-4 border-indigo-500'
+                            : 'hover:bg-slate-800/40'
                       }`}
                     >
                       <span
-                        className={`flex h-6 w-6 shrink-0 items-center justify-center rounded text-[11px] font-bold ${
+                        className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-lg text-[11px] font-bold ${
                           isCurrent
-                            ? 'bg-red-600 text-white'
+                            ? 'bg-indigo-600 text-white shadow-xs'
                             : vidProg?.completed
-                              ? 'bg-emerald-950/80 text-emerald-400 border border-emerald-700/50'
-                              : 'bg-gray-800 text-gray-400'
+                              ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/25'
+                              : 'bg-slate-800 text-slate-400'
                         }`}
                       >
                         {vidProg?.completed && !isCurrent ? (
@@ -730,10 +730,10 @@ export const WatchPage = () => {
                       <span
                         className={`flex-1 truncate text-xs ${
                           !isAvailable
-                            ? 'text-gray-500 line-through'
+                            ? 'text-slate-500 line-through'
                             : isCurrent
-                              ? 'font-semibold text-red-400'
-                              : 'text-gray-300'
+                              ? 'font-semibold text-indigo-300'
+                              : 'text-slate-300'
                         }`}
                       >
                         {vid.title}
@@ -747,12 +747,12 @@ export const WatchPage = () => {
                       {vidProg?.completed ? (
                         <CompletedBadge size="xs" />
                       ) : vidProg && vidProg.progressPercentage > 0 ? (
-                        <span className="shrink-0 text-[11px] text-red-400 font-medium">
+                        <span className="shrink-0 text-[11px] text-indigo-400 font-semibold">
                           {vidProg.progressPercentage}%
                         </span>
                       ) : null}
                       {vid.durationSeconds > 0 && (
-                        <span className="shrink-0 text-[11px] text-gray-500">
+                        <span className="shrink-0 text-[11px] text-slate-500 font-mono">
                           {formatVideoDuration(vid.durationSeconds)}
                         </span>
                       )}

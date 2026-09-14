@@ -117,7 +117,6 @@ export const NotesPage: React.FC = () => {
     return notes[0];
   }, [notes, selectedNote]);
 
-
   // Reset page when filters change
   const handleSearchChange = (val: string) => {
     setSearch(val);
@@ -275,7 +274,7 @@ export const NotesPage: React.FC = () => {
 
       {/* Empty states */}
       {!isLoading && !error && total === 0 && (
-        <div className="rounded-2xl border border-gray-800/80 bg-gray-900/30 p-8">
+        <div className="rounded-2xl border border-white/[0.08] bg-[#111827]/50 p-8">
           {hasActiveFilters ? (
             <EmptyState
               title="No notes match your filters"
@@ -317,7 +316,7 @@ export const NotesPage: React.FC = () => {
 
             {/* Pagination Controls */}
             {totalPages > 1 && (
-              <div className="flex items-center justify-between rounded-xl border border-gray-800 bg-gray-900/50 px-3.5 py-2.5 text-xs text-gray-400">
+              <div className="flex items-center justify-between rounded-2xl border border-white/[0.08] bg-[#111827] px-4 py-3 text-xs text-slate-400">
                 <span>
                   Page {page} of {totalPages}
                 </span>
@@ -327,7 +326,7 @@ export const NotesPage: React.FC = () => {
                     type="button"
                     disabled={page <= 1}
                     onClick={() => setPage((p) => Math.max(1, p - 1))}
-                    className="inline-flex items-center gap-1 rounded-lg border border-gray-800 bg-gray-950 px-2.5 py-1 text-xs text-gray-300 hover:bg-gray-800 disabled:opacity-40 transition-colors"
+                    className="inline-flex items-center gap-1 rounded-xl border border-white/[0.08] bg-[#0B1120] px-3 py-1.5 text-xs text-slate-300 hover:border-white/[0.15] hover:text-white disabled:opacity-40 transition-colors"
                   >
                     <ChevronLeft className="h-3.5 w-3.5" />
                     <span>Prev</span>
@@ -336,7 +335,7 @@ export const NotesPage: React.FC = () => {
                     type="button"
                     disabled={page >= totalPages}
                     onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                    className="inline-flex items-center gap-1 rounded-lg border border-gray-800 bg-gray-950 px-2.5 py-1 text-xs text-gray-300 hover:bg-gray-800 disabled:opacity-40 transition-colors"
+                    className="inline-flex items-center gap-1 rounded-xl border border-white/[0.08] bg-[#0B1120] px-3 py-1.5 text-xs text-slate-300 hover:border-white/[0.15] hover:text-white disabled:opacity-40 transition-colors"
                   >
                     <span>Next</span>
                     <ChevronRight className="h-3.5 w-3.5" />
@@ -358,7 +357,7 @@ export const NotesPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setSelectedNote(null)}
-                  className="inline-flex items-center gap-1.5 rounded-xl border border-gray-800 bg-gray-900/80 px-3 py-1.5 text-xs font-semibold text-gray-300 hover:bg-gray-800 hover:text-white transition-colors"
+                  className="inline-flex items-center gap-1.5 rounded-xl border border-white/[0.08] bg-[#111827] px-3.5 py-2 text-xs font-semibold text-slate-300 hover:text-white transition-colors"
                 >
                   <ArrowLeft className="h-4 w-4" />
                   <span>Back to notes list</span>
@@ -368,7 +367,6 @@ export const NotesPage: React.FC = () => {
 
             <NoteDetailPanel
               note={activeSelectedNote}
-
               onEdit={handleOpenEdit}
               onDelete={handleDeletePrompt}
               onTogglePin={(noteId) => togglePinMutation.mutate(noteId)}
@@ -395,37 +393,37 @@ export const NotesPage: React.FC = () => {
 
       {/* Delete Confirmation Dialog */}
       {noteToDelete && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm animate-fade-in">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in">
           <div
             role="dialog"
             aria-modal="true"
             aria-labelledby="delete-note-title"
-            className="w-full max-w-sm rounded-2xl border border-gray-800 bg-gray-900 p-6 shadow-2xl space-y-4"
+            className="w-full max-w-sm rounded-3xl border border-white/[0.08] bg-[#111827] p-6 shadow-2xl space-y-4"
           >
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-red-500/10 text-red-400 border border-red-500/20">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-rose-500/10 text-rose-400 border border-rose-500/20">
                 <AlertTriangle className="h-5 w-5" />
               </div>
               <div>
-                <h4 id="delete-note-title" className="text-base font-bold text-white">
+                <h4 id="delete-note-title" className="text-base font-bold text-white font-heading">
                   Delete Note?
                 </h4>
-                <p className="text-xs text-gray-400">
+                <p className="text-xs text-slate-400">
                   This action cannot be undone.
                 </p>
               </div>
             </div>
 
-            <p className="text-xs text-gray-300 line-clamp-3 bg-gray-950 p-3 rounded-xl border border-gray-800">
+            <p className="text-xs text-slate-300 line-clamp-3 bg-[#0B1120] p-3.5 rounded-2xl border border-white/[0.06]">
               "{noteToDelete.content}"
             </p>
 
-            <div className="flex items-center justify-end gap-2 pt-2">
+            <div className="flex items-center justify-end gap-2.5 pt-2">
               <button
                 type="button"
                 disabled={deleteMutation.isPending}
                 onClick={() => setNoteToDelete(null)}
-                className="rounded-xl border border-gray-800 bg-gray-900 px-3.5 py-1.5 text-xs font-semibold text-gray-300 hover:bg-gray-800 hover:text-white transition-colors"
+                className="rounded-xl border border-white/[0.08] bg-[#0B1120] px-3.5 py-2 text-xs font-semibold text-slate-300 hover:border-white/[0.15] hover:text-white transition-colors"
               >
                 Cancel
               </button>
@@ -433,7 +431,7 @@ export const NotesPage: React.FC = () => {
                 type="button"
                 disabled={deleteMutation.isPending}
                 onClick={() => deleteMutation.mutate(noteToDelete._id)}
-                className="inline-flex items-center gap-1.5 rounded-xl bg-red-600 px-4 py-1.5 text-xs font-semibold text-white shadow-md shadow-red-600/20 hover:bg-red-500 disabled:opacity-50 transition-colors"
+                className="inline-flex items-center gap-1.5 rounded-xl bg-rose-600 px-4 py-2 text-xs font-semibold text-white shadow-md shadow-rose-600/20 hover:bg-rose-500 disabled:opacity-50 transition-colors"
               >
                 {deleteMutation.isPending && (
                   <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -447,4 +445,3 @@ export const NotesPage: React.FC = () => {
     </div>
   );
 };
-

@@ -103,16 +103,16 @@ export const ImportCourseModal = ({
       />
 
       {/* Modal Dialog */}
-      <div className="relative w-full max-w-lg overflow-hidden rounded-2xl border border-gray-800 bg-gray-900 p-6 shadow-2xl transition-all sm:p-8">
-        <div className="flex items-center justify-between pb-4 border-b border-gray-800">
+      <div className="relative w-full max-w-lg overflow-hidden rounded-2xl border border-white/[0.08] bg-[#111827] p-6 shadow-2xl transition-all sm:p-8">
+        <div className="flex items-center justify-between pb-4 border-b border-white/[0.08]">
           <div className="flex items-center gap-2.5">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-red-600/20 text-red-500 border border-red-500/30">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-500/15 text-indigo-400 border border-indigo-500/25">
               <PlaySquare className="h-5 w-5" />
             </div>
             <div>
-              <h3 className="text-lg font-bold text-white">Import YouTube Playlist</h3>
-              <p className="text-xs text-gray-400">
-                Turn any educational playlist into a structured course
+              <h3 className="text-lg font-bold text-white font-heading">Import YouTube Playlist</h3>
+              <p className="text-xs text-slate-400">
+                Transform any educational playlist into a structured course
               </p>
             </div>
           </div>
@@ -120,7 +120,7 @@ export const ImportCourseModal = ({
             type="button"
             disabled={isLoading}
             onClick={onClose}
-            className="rounded-lg p-1.5 text-gray-400 hover:bg-gray-800 hover:text-white transition-colors disabled:opacity-50"
+            className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-800 hover:text-white transition-colors disabled:opacity-50"
             aria-label="Close"
           >
             <X className="h-5 w-5" />
@@ -128,7 +128,7 @@ export const ImportCourseModal = ({
         </div>
 
         {error && (
-          <div className="mt-4 flex items-start gap-2.5 rounded-xl border border-red-500/30 bg-red-500/10 p-3.5 text-xs text-red-400">
+          <div className="mt-4 flex items-start gap-2.5 rounded-xl border border-rose-500/30 bg-rose-500/10 p-3.5 text-xs text-rose-400">
             <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" />
             <span className="leading-relaxed">{error}</span>
           </div>
@@ -145,7 +145,7 @@ export const ImportCourseModal = ({
           <div>
             <label
               htmlFor="playlistUrl"
-              className="block text-xs font-semibold uppercase tracking-wider text-gray-300"
+              className="block text-xs font-semibold uppercase tracking-wider text-slate-300"
             >
               YouTube Playlist URL
             </label>
@@ -160,10 +160,10 @@ export const ImportCourseModal = ({
                 if (error) setError(null);
               }}
               placeholder="https://www.youtube.com/playlist?list=..."
-              className="mt-1.5 block w-full rounded-xl border border-gray-700 bg-gray-950 px-4 py-3 text-sm text-white placeholder-gray-500 transition-colors focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500 disabled:opacity-60"
+              className="mt-1.5 block w-full rounded-xl border border-white/[0.1] bg-slate-950/80 px-4 py-2.5 text-sm text-white placeholder-slate-500 transition-colors focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 disabled:opacity-60"
             />
-            <p className="mt-1.5 text-[11px] text-gray-400">
-              Provide a public or unlisted YouTube playlist link.
+            <p className="mt-1.5 text-[11px] text-slate-400">
+              Provide a public or unlisted YouTube playlist link or playlist ID.
             </p>
           </div>
 
@@ -172,14 +172,14 @@ export const ImportCourseModal = ({
               type="button"
               disabled={isLoading}
               onClick={onClose}
-              className="rounded-xl border border-gray-700 bg-gray-800 px-4 py-2.5 text-xs font-semibold text-gray-300 hover:bg-gray-700 hover:text-white transition-colors disabled:opacity-50"
+              className="rounded-xl border border-white/[0.08] bg-slate-800/80 px-4 py-2.5 text-xs font-semibold text-slate-300 hover:bg-slate-700 hover:text-white transition-colors disabled:opacity-50"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isLoading}
-              className="flex items-center gap-2 rounded-xl bg-red-600 px-5 py-2.5 text-xs font-semibold text-white shadow-lg shadow-red-600/25 hover:bg-red-500 transition-colors disabled:opacity-60"
+              className="flex items-center gap-2 rounded-xl bg-indigo-600 px-5 py-2.5 text-xs font-semibold text-white shadow-md shadow-indigo-600/20 hover:bg-indigo-500 transition-all disabled:opacity-60 active:scale-[0.98]"
             >
               {isLoading ? (
                 <>

@@ -35,15 +35,15 @@ export const BookmarksPage: React.FC = () => {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <div className="flex items-center gap-2.5">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-amber-500/10 text-amber-400 border border-amber-500/20">
-            <Bookmark className="h-5 w-5" />
+        <div className="flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-500/10 text-amber-400 border border-amber-500/20">
+            <Bookmark className="h-5 w-5 fill-current" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold tracking-tight text-white sm:text-3xl">
-              Bookmarked Videos
+            <h1 className="text-2xl font-bold tracking-tight text-white sm:text-3xl font-heading">
+              Bookmarked Lessons
             </h1>
-            <p className="text-xs sm:text-sm text-gray-400">
+            <p className="text-xs sm:text-sm text-slate-400">
               Quick access to your saved lessons and key learning moments.
             </p>
           </div>
@@ -57,7 +57,7 @@ export const BookmarksPage: React.FC = () => {
           title="Unable to load bookmarks"
           message="Could not retrieve your bookmarks at this time. Please check your connection."
           onRetry={() => refetch()}
-          isRetrying={isRefetching}
+          isRefetching={isRefetching}
         />
       )}
 
@@ -78,40 +78,40 @@ export const BookmarksPage: React.FC = () => {
             return (
               <div
                 key={b._id}
-                className="group flex flex-col justify-between rounded-2xl border border-gray-800 bg-gray-900/40 p-4 transition-all hover:border-gray-700 hover:bg-gray-900/60"
+                className="group flex flex-col justify-between rounded-2xl border border-white/[0.08] bg-[#111827] p-4 transition-all duration-200 hover:-translate-y-0.5 hover:border-white/[0.15] hover:shadow-xl hover:shadow-black/40"
               >
                 <div className="space-y-3">
                   {/* Thumbnail and Course info */}
-                  <div className="relative aspect-video w-full overflow-hidden rounded-xl border border-gray-800 bg-gray-950">
+                  <div className="relative aspect-video w-full overflow-hidden rounded-xl border border-white/[0.08] bg-[#0B1120]">
                     {b.course.thumbnail ? (
                       <img
                         src={b.course.thumbnail}
                         alt={b.video.title}
-                        className={`h-full w-full object-cover transition-transform duration-200 ${
+                        className={`h-full w-full object-cover transition-transform duration-300 ${
                           isAvailable ? 'group-hover:scale-105' : 'grayscale'
                         }`}
                         loading="lazy"
                       />
                     ) : (
-                      <div className="flex h-full w-full items-center justify-center text-gray-600">
+                      <div className="flex h-full w-full items-center justify-center text-slate-600">
                         <PlaySquare className="h-8 w-8" />
                       </div>
                     )}
 
                     {b.video.durationSeconds > 0 && (
-                      <div className="absolute bottom-2 right-2 rounded bg-black/85 px-1.5 py-0.5 text-[10px] font-medium text-white backdrop-blur-sm">
+                      <div className="absolute bottom-2 right-2 rounded-lg bg-black/85 px-2 py-0.5 text-[10px] font-medium text-white backdrop-blur-sm border border-white/10 font-mono">
                         {formatVideoDuration(b.video.durationSeconds)}
                       </div>
                     )}
                   </div>
 
                   <div>
-                    <span className="text-[11px] font-medium text-red-400 line-clamp-1">
+                    <span className="text-[11px] font-semibold text-indigo-400 line-clamp-1">
                       {b.course.title}
                     </span>
                     <h3
                       className={`mt-0.5 text-sm font-semibold line-clamp-2 ${
-                        isAvailable ? 'text-white' : 'text-gray-500 line-through'
+                        isAvailable ? 'text-white' : 'text-slate-500 line-through'
                       }`}
                     >
                       {b.video.title}
@@ -127,23 +127,23 @@ export const BookmarksPage: React.FC = () => {
                 </div>
 
                 {/* Footer Buttons */}
-                <div className="mt-4 flex items-center justify-between border-t border-gray-800/80 pt-3">
+                <div className="mt-4 flex items-center justify-between border-t border-white/[0.06] pt-3">
                   {isAvailable ? (
                     <Link
                       to={`/watch/${b.course._id}/${b.video._id}`}
-                      className="inline-flex items-center gap-1.5 rounded-lg bg-red-600 px-3 py-1.5 text-xs font-semibold text-white shadow-md shadow-red-600/20 hover:bg-red-500 transition-colors"
+                      className="inline-flex items-center gap-1.5 rounded-xl bg-indigo-600 px-3.5 py-1.5 text-xs font-semibold text-white shadow-md shadow-indigo-600/20 hover:bg-indigo-500 transition-colors"
                     >
                       <Play className="h-3 w-3 fill-current" />
                       <span>Watch Lesson</span>
                     </Link>
                   ) : (
-                    <span className="text-xs text-gray-500">Unavailable</span>
+                    <span className="text-xs text-slate-500">Unavailable</span>
                   )}
 
                   <button
                     type="button"
                     onClick={() => removeMutation.mutate(b.video._id)}
-                    className="inline-flex items-center gap-1 rounded-lg p-1.5 text-gray-400 hover:text-red-400 hover:bg-gray-800 transition-colors"
+                    className="inline-flex items-center gap-1 rounded-xl p-1.5 text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition-colors"
                     aria-label="Remove bookmark"
                     title="Remove bookmark"
                   >

@@ -8,5 +8,7 @@ export * from './WatchPage';
 export * from './NotesPage';
 export * from './BookmarksPage';
 export * from './AnalyticsPage';
+export * from './StudyPlanPage';
+export * from './FocusPage';
+export * from './SettingsPage';
 export * from './PlaceholderPage';
-

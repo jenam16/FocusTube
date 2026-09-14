@@ -79,11 +79,11 @@ export const DashboardPage = () => {
       {/* Header Greeting & Actions */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-white sm:text-3xl">
-            Welcome to FocusTube{user?.name ? `, ${user.name}` : ''}
+          <h1 className="text-2xl font-bold tracking-tight text-white sm:text-3xl font-heading">
+            Welcome back{user?.name ? `, ${user.name}` : ''}
           </h1>
-          <p className="mt-1 text-sm text-gray-400">
-            Distraction-free YouTube learning command center.
+          <p className="mt-1 text-xs sm:text-sm text-slate-400">
+            Continue your distraction-free learning and stay on track.
           </p>
         </div>
 
@@ -99,7 +99,7 @@ export const DashboardPage = () => {
           <button
             type="button"
             onClick={() => setIsImportModalOpen(true)}
-            className="inline-flex items-center justify-center gap-2 rounded-xl bg-red-600 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-red-600/25 transition-all hover:bg-red-500 hover:shadow-red-600/35"
+            className="inline-flex items-center justify-center gap-2 rounded-xl bg-indigo-600 px-4 py-2.5 text-xs sm:text-sm font-semibold text-white shadow-md shadow-indigo-600/20 transition-all hover:bg-indigo-500 hover:shadow-indigo-600/30 active:scale-[0.98]"
           >
             <PlusCircle className="h-4 w-4" />
             <span>Import Playlist</span>
@@ -123,8 +123,8 @@ export const DashboardPage = () => {
       {/* Empty State when 0 courses */}
       {!isLoading && !error && courseCount === 0 && (
         <EmptyState
-          title="No courses yet"
-          description="Import your first YouTube playlist and start learning."
+          title="Start your learning journey"
+          description="Import a YouTube playlist to create your first structured course with zero distractions."
           actionLabel="Import Playlist"
           onAction={() => setIsImportModalOpen(true)}
         />
@@ -135,33 +135,33 @@ export const DashboardPage = () => {
         <>
           {/* Actual Stats Bar */}
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-            <div className="flex items-center gap-3.5 rounded-2xl border border-gray-800 bg-gray-900/60 p-4">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-red-500/10 text-red-400 border border-red-500/20">
+            <div className="flex items-center gap-3.5 rounded-2xl border border-white/[0.08] bg-[#111827] p-4 shadow-xs">
+              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-indigo-500/15 text-indigo-400 border border-indigo-500/25">
                 <BookOpen className="h-5 w-5" />
               </div>
               <div>
-                <p className="text-xs font-medium text-gray-400">My Courses</p>
-                <p className="text-xl font-bold text-white">{courseCount}</p>
+                <p className="text-xs font-medium text-slate-400">My Courses</p>
+                <p className="text-xl font-bold text-white font-heading">{courseCount}</p>
               </div>
             </div>
 
-            <div className="flex items-center gap-3.5 rounded-2xl border border-gray-800 bg-gray-900/60 p-4">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-500/10 text-blue-400 border border-blue-500/20">
+            <div className="flex items-center gap-3.5 rounded-2xl border border-white/[0.08] bg-[#111827] p-4 shadow-xs">
+              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-teal-500/15 text-teal-400 border border-teal-500/25">
                 <Video className="h-5 w-5" />
               </div>
               <div>
-                <p className="text-xs font-medium text-gray-400">Total Lessons</p>
-                <p className="text-xl font-bold text-white">{totalVideosCount}</p>
+                <p className="text-xs font-medium text-slate-400">Total Lessons</p>
+                <p className="text-xl font-bold text-white font-heading">{totalVideosCount}</p>
               </div>
             </div>
 
-            <div className="flex items-center gap-3.5 rounded-2xl border border-gray-800 bg-gray-900/60 p-4">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+            <div className="flex items-center gap-3.5 rounded-2xl border border-white/[0.08] bg-[#111827] p-4 shadow-xs">
+              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-amber-500/15 text-amber-400 border border-amber-500/25">
                 <Clock className="h-5 w-5" />
               </div>
               <div>
-                <p className="text-xs font-medium text-gray-400">Total Content</p>
-                <p className="text-xl font-bold text-white">
+                <p className="text-xs font-medium text-slate-400">Total Content</p>
+                <p className="text-xl font-bold text-white font-heading">
                   {formatDuration(totalDurationSum)}
                 </p>
               </div>
@@ -183,11 +183,11 @@ export const DashboardPage = () => {
 
               if (courseCompleted) {
                 return (
-                  <div className="overflow-hidden rounded-2xl border border-emerald-500/30 bg-gradient-to-br from-emerald-950/25 via-gray-900/80 to-gray-900/40 p-5 sm:p-6 backdrop-blur-md shadow-xl">
+                  <div className="overflow-hidden rounded-2xl border border-emerald-500/30 bg-gradient-to-br from-emerald-950/25 via-[#111827]/90 to-slate-900/60 p-5 sm:p-6 backdrop-blur-md shadow-lg">
                     <div className="flex flex-col gap-5 sm:gap-6 lg:flex-row lg:items-center lg:justify-between">
                       <Link
                         to={`/courses/${recent.course._id}`}
-                        className="group/thumb relative aspect-video w-full shrink-0 overflow-hidden rounded-xl border border-gray-800 bg-gray-950 sm:w-72 lg:w-80 shadow-md block"
+                        className="group/thumb relative aspect-video w-full shrink-0 overflow-hidden rounded-xl border border-white/[0.08] bg-slate-950 sm:w-72 lg:w-80 shadow-md block"
                       >
                         {recent.course.thumbnail || recent.video.thumbnail ? (
                           <img
@@ -196,7 +196,7 @@ export const DashboardPage = () => {
                             className="h-full w-full object-cover transition-transform duration-300 group-hover/thumb:scale-105"
                           />
                         ) : (
-                          <div className="flex h-full w-full items-center justify-center bg-gray-900 text-gray-600">
+                          <div className="flex h-full w-full items-center justify-center bg-slate-900 text-slate-600">
                             <CheckCircle2 className="h-10 w-10 text-emerald-400" />
                           </div>
                         )}
@@ -209,38 +209,38 @@ export const DashboardPage = () => {
                       <div className="flex-1 min-w-0 space-y-3">
                         <div className="flex flex-wrap items-center gap-2">
                           <CompletedBadge size="sm" />
-                          <span className="text-xs text-gray-400 font-medium">
+                          <span className="text-xs text-slate-400 font-medium">
                             All lessons completed 🎉
                           </span>
                         </div>
 
                         <div>
-                          <p className="text-xs font-medium text-gray-400 truncate">
+                          <p className="text-xs font-medium text-slate-400 truncate">
                             Congratulations!
                           </p>
                           <Link
                             to={`/courses/${recent.course._id}`}
                             className="mt-1 block focus:outline-none"
                           >
-                            <h3 className="line-clamp-2 text-base sm:text-lg font-bold text-white hover:text-emerald-400 transition-colors">
+                            <h3 className="line-clamp-2 text-base sm:text-lg font-bold text-white hover:text-emerald-400 transition-colors font-heading">
                               {recent.course.title}
                             </h3>
                           </Link>
                         </div>
 
                         <div className="space-y-1.5 max-w-md">
-                          <div className="flex items-center justify-between text-xs text-gray-400">
+                          <div className="flex items-center justify-between text-xs text-slate-400">
                             <span className="text-emerald-400 font-semibold">100% Course Completed</span>
                             <span>{recent.course.totalVideos} of {recent.course.totalVideos} lessons</span>
                           </div>
-                          <ProgressBar progress={100} size="sm" />
+                          <ProgressBar progress={100} size="sm" color="emerald" />
                         </div>
                       </div>
 
                       <div className="shrink-0 flex items-center pt-2 sm:pt-0">
                         <Link
                           to={`/courses/${recent.course._id}`}
-                          className="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-xl bg-emerald-600 px-5 py-3 text-xs sm:text-sm font-semibold text-white shadow-lg shadow-emerald-600/30 transition-all hover:bg-emerald-500 hover:shadow-emerald-600/45"
+                          className="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-xl bg-emerald-600 px-5 py-3 text-xs sm:text-sm font-semibold text-white shadow-md shadow-emerald-600/25 transition-all hover:bg-emerald-500"
                         >
                           <span>Review Course</span>
                           <ArrowRight className="h-4 w-4" />
@@ -254,12 +254,12 @@ export const DashboardPage = () => {
               if (!targetVideo) return null;
 
               return (
-                <div className="overflow-hidden rounded-2xl border border-red-500/30 bg-gradient-to-br from-red-950/20 via-gray-900/80 to-gray-900/40 p-5 sm:p-6 backdrop-blur-md shadow-xl">
+                <div className="overflow-hidden rounded-2xl border border-indigo-500/25 bg-gradient-to-br from-indigo-950/20 via-[#111827] to-slate-900/80 p-5 sm:p-6 backdrop-blur-md shadow-xl">
                   <div className="flex flex-col gap-5 sm:gap-6 lg:flex-row lg:items-center lg:justify-between">
                     {/* Thumbnail */}
                     <Link
                       to={`/watch/${recent.course._id}/${targetVideo._id}`}
-                      className="group/thumb relative aspect-video w-full shrink-0 overflow-hidden rounded-xl border border-gray-800 bg-gray-950 sm:w-72 lg:w-80 shadow-md block"
+                      className="group/thumb relative aspect-video w-full shrink-0 overflow-hidden rounded-xl border border-white/[0.08] bg-slate-950 sm:w-72 lg:w-80 shadow-md block"
                     >
                       {targetVideo.thumbnail || recent.course.thumbnail ? (
                         <img
@@ -268,20 +268,20 @@ export const DashboardPage = () => {
                           className="h-full w-full object-cover transition-transform duration-300 group-hover/thumb:scale-105"
                         />
                       ) : (
-                        <div className="flex h-full w-full items-center justify-center bg-gray-900 text-gray-600">
+                        <div className="flex h-full w-full items-center justify-center bg-slate-900 text-slate-600">
                           <Play className="h-10 w-10" />
                         </div>
                       )}
                       {/* Play overlay */}
                       <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover/thumb:opacity-100 transition-opacity">
-                        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-red-600 text-white shadow-lg shadow-red-600/50">
+                        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-indigo-600 text-white shadow-lg shadow-indigo-600/40">
                           <Play className="h-5 w-5 fill-current ml-0.5" />
                         </div>
                       </div>
                       {/* Bottom progress bar */}
-                      <div className="absolute bottom-0 left-0 right-0 h-1.5 bg-gray-800">
+                      <div className="absolute bottom-0 left-0 right-0 h-1.5 bg-slate-850">
                         <div
-                          className="h-full bg-red-600 transition-all duration-300"
+                          className="h-full bg-indigo-500 transition-all duration-300"
                           style={{
                             width: `${
                               isAdvancingToNext
@@ -302,34 +302,34 @@ export const DashboardPage = () => {
                             Lesson Completed — Up Next
                           </span>
                         ) : (
-                          <span className="inline-flex items-center gap-1 rounded-full bg-red-500/10 px-2.5 py-0.5 text-xs font-semibold text-red-400 border border-red-500/20">
+                          <span className="inline-flex items-center gap-1 rounded-full bg-indigo-500/15 px-2.5 py-0.5 text-xs font-semibold text-indigo-300 border border-indigo-500/25">
                             <Play className="h-3 w-3 fill-current" />
                             Continue Learning
                           </span>
                         )}
                         {recent.lastWatchedAt && (
-                          <span className="text-xs text-gray-500">
+                          <span className="text-xs text-slate-400">
                             Last active {formatTimeAgo(recent.lastWatchedAt)}
                           </span>
                         )}
                       </div>
 
                       <div>
-                        <p className="text-xs font-medium text-gray-400 truncate">
+                        <p className="text-xs font-medium text-slate-400 truncate">
                           {recent.course.title}
                         </p>
                         <Link
                           to={`/watch/${recent.course._id}/${targetVideo._id}`}
                           className="mt-1 block focus:outline-none"
                         >
-                          <h3 className="line-clamp-2 text-base sm:text-lg font-bold text-white hover:text-red-400 transition-colors">
+                          <h3 className="line-clamp-2 text-base sm:text-lg font-bold text-white hover:text-indigo-300 transition-colors font-heading">
                             {formatLessonNumber(targetVideo.position)} — {targetVideo.title}
                           </h3>
                         </Link>
                       </div>
 
                       <div className="space-y-1.5 max-w-md">
-                        <div className="flex items-center justify-between text-xs text-gray-400">
+                        <div className="flex items-center justify-between text-xs text-slate-400">
                           <span>
                             {isAdvancingToNext
                               ? 'Next Lesson Ready'
@@ -353,7 +353,7 @@ export const DashboardPage = () => {
                     <div className="shrink-0 flex items-center pt-2 sm:pt-0">
                       <Link
                         to={`/watch/${recent.course._id}/${targetVideo._id}`}
-                        className="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-xl bg-red-600 px-5 py-3 text-xs sm:text-sm font-semibold text-white shadow-lg shadow-red-600/30 transition-all hover:bg-red-500 hover:shadow-red-600/45"
+                        className="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-xl bg-indigo-600 px-5 py-3 text-xs sm:text-sm font-semibold text-white shadow-md shadow-indigo-600/25 transition-all hover:bg-indigo-500 hover:shadow-indigo-600/35 active:scale-[0.98]"
                       >
                         <Play className="h-4 w-4 fill-current" />
                         <span>{isAdvancingToNext ? 'Start Next Lesson' : 'Resume Lesson'}</span>
@@ -365,17 +365,16 @@ export const DashboardPage = () => {
             })()
           )}
 
-          {/* Dashboard Course Preview Section (Section 16) */}
+          {/* Dashboard Course Preview Section */}
           <div className="space-y-4">
-
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Sparkles className="h-4 w-4 text-red-400" />
-                <h2 className="text-lg font-bold text-white">Your Courses</h2>
+                <Sparkles className="h-4 w-4 text-indigo-400" />
+                <h2 className="text-lg font-bold text-white font-heading">Your Courses</h2>
               </div>
               <Link
                 to="/courses"
-                className="inline-flex items-center gap-1.5 text-xs font-semibold text-red-400 hover:text-red-300 transition-colors"
+                className="inline-flex items-center gap-1.5 text-xs font-semibold text-indigo-400 hover:text-indigo-300 transition-colors"
               >
                 <span>View all courses</span>
                 <ArrowRight className="h-3.5 w-3.5" />
@@ -390,7 +389,7 @@ export const DashboardPage = () => {
             </div>
           </div>
 
-          {/* Phase 8 & 10: Daily Learning Tasks & Bookmarked Videos Grid */}
+          {/* Daily Learning Tasks & Bookmarked Videos Grid */}
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
             {/* Daily Learning Tasks (7 cols) */}
             <div className="lg:col-span-7">
@@ -398,11 +397,11 @@ export const DashboardPage = () => {
             </div>
 
             {/* Bookmarks Preview Widget (5 cols) */}
-            <div className="lg:col-span-5 rounded-2xl border border-gray-800 bg-gray-900/40 p-5 space-y-4">
+            <div className="lg:col-span-5 rounded-2xl border border-white/[0.08] bg-[#111827] p-5 space-y-4 shadow-xs">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Bookmark className="h-4 w-4 text-amber-400" />
-                  <h3 className="text-base font-bold text-white">Bookmarked Lessons</h3>
+                  <h3 className="text-base font-bold text-white font-heading">Bookmarked Lessons</h3>
                 </div>
                 <Link
                   to="/bookmarks"
@@ -414,26 +413,26 @@ export const DashboardPage = () => {
               </div>
 
               {bookmarks.length === 0 ? (
-                <div className="rounded-xl border border-dashed border-gray-800/80 p-6 text-center text-xs text-gray-500">
+                <div className="rounded-xl border border-dashed border-white/[0.08] p-6 text-center text-xs text-slate-400">
                   No bookmarked lessons yet. Bookmark key videos while learning to find them quickly!
                 </div>
               ) : (
-                <div className="divide-y divide-gray-800/60 max-h-56 overflow-y-auto">
+                <div className="divide-y divide-white/[0.06] max-h-56 overflow-y-auto">
                   {bookmarks.slice(0, 4).map((b) => (
                     <Link
                       key={b._id}
                       to={`/watch/${b.course._id}/${b.video._id}`}
-                      className="flex items-center justify-between gap-3 py-2.5 px-1 hover:bg-gray-800/30 rounded-lg group transition-colors"
+                      className="flex items-center justify-between gap-3 py-2.5 px-1.5 hover:bg-slate-800/40 rounded-xl group transition-colors"
                     >
                       <div className="min-w-0 flex-1">
-                        <span className="text-[11px] text-gray-400 block truncate">
+                        <span className="text-[11px] text-slate-400 block truncate">
                           {b.course.title}
                         </span>
-                        <h4 className="text-xs font-medium text-gray-200 group-hover:text-white truncate">
+                        <h4 className="text-xs font-medium text-slate-200 group-hover:text-white truncate">
                           {b.video.title}
                         </h4>
                       </div>
-                      <Play className="h-3.5 w-3.5 text-gray-500 group-hover:text-red-400 shrink-0 fill-current transition-colors" />
+                      <Play className="h-3.5 w-3.5 text-slate-500 group-hover:text-indigo-400 shrink-0 fill-current transition-colors" />
                     </Link>
                   ))}
                 </div>

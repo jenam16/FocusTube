@@ -26,7 +26,6 @@ export const NoteListItem: React.FC<NoteListItemProps> = ({
       ? note.video.position
       : null;
 
-
   // Title fallback
   const displayTitle =
     note.title && note.title.trim()
@@ -61,21 +60,21 @@ export const NoteListItem: React.FC<NoteListItemProps> = ({
           onSelect(note);
         }
       }}
-      className={`group relative flex flex-col text-left rounded-xl p-3.5 transition-all cursor-pointer border ${
+      className={`group relative flex flex-col text-left rounded-2xl p-4 transition-all cursor-pointer border ${
         isSelected
-          ? 'border-red-500/60 bg-gray-900/90 shadow-md shadow-red-500/5 ring-1 ring-red-500/50'
-          : 'border-gray-800/80 bg-gray-900/40 hover:border-gray-700 hover:bg-gray-900/70'
+          ? 'border-indigo-500/60 bg-[#111827] shadow-lg shadow-indigo-500/10 ring-1 ring-indigo-500/40'
+          : 'border-white/[0.08] bg-[#111827]/70 hover:border-white/[0.15] hover:bg-[#111827]'
       }`}
     >
       {/* Top Header: Course badge + Timestamp + Pin button */}
-      <div className="flex items-center justify-between gap-2 mb-1.5">
+      <div className="flex items-center justify-between gap-2 mb-2">
         <div className="flex items-center gap-1.5 min-w-0">
-          <BookOpen className="h-3 w-3 text-red-400 shrink-0" />
-          <span className="text-[11px] font-medium text-gray-400 truncate max-w-[140px] sm:max-w-[180px]">
+          <BookOpen className="h-3 w-3 text-indigo-400 shrink-0" />
+          <span className="text-[11px] font-medium text-slate-400 truncate max-w-[140px] sm:max-w-[180px]">
             {courseTitle}
           </span>
           {videoPosition && (
-            <span className="text-[10px] text-gray-500 shrink-0">
+            <span className="text-[10px] text-slate-500 shrink-0">
               • L{videoPosition}
             </span>
           )}
@@ -84,12 +83,12 @@ export const NoteListItem: React.FC<NoteListItemProps> = ({
         <div className="flex items-center gap-1.5 shrink-0">
           {/* Timestamp badge */}
           {note.timestampSeconds !== null && note.timestampSeconds !== undefined ? (
-            <span className="inline-flex items-center gap-1 rounded bg-red-500/10 border border-red-500/20 px-1.5 py-0.5 text-[10px] font-semibold text-red-400">
+            <span className="inline-flex items-center gap-1 rounded-md bg-indigo-500/10 border border-indigo-500/20 px-1.5 py-0.5 text-[10px] font-semibold text-indigo-400 font-mono">
               <Play className="h-2.5 w-2.5 fill-current" />
               {formatVideoDuration(note.timestampSeconds)}
             </span>
           ) : (
-            <span className="inline-flex items-center gap-1 text-[10px] text-gray-500">
+            <span className="inline-flex items-center gap-1 text-[10px] text-slate-500">
               <Clock className="h-2.5 w-2.5" />
             </span>
           )}
@@ -103,11 +102,10 @@ export const NoteListItem: React.FC<NoteListItemProps> = ({
                 onTogglePin(note._id, e);
               }
             }}
-
             className={`rounded p-1 transition-all ${
               note.isPinned
                 ? 'text-amber-400 hover:text-amber-300'
-                : 'text-gray-600 hover:text-gray-300 opacity-0 group-hover:opacity-100'
+                : 'text-slate-600 hover:text-slate-300 opacity-0 group-hover:opacity-100'
             }`}
             title={note.isPinned ? 'Unpin note' : 'Pin note to top'}
           >
@@ -117,30 +115,30 @@ export const NoteListItem: React.FC<NoteListItemProps> = ({
       </div>
 
       {/* Note Title */}
-      <h3 className="text-xs sm:text-sm font-semibold text-gray-100 line-clamp-1 group-hover:text-white transition-colors">
+      <h3 className="text-xs sm:text-sm font-semibold text-slate-100 line-clamp-1 group-hover:text-white transition-colors">
         {displayTitle}
       </h3>
 
       {/* Content Preview */}
-      <p className="mt-1 text-xs text-gray-400 line-clamp-2 leading-relaxed whitespace-pre-wrap">
+      <p className="mt-1 text-xs text-slate-400 line-clamp-2 leading-relaxed whitespace-pre-wrap">
         {note.content}
       </p>
 
       {/* Footer: Tags + Lesson pill + Updated Time */}
-      <div className="mt-2.5 flex items-center justify-between gap-2 pt-2 border-t border-gray-800/40 text-[11px] text-gray-500">
+      <div className="mt-3 flex items-center justify-between gap-2 pt-2 border-t border-white/[0.06] text-[11px] text-slate-500">
         <div className="flex items-center gap-1.5 flex-wrap min-w-0">
           {note.tags && note.tags.length > 0 && (
             <div className="flex items-center gap-1 flex-wrap">
               {note.tags.slice(0, 3).map((tag) => (
                 <span
                   key={tag}
-                  className="rounded bg-gray-800/80 px-1.5 py-0.5 text-[10px] text-gray-400"
+                  className="rounded-md bg-[#0B1120] border border-white/[0.06] px-1.5 py-0.5 text-[10px] text-slate-400"
                 >
                   #{tag}
                 </span>
               ))}
               {note.tags.length > 3 && (
-                <span className="text-[10px] text-gray-500">
+                <span className="text-[10px] text-slate-500">
                   +{note.tags.length - 3}
                 </span>
               )}
@@ -150,7 +148,7 @@ export const NoteListItem: React.FC<NoteListItemProps> = ({
 
         <div className="flex items-center gap-1 shrink-0">
           <span>{formatDate(note.updatedAt || note.createdAt)}</span>
-          <ChevronRight className="h-3 w-3 text-gray-600 group-hover:text-gray-400 transition-colors" />
+          <ChevronRight className="h-3 w-3 text-slate-600 group-hover:text-slate-400 transition-colors" />
         </div>
       </div>
     </div>

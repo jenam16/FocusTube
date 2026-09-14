@@ -35,7 +35,7 @@ export const CourseHeader = ({
       <div>
         <Link
           to="/courses"
-          className="inline-flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs font-medium text-gray-400 transition-colors hover:bg-gray-800 hover:text-white"
+          className="inline-flex items-center gap-2 rounded-xl px-3 py-1.5 text-xs font-semibold text-slate-400 transition-colors hover:bg-slate-800/60 hover:text-white border border-transparent hover:border-white/[0.06]"
         >
           <ArrowLeft className="h-4 w-4" />
           <span>Back to Courses</span>
@@ -43,10 +43,10 @@ export const CourseHeader = ({
       </div>
 
       {/* Hero Banner */}
-      <div className="overflow-hidden rounded-2xl border border-gray-800 bg-gray-900/60 p-6 sm:p-8 backdrop-blur-md">
+      <div className="overflow-hidden rounded-2xl border border-white/[0.08] bg-[#111827] p-6 sm:p-8 backdrop-blur-md shadow-sm">
         <div className="flex flex-col gap-6 md:flex-row md:items-start">
           {/* Thumbnail */}
-          <div className="relative aspect-video w-full shrink-0 overflow-hidden rounded-xl border border-gray-800 bg-gray-950 md:w-80 lg:w-96 shadow-lg">
+          <div className="relative aspect-video w-full shrink-0 overflow-hidden rounded-xl border border-white/[0.08] bg-slate-950 md:w-80 lg:w-96 shadow-md">
             {course.thumbnail ? (
               <img
                 src={course.thumbnail}
@@ -55,11 +55,11 @@ export const CourseHeader = ({
                 loading="eager"
               />
             ) : (
-              <div className="flex h-full w-full items-center justify-center bg-gray-900 text-gray-600">
+              <div className="flex h-full w-full items-center justify-center bg-slate-900 text-slate-600">
                 <PlaySquare className="h-12 w-12" />
               </div>
             )}
-            <div className="absolute bottom-2.5 right-2.5 rounded-md bg-black/85 px-2 py-0.5 text-xs font-medium text-white backdrop-blur-sm">
+            <div className="absolute bottom-2.5 right-2.5 rounded-md bg-black/80 px-2 py-0.5 text-xs font-medium text-white backdrop-blur-sm border border-white/[0.08]">
               {course.totalVideos} {course.totalVideos === 1 ? 'Lesson' : 'Lessons'}
             </div>
           </div>
@@ -68,33 +68,33 @@ export const CourseHeader = ({
           <div className="flex flex-1 flex-col justify-between space-y-4">
             <div>
               {course.channelName && (
-                <div className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-red-400">
+                <div className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-indigo-400">
                   <User className="h-3.5 w-3.5" />
                   <span>{course.channelName}</span>
                 </div>
               )}
-              <h1 className="mt-1.5 text-xl font-bold tracking-tight text-white sm:text-2xl lg:text-3xl">
+              <h1 className="mt-1.5 text-xl font-bold tracking-tight text-white sm:text-2xl lg:text-3xl font-heading">
                 {course.title}
               </h1>
               {course.description ? (
-                <p className="mt-3 text-sm text-gray-400 line-clamp-3 leading-relaxed">
+                <p className="mt-3 text-xs sm:text-sm text-slate-400 line-clamp-3 leading-relaxed">
                   {course.description}
                 </p>
               ) : (
-                <p className="mt-3 text-xs italic text-gray-500">
+                <p className="mt-3 text-xs italic text-slate-500">
                   No description available.
                 </p>
               )}
             </div>
 
             {/* Course Progress Section */}
-            <div className="rounded-xl border border-gray-800/80 bg-gray-950/40 p-3.5">
+            <div className="rounded-xl border border-white/[0.06] bg-slate-950/60 p-4">
               <div className="mb-2 flex items-center justify-between text-xs">
                 <div className="flex items-center gap-2">
-                  <span className="text-gray-400 font-medium">Course Progress</span>
+                  <span className="text-slate-400 font-medium">Course Progress</span>
                   {isFinished && <CompletedBadge size="xs" />}
                 </div>
-                <span className="font-bold text-gray-200">
+                <span className="font-bold text-slate-200">
                   {completedVideos !== undefined
                     ? `${completedVideos} of ${totalAvailableVideos ?? course.totalVideos} completed (${progress}%)`
                     : `${progress}% complete`}
@@ -108,7 +108,7 @@ export const CourseHeader = ({
               {firstVideo && (
                 <Link
                   to={`/watch/${course._id}/${firstVideo._id}`}
-                  className="inline-flex items-center gap-2 rounded-xl bg-red-600 px-5 py-2.5 text-xs font-semibold text-white shadow-lg shadow-red-600/25 transition-all hover:bg-red-500 hover:shadow-red-600/35"
+                  className="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-5 py-2.5 text-xs font-semibold text-white shadow-md shadow-indigo-600/20 transition-all hover:bg-indigo-500 hover:shadow-indigo-600/30 active:scale-[0.98]"
                 >
                   <Play className="h-3.5 w-3.5 fill-current" />
                   <span>
@@ -125,13 +125,13 @@ export const CourseHeader = ({
                 href={`https://www.youtube.com/playlist?list=${course.playlistId}`}
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex items-center gap-1.5 rounded-xl border border-gray-700 bg-gray-800/80 px-3.5 py-2.5 text-xs font-medium text-gray-300 transition-colors hover:border-gray-600 hover:bg-gray-800 hover:text-white"
+                className="inline-flex items-center gap-1.5 rounded-xl border border-white/[0.08] bg-slate-800/80 px-3.5 py-2.5 text-xs font-medium text-slate-300 transition-colors hover:border-white/[0.15] hover:bg-slate-700 hover:text-white"
               >
                 <span>Original YouTube Playlist</span>
-                <ExternalLink className="h-3.5 w-3.5 text-gray-400" />
+                <ExternalLink className="h-3.5 w-3.5 text-slate-400" />
               </a>
 
-              <span className="text-xs text-gray-500 ml-auto hidden sm:inline-block">
+              <span className="text-xs text-slate-400 ml-auto hidden sm:inline-block">
                 Total Duration: {formatDuration(course.totalDurationSeconds)}
               </span>
             </div>

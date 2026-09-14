@@ -26,7 +26,7 @@ export const CompletedBadge: React.FC<CompletedBadgeProps> = ({
 
   return (
     <span
-      className={`inline-flex items-center font-medium rounded-full bg-emerald-950/70 text-emerald-400 border border-emerald-700/60 transition-colors shadow-sm ${sizeClasses[size]} ${className}`}
+      className={`inline-flex items-center font-semibold rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/25 transition-colors shadow-xs ${sizeClasses[size]} ${className}`}
       aria-label="Completed"
     >
       <CheckCircle2 className={`${iconSizes[size]} shrink-0 text-emerald-400`} />

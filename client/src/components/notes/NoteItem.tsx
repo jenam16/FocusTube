@@ -47,21 +47,21 @@ export const NoteItem: React.FC<NoteItemProps> = ({
   };
 
   return (
-    <div className="group rounded-xl border border-gray-800/80 bg-gray-900/40 p-3.5 space-y-2.5 transition-colors hover:border-gray-700/80 hover:bg-gray-900/60">
+    <div className="group rounded-2xl border border-white/[0.08] bg-[#0B1120] p-3.5 space-y-2.5 transition-all duration-200 hover:border-white/[0.15] hover:bg-[#0B1120]/90">
       {/* Top Bar: Timestamp and Actions */}
       <div className="flex items-center justify-between gap-2">
         {note.timestampSeconds !== null && note.timestampSeconds !== undefined ? (
           <button
             type="button"
             onClick={() => onSeekTo && onSeekTo(note.timestampSeconds!)}
-            className="inline-flex items-center gap-1.5 rounded-lg border border-red-500/30 bg-red-500/10 px-2 py-1 text-xs font-semibold text-red-400 hover:bg-red-500/20 hover:text-red-300 transition-colors"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-indigo-500/30 bg-indigo-500/10 px-2 py-1 text-xs font-semibold text-indigo-400 hover:bg-indigo-500/20 hover:text-indigo-300 transition-colors font-mono"
             title={`Seek to ${formatVideoDuration(note.timestampSeconds)}`}
           >
             <Play className="h-3 w-3 fill-current" />
             <span>{formatVideoDuration(note.timestampSeconds)}</span>
           </button>
         ) : (
-          <span className="inline-flex items-center gap-1 text-[11px] text-gray-500">
+          <span className="inline-flex items-center gap-1 text-[11px] text-slate-500">
             <Clock className="h-3 w-3" />
             General Note
           </span>
@@ -76,7 +76,7 @@ export const NoteItem: React.FC<NoteItemProps> = ({
                 setEditContent(note.content);
                 setIsEditing(true);
               }}
-              className="rounded p-1 text-gray-400 hover:text-white hover:bg-gray-800 transition-colors"
+              className="rounded-lg p-1.5 text-slate-400 hover:text-white hover:bg-white/[0.06] transition-colors"
               aria-label="Edit note"
             >
               <Edit2 className="h-3.5 w-3.5" />
@@ -84,7 +84,7 @@ export const NoteItem: React.FC<NoteItemProps> = ({
             <button
               type="button"
               onClick={() => setIsDeleting(true)}
-              className="rounded p-1 text-gray-400 hover:text-red-400 hover:bg-gray-800 transition-colors"
+              className="rounded-lg p-1.5 text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition-colors"
               aria-label="Delete note"
             >
               <Trash2 className="h-3.5 w-3.5" />
@@ -95,14 +95,14 @@ export const NoteItem: React.FC<NoteItemProps> = ({
 
       {/* Delete Confirmation */}
       {isDeleting && (
-        <div className="flex items-center justify-between rounded-lg bg-red-950/30 border border-red-900/40 p-2 text-xs">
-          <span className="text-red-300 font-medium">Delete this note?</span>
+        <div className="flex items-center justify-between rounded-xl bg-rose-950/30 border border-rose-900/40 p-2.5 text-xs">
+          <span className="text-rose-300 font-medium">Delete this note?</span>
           <div className="flex items-center gap-1.5">
             <button
               type="button"
               disabled={isSubmitting}
               onClick={handleDelete}
-              className="rounded bg-red-600 px-2.5 py-1 font-semibold text-white hover:bg-red-500 disabled:opacity-50"
+              className="rounded-lg bg-rose-600 px-2.5 py-1 font-semibold text-white hover:bg-rose-500 disabled:opacity-50"
             >
               Delete
             </button>
@@ -110,7 +110,7 @@ export const NoteItem: React.FC<NoteItemProps> = ({
               type="button"
               disabled={isSubmitting}
               onClick={() => setIsDeleting(false)}
-              className="rounded bg-gray-800 px-2 py-1 text-gray-300 hover:bg-gray-700"
+              className="rounded-lg bg-[#111827] px-2 py-1 text-slate-300 hover:bg-slate-800"
             >
               Cancel
             </button>
@@ -126,14 +126,14 @@ export const NoteItem: React.FC<NoteItemProps> = ({
             onChange={(e) => setEditContent(e.target.value)}
             rows={3}
             maxLength={5000}
-            className="w-full rounded-lg border border-gray-700 bg-gray-950 p-2 text-xs text-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-red-500"
+            className="w-full rounded-xl border border-white/[0.08] bg-[#111827] p-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
           />
           <div className="flex items-center justify-end gap-1.5">
             <button
               type="button"
               disabled={!editContent.trim() || isSubmitting}
               onClick={handleSave}
-              className="inline-flex items-center gap-1 rounded-lg bg-red-600 px-2.5 py-1 text-xs font-semibold text-white hover:bg-red-500 disabled:opacity-50"
+              className="inline-flex items-center gap-1 rounded-lg bg-indigo-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-indigo-500 disabled:opacity-50"
             >
               <Check className="h-3 w-3" />
               <span>Save</span>
@@ -142,7 +142,7 @@ export const NoteItem: React.FC<NoteItemProps> = ({
               type="button"
               disabled={isSubmitting}
               onClick={() => setIsEditing(false)}
-              className="inline-flex items-center gap-1 rounded-lg bg-gray-800 px-2.5 py-1 text-xs text-gray-300 hover:bg-gray-700"
+              className="inline-flex items-center gap-1 rounded-lg bg-[#111827] px-3 py-1.5 text-xs text-slate-300 hover:bg-slate-800"
             >
               <X className="h-3 w-3" />
               <span>Cancel</span>
@@ -150,7 +150,7 @@ export const NoteItem: React.FC<NoteItemProps> = ({
           </div>
         </div>
       ) : (
-        <p className="text-xs text-gray-300 whitespace-pre-wrap leading-relaxed break-words">
+        <p className="text-xs text-slate-300 whitespace-pre-wrap leading-relaxed break-words">
           {note.content}
         </p>
       )}

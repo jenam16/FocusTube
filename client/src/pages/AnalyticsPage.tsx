@@ -24,15 +24,15 @@ export const AnalyticsPage: React.FC = () => {
     <div className="space-y-8">
       {/* Header */}
       <div>
-        <div className="flex items-center gap-2.5">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-red-500/10 text-red-400 border border-red-500/20">
+        <div className="flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
             <BarChart3 className="h-5 w-5" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold tracking-tight text-white sm:text-3xl">
+            <h1 className="text-2xl font-bold tracking-tight text-white sm:text-3xl font-heading">
               Learning Analytics
             </h1>
-            <p className="text-xs sm:text-sm text-gray-400">
+            <p className="text-xs sm:text-sm text-slate-400">
               Deterministic progress insights, completed lessons, streaks, and tasks.
             </p>
           </div>
@@ -55,54 +55,62 @@ export const AnalyticsPage: React.FC = () => {
           {/* Key Metrics Cards */}
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {/* Completed Videos */}
-            <div className="rounded-2xl border border-gray-800 bg-gray-900/40 p-5 space-y-2">
-              <div className="flex items-center justify-between text-gray-400">
+            <div className="rounded-2xl border border-white/[0.08] bg-[#111827] p-5 space-y-2">
+              <div className="flex items-center justify-between text-slate-400">
                 <span className="text-xs font-semibold">Completed Lessons</span>
-                <CheckCircle2 className="h-4 w-4 text-emerald-400" />
+                <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                  <CheckCircle2 className="h-4 w-4" />
+                </div>
               </div>
-              <div className="text-2xl font-bold text-white">
+              <div className="text-2xl font-bold text-white font-heading">
                 {stats.completedVideos}
               </div>
-              <p className="text-[11px] text-gray-500">
-                Videos watched $\ge 90\%$ or completed
+              <p className="text-[11px] text-slate-500">
+                Videos watched ≥ 90% or completed
               </p>
             </div>
 
             {/* Completed Courses */}
-            <div className="rounded-2xl border border-gray-800 bg-gray-900/40 p-5 space-y-2">
-              <div className="flex items-center justify-between text-gray-400">
+            <div className="rounded-2xl border border-white/[0.08] bg-[#111827] p-5 space-y-2">
+              <div className="flex items-center justify-between text-slate-400">
                 <span className="text-xs font-semibold">Completed Courses</span>
-                <BookOpen className="h-4 w-4 text-red-400" />
+                <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+                  <BookOpen className="h-4 w-4" />
+                </div>
               </div>
-              <div className="text-2xl font-bold text-white">
+              <div className="text-2xl font-bold text-white font-heading">
                 {stats.completedCourses} / {stats.totalCourses}
               </div>
-              <p className="text-[11px] text-gray-500">
+              <p className="text-[11px] text-slate-500">
                 Courses where all lessons are done
               </p>
             </div>
 
             {/* Learning Streak */}
-            <div className="rounded-2xl border border-gray-800 bg-gray-900/40 p-5 space-y-2">
-              <div className="flex items-center justify-between text-gray-400">
+            <div className="rounded-2xl border border-white/[0.08] bg-[#111827] p-5 space-y-2">
+              <div className="flex items-center justify-between text-slate-400">
                 <span className="text-xs font-semibold">Current Streak</span>
-                <Flame className="h-4 w-4 text-amber-500" />
+                <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                  <Flame className="h-4 w-4" />
+                </div>
               </div>
-              <div className="text-2xl font-bold text-white">
+              <div className="text-2xl font-bold text-white font-heading">
                 {stats.currentStreak} {stats.currentStreak === 1 ? 'day' : 'days'}
               </div>
-              <p className="text-[11px] text-gray-500">
+              <p className="text-[11px] text-slate-500">
                 Best streak: {stats.longestStreak} {stats.longestStreak === 1 ? 'day' : 'days'}
               </p>
             </div>
 
             {/* Daily Tasks Completion Rate */}
-            <div className="rounded-2xl border border-gray-800 bg-gray-900/40 p-5 space-y-2">
-              <div className="flex items-center justify-between text-gray-400">
+            <div className="rounded-2xl border border-white/[0.08] bg-[#111827] p-5 space-y-2">
+              <div className="flex items-center justify-between text-slate-400">
                 <span className="text-xs font-semibold">Tasks Completed</span>
-                <ListTodo className="h-4 w-4 text-blue-400" />
+                <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-teal-500/10 text-teal-400 border border-teal-500/20">
+                  <ListTodo className="h-4 w-4" />
+                </div>
               </div>
-              <div className="text-2xl font-bold text-white">
+              <div className="text-2xl font-bold text-white font-heading">
                 {stats.tasks.completed} / {stats.tasks.total}
               </div>
               <div className="pt-1">
@@ -112,7 +120,7 @@ export const AnalyticsPage: React.FC = () => {
           </div>
 
           {/* Deterministic Learning Insights */}
-          <div className="rounded-2xl border border-gray-800 bg-gray-900/40 p-5 space-y-3">
+          <div className="rounded-2xl border border-white/[0.08] bg-[#111827] p-5 space-y-3">
             <div className="flex items-center gap-2">
               <Sparkles className="h-4 w-4 text-amber-400" />
               <h3 className="text-sm font-bold text-white">Learning Insights</h3>
@@ -121,9 +129,9 @@ export const AnalyticsPage: React.FC = () => {
               {stats.insights.map((insight, idx) => (
                 <div
                   key={idx}
-                  className="rounded-xl border border-gray-800/80 bg-gray-950/40 p-3 text-xs text-gray-300 leading-relaxed flex items-start gap-2.5"
+                  className="rounded-xl border border-white/[0.06] bg-[#0B1120] p-3 text-xs text-slate-300 leading-relaxed flex items-start gap-2.5"
                 >
-                  <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-red-600/10 text-[11px] font-bold text-red-400">
+                  <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-indigo-500/10 text-[11px] font-bold text-indigo-400 border border-indigo-500/20">
                     {idx + 1}
                   </span>
                   <span>{insight}</span>
@@ -133,9 +141,9 @@ export const AnalyticsPage: React.FC = () => {
           </div>
 
           {/* Weekly Completion Breakdown (Past 7 Days) */}
-          <div className="rounded-2xl border border-gray-800 bg-gray-900/40 p-5 space-y-4">
+          <div className="rounded-2xl border border-white/[0.08] bg-[#111827] p-5 space-y-4">
             <div className="flex items-center gap-2">
-              <TrendingUp className="h-4 w-4 text-red-400" />
+              <TrendingUp className="h-4 w-4 text-indigo-400" />
               <h3 className="text-sm font-bold text-white">
                 Activity in the Last 7 Days
               </h3>
@@ -151,26 +159,26 @@ export const AnalyticsPage: React.FC = () => {
                     key={day.date}
                     className={`flex flex-col items-center justify-between rounded-xl border p-2.5 space-y-2 transition-all ${
                       hasActivity
-                        ? 'border-red-500/30 bg-red-500/10'
-                        : 'border-gray-800/80 bg-gray-950/40'
+                        ? 'border-indigo-500/30 bg-indigo-500/10'
+                        : 'border-white/[0.06] bg-[#0B1120]'
                     }`}
                   >
-                    <span className="text-[11px] font-semibold text-gray-400">
+                    <span className="text-[11px] font-semibold text-slate-400">
                       {day.label}
                     </span>
 
                     <div className="flex flex-col items-center">
                       <span
-                        className={`text-lg font-bold ${
-                          hasActivity ? 'text-white' : 'text-gray-600'
+                        className={`text-lg font-bold font-heading ${
+                          hasActivity ? 'text-white' : 'text-slate-600'
                         }`}
                       >
                         {totalActions}
                       </span>
-                      <span className="text-[9px] text-gray-500">actions</span>
+                      <span className="text-[9px] text-slate-500">actions</span>
                     </div>
 
-                    <div className="text-[9px] text-gray-400 space-y-0.5">
+                    <div className="text-[9px] text-slate-400 space-y-0.5">
                       <div>{day.videosCompleted}v</div>
                       <div>{day.tasksCompleted}t</div>
                     </div>
@@ -182,15 +190,15 @@ export const AnalyticsPage: React.FC = () => {
 
           {/* Course Completion Breakdown */}
           {stats.courseStats.length > 0 && (
-            <div className="rounded-2xl border border-gray-800 bg-gray-900/40 p-5 space-y-4">
+            <div className="rounded-2xl border border-white/[0.08] bg-[#111827] p-5 space-y-4">
               <div className="flex items-center gap-2">
-                <BookOpen className="h-4 w-4 text-red-400" />
+                <BookOpen className="h-4 w-4 text-indigo-400" />
                 <h3 className="text-sm font-bold text-white">
                   Course Completion Status
                 </h3>
               </div>
 
-              <div className="divide-y divide-gray-800/60 rounded-xl border border-gray-800 bg-gray-950/40">
+              <div className="divide-y divide-white/[0.06] rounded-xl border border-white/[0.06] bg-[#0B1120]">
                 {stats.courseStats.map((cs) => (
                   <div
                     key={cs.courseId}
@@ -200,7 +208,7 @@ export const AnalyticsPage: React.FC = () => {
                       <h4 className="text-xs font-semibold text-white truncate">
                         {cs.title}
                       </h4>
-                      <span className="text-[11px] text-gray-400">
+                      <span className="text-[11px] text-slate-400">
                         {cs.completedVideos} / {cs.totalAvailableVideos} lessons completed
                       </span>
                     </div>
@@ -209,7 +217,7 @@ export const AnalyticsPage: React.FC = () => {
                       <div className="flex-1">
                         <ProgressBar progress={cs.completionPercentage} size="sm" />
                       </div>
-                      <span className="text-xs font-semibold text-gray-300 w-10 text-right">
+                      <span className="text-xs font-semibold text-slate-300 w-10 text-right">
                         {cs.completionPercentage}%
                       </span>
                     </div>

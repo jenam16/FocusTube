@@ -60,6 +60,36 @@ assert.strictEqual(validTask.trimmed, 'Practice useEffect');
 
 console.log('✓ Task validation logic verified!');
 
+// 2b. Study Plan Date Parsing & Overdue Derivation Logic
+console.log('2b. Testing Study Plan date parsing and overdue derivation...');
+import { parseDateToUtcMidnight, formatDateToUtcString } from '../controllers/taskController.js';
+
+const parsed = parseDateToUtcMidnight('2026-09-15');
+assert.strictEqual(parsed.getUTCFullYear(), 2026);
+assert.strictEqual(parsed.getUTCMonth(), 8); // 0-indexed September
+assert.strictEqual(parsed.getUTCDate(), 15);
+assert.strictEqual(parsed.getUTCHours(), 0);
+
+const formatted = formatDateToUtcString(parsed);
+assert.strictEqual(formatted, '2026-09-15');
+
+// Overdue derivation: date < todayMidnight && !completed
+const todayMidnight = new Date();
+todayMidnight.setUTCHours(0, 0, 0, 0);
+
+const yesterdayDate = new Date(Date.UTC(todayMidnight.getUTCFullYear(), todayMidnight.getUTCMonth(), todayMidnight.getUTCDate() - 1));
+const tomorrowDate = new Date(Date.UTC(todayMidnight.getUTCFullYear(), todayMidnight.getUTCMonth(), todayMidnight.getUTCDate() + 1));
+
+const isOverdue = (taskDate: Date, completed: boolean) => taskDate.getTime() < todayMidnight.getTime() && !completed;
+
+assert.strictEqual(isOverdue(yesterdayDate, false), true, 'Yesterday incomplete task must be overdue');
+assert.strictEqual(isOverdue(yesterdayDate, true), false, 'Yesterday completed task must NOT be overdue');
+assert.strictEqual(isOverdue(todayMidnight, false), false, 'Today incomplete task is not overdue');
+assert.strictEqual(isOverdue(tomorrowDate, false), false, 'Tomorrow task is not overdue');
+
+console.log('✓ Study Plan date parsing and overdue derivation verified!');
+
+
 // 3. Note Validation Logic
 console.log('3. Testing note validation logic...');
 const validateNote = (

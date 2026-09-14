@@ -47,7 +47,7 @@ export const LessonList = ({
 
   if (sortedVideos.length === 0) {
     return (
-      <div className="rounded-2xl border border-gray-800 bg-gray-900/40 p-10 text-center text-sm text-gray-400">
+      <div className="rounded-2xl border border-dashed border-white/[0.08] bg-[#111827]/40 p-10 text-center text-sm text-slate-400">
         No lessons found in this course syllabus.
       </div>
     );
@@ -58,12 +58,12 @@ export const LessonList = ({
       {/* Header */}
       <div className="flex items-center justify-between px-1">
         <div className="flex items-center gap-2">
-          <BookOpen className="h-4 w-4 text-red-400" />
-          <h3 className="text-base font-bold text-white">Course Syllabus</h3>
+          <BookOpen className="h-4 w-4 text-indigo-400" />
+          <h3 className="text-base font-bold text-white font-heading">Course Syllabus</h3>
         </div>
-        <div className="flex items-center gap-2 text-xs text-gray-400">
+        <div className="flex items-center gap-2 text-xs text-slate-400">
           {completedCount > 0 && (
-            <span className="text-emerald-400 font-medium">
+            <span className="text-emerald-400 font-semibold">
               {completedCount}/{availableCount} completed
             </span>
           )}
@@ -77,7 +77,7 @@ export const LessonList = ({
 
       {/* Lesson List Container */}
       <div
-        className={`space-y-1.5 overflow-y-auto rounded-2xl border border-gray-800 bg-gray-900/50 p-2 shadow-sm ${maxHeightClass}`}
+        className={`space-y-1.5 overflow-y-auto rounded-2xl border border-white/[0.08] bg-[#111827] p-2 shadow-xs ${maxHeightClass}`}
       >
         {sortedVideos.map((video) => (
           <LessonItem
@@ -94,7 +94,6 @@ export const LessonList = ({
             onSelect={onSelectVideo}
           />
         ))}
-
       </div>
     </div>
   );

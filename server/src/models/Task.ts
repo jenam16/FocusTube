@@ -4,6 +4,10 @@ export interface ITask extends Document {
   _id: mongoose.Types.ObjectId;
   user: mongoose.Types.ObjectId;
   title: string;
+  description?: string;
+  course?: mongoose.Types.ObjectId | null;
+  video?: mongoose.Types.ObjectId | null;
+  priority: 'low' | 'medium' | 'high';
   completed: boolean;
   completedAt: Date | null;
   date: Date;
@@ -25,6 +29,30 @@ const taskSchema = new Schema<ITask>(
       trim: true,
       maxlength: 200,
     },
+    description: {
+      type: String,
+      default: '',
+      trim: true,
+      maxlength: 1000,
+    },
+    course: {
+      type: Schema.Types.ObjectId,
+      ref: 'Course',
+      default: null,
+      index: true,
+    },
+    video: {
+      type: Schema.Types.ObjectId,
+      ref: 'Video',
+      default: null,
+      index: true,
+    },
+    priority: {
+      type: String,
+      enum: ['low', 'medium', 'high'],
+      default: 'medium',
+      index: true,
+    },
     completed: {
       type: Boolean,
       required: true,
@@ -43,6 +71,7 @@ const taskSchema = new Schema<ITask>(
         now.setUTCHours(0, 0, 0, 0);
         return now;
       },
+      index: true,
     },
   },
   {
@@ -50,7 +79,10 @@ const taskSchema = new Schema<ITask>(
   }
 );
 
+taskSchema.index({ user: 1, date: 1, completed: 1 });
 taskSchema.index({ user: 1, date: -1, createdAt: -1 });
+taskSchema.index({ user: 1, course: 1 });
 
 export const Task: Model<ITask> =
   mongoose.models.Task || mongoose.model<ITask>('Task', taskSchema);
+

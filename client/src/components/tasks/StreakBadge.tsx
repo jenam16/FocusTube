@@ -22,7 +22,7 @@ export const StreakBadge: React.FC<StreakBadgeProps> = ({
       className={`inline-flex items-center gap-1.5 rounded-xl border transition-all ${
         hasStreak
           ? 'border-amber-500/30 bg-amber-500/10 text-amber-400 shadow-sm shadow-amber-500/10'
-          : 'border-gray-800 bg-gray-900/60 text-gray-500'
+          : 'border-white/[0.08] bg-slate-900/60 text-slate-500'
       } ${
         isSm
           ? 'px-2.5 py-1 text-xs'

@@ -33,22 +33,22 @@ export const LessonItem = ({
     <div
       className={`group flex items-center gap-3.5 p-3 sm:gap-4 sm:p-3.5 transition-all text-left w-full rounded-xl ${
         !isAvailable
-          ? 'opacity-50 cursor-not-allowed bg-gray-950/20'
+          ? 'opacity-45 cursor-not-allowed bg-slate-950/20'
           : isSelected
-            ? 'bg-red-600/15 border border-red-500/40 text-white shadow-sm'
-            : 'hover:bg-gray-800/60 text-gray-200'
+            ? 'bg-indigo-500/12 border border-indigo-500/30 text-white shadow-xs'
+            : 'hover:bg-slate-800/50 text-slate-200 border border-transparent hover:border-white/[0.04]'
       }`}
     >
       {/* Lesson Number Badge */}
       <div
-        className={`flex h-7 w-7 sm:h-8 sm:w-8 shrink-0 items-center justify-center rounded-lg text-xs font-bold transition-colors ${
+        className={`flex h-7 w-7 sm:h-8 sm:w-8 shrink-0 items-center justify-center rounded-xl text-xs font-bold transition-colors font-heading ${
           !isAvailable
-            ? 'bg-gray-800 text-gray-500'
+            ? 'bg-slate-800 text-slate-500'
             : isSelected
-              ? 'bg-red-600 text-white shadow-md shadow-red-600/30'
+              ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
               : progress?.completed
-                ? 'bg-emerald-950/80 text-emerald-400 border border-emerald-700/50'
-                : 'bg-gray-800 text-gray-400 group-hover:bg-gray-700 group-hover:text-white'
+                ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/25'
+                : 'bg-slate-800 text-slate-400 group-hover:bg-slate-700 group-hover:text-white'
         }`}
       >
         {isSelected ? (
@@ -61,7 +61,7 @@ export const LessonItem = ({
       </div>
 
       {/* Video Thumbnail */}
-      <div className="relative aspect-video w-16 sm:w-24 shrink-0 overflow-hidden rounded-lg border border-gray-800 bg-gray-950 shadow-sm">
+      <div className="relative aspect-video w-16 sm:w-24 shrink-0 overflow-hidden rounded-lg border border-white/[0.08] bg-slate-950 shadow-xs">
         {video.thumbnail ? (
           <img
             src={video.thumbnail}
@@ -72,21 +72,21 @@ export const LessonItem = ({
             loading="lazy"
           />
         ) : (
-          <div className="flex h-full w-full items-center justify-center text-gray-600">
+          <div className="flex h-full w-full items-center justify-center text-slate-600">
             <PlaySquare className="h-5 w-5" />
           </div>
         )}
         {video.durationSeconds > 0 && (
-          <div className="absolute bottom-1 right-1 rounded bg-black/85 px-1 py-0.5 text-[9px] font-medium text-white backdrop-blur-sm">
+          <div className="absolute bottom-1 right-1 rounded bg-black/80 px-1 py-0.5 text-[9px] font-medium text-white backdrop-blur-sm">
             {formatVideoDuration(video.durationSeconds)}
           </div>
         )}
         {/* Playback progress bar at bottom of thumbnail */}
         {progress && (progress.progressPercentage > 0 || progress.completed) && (
-          <div className="absolute bottom-0 left-0 right-0 h-1 bg-gray-800/80">
+          <div className="absolute bottom-0 left-0 right-0 h-1 bg-slate-800">
             <div
               className={`h-full transition-all duration-300 ${
-                progress.completed ? 'bg-emerald-500' : 'bg-red-600'
+                progress.completed ? 'bg-emerald-400' : 'bg-indigo-500'
               }`}
               style={{
                 width: `${progress.completed ? 100 : Math.min(100, Math.max(0, progress.progressPercentage))}%`,
@@ -101,21 +101,21 @@ export const LessonItem = ({
         <h4
           className={`line-clamp-2 text-xs sm:text-sm font-medium transition-colors ${
             !isAvailable
-              ? 'text-gray-500 line-through'
+              ? 'text-slate-500 line-through'
               : isSelected
-                ? 'font-semibold text-red-400'
-                : 'text-gray-200 group-hover:text-white'
+                ? 'font-semibold text-indigo-300'
+                : 'text-slate-200 group-hover:text-white'
           }`}
         >
           {video.title}
         </h4>
-        <div className="mt-1 flex flex-wrap items-center gap-2 text-[11px] text-gray-400">
+        <div className="mt-1 flex flex-wrap items-center gap-2 text-[11px] text-slate-400">
           {video.durationSeconds > 0 && (
             <span>{formatVideoDuration(video.durationSeconds)}</span>
           )}
           {progress?.completed ? (
             <>
-              <span className="text-gray-600">•</span>
+              <span className="text-slate-600">•</span>
               <span className="text-emerald-400 font-semibold inline-flex items-center gap-1">
                 <CheckCircle2 className="h-3 w-3" />
                 Completed
@@ -123,15 +123,15 @@ export const LessonItem = ({
             </>
           ) : progress && progress.progressPercentage > 0 ? (
             <>
-              <span className="text-gray-600">•</span>
-              <span className="text-red-400 font-medium">
+              <span className="text-slate-600">•</span>
+              <span className="text-indigo-400 font-medium">
                 {progress.progressPercentage}% watched
               </span>
             </>
           ) : null}
-          <span className="text-gray-600">•</span>
+          <span className="text-slate-600">•</span>
           {isAvailable ? (
-            <span className="inline-flex items-center gap-1 text-[11px] text-gray-400">
+            <span className="inline-flex items-center gap-1 text-[11px] text-slate-400">
               <span>Available</span>
             </span>
           ) : (
@@ -155,7 +155,7 @@ export const LessonItem = ({
           <CompletedBadge size="xs" />
         )}
         {isSelected && (
-          <span className="inline-flex items-center rounded-full bg-red-600/20 px-2 py-0.5 text-[10px] font-semibold text-red-400 border border-red-500/30">
+          <span className="inline-flex items-center rounded-full bg-indigo-500/15 px-2 py-0.5 text-[10px] font-semibold text-indigo-300 border border-indigo-500/30">
             Playing
           </span>
         )}
@@ -178,7 +178,7 @@ export const LessonItem = ({
     <button
       type="button"
       onClick={handleClick}
-      className="block w-full focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500 rounded-xl text-left"
+      className="block w-full focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 rounded-xl text-left"
     >
       {content}
     </button>

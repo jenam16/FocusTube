@@ -76,7 +76,7 @@ export const NotesPanel: React.FC<NotesPanelProps> = ({
   });
 
   return (
-    <div className="rounded-2xl border border-gray-800 bg-gray-900/40 p-5 space-y-4">
+    <div className="rounded-2xl border border-white/[0.08] bg-[#111827] p-5 space-y-4">
       {/* Header */}
       <div className="flex items-center justify-between">
         <button
@@ -84,14 +84,14 @@ export const NotesPanel: React.FC<NotesPanelProps> = ({
           onClick={() => setIsExpanded((prev) => !prev)}
           className="flex items-center gap-2 text-left focus:outline-none"
         >
-          <FileText className="h-4 w-4 text-red-400" />
+          <FileText className="h-4 w-4 text-indigo-400" />
           <h3 className="text-sm font-bold text-white">
             Lesson Notes ({notes.length})
           </h3>
           {isExpanded ? (
-            <ChevronUp className="h-4 w-4 text-gray-400" />
+            <ChevronUp className="h-4 w-4 text-slate-400" />
           ) : (
-            <ChevronDown className="h-4 w-4 text-gray-400" />
+            <ChevronDown className="h-4 w-4 text-slate-400" />
           )}
         </button>
 
@@ -99,9 +99,9 @@ export const NotesPanel: React.FC<NotesPanelProps> = ({
           <button
             type="button"
             onClick={() => setIsAddingNote(true)}
-            className="inline-flex items-center gap-1.5 rounded-xl border border-gray-700 bg-gray-800/80 px-3 py-1.5 text-xs font-semibold text-gray-200 hover:bg-gray-700 hover:text-white transition-colors"
+            className="inline-flex items-center gap-1.5 rounded-xl border border-white/[0.08] bg-[#0B1120] px-3 py-1.5 text-xs font-semibold text-slate-200 hover:border-white/[0.15] hover:text-white transition-colors"
           >
-            <Plus className="h-3.5 w-3.5" />
+            <Plus className="h-3.5 w-3.5 text-indigo-400" />
             <span>Add Note</span>
           </button>
         )}
@@ -124,18 +124,18 @@ export const NotesPanel: React.FC<NotesPanelProps> = ({
 
           {/* Notes List */}
           {isLoading ? (
-            <div className="flex items-center justify-center py-6 text-xs text-gray-500">
-              <Loader2 className="h-4 w-4 animate-spin mr-2" />
+            <div className="flex items-center justify-center py-6 text-xs text-slate-500">
+              <Loader2 className="h-4 w-4 animate-spin mr-2 text-indigo-400" />
               Loading notes...
             </div>
           ) : notes.length === 0 ? (
-            <div className="rounded-xl border border-dashed border-gray-800/80 p-6 text-center space-y-2">
-              <p className="text-xs text-gray-400">No notes for this lesson yet.</p>
+            <div className="rounded-xl border border-dashed border-white/[0.08] p-6 text-center space-y-2">
+              <p className="text-xs text-slate-400">No notes for this lesson yet.</p>
               {!isAddingNote && (
                 <button
                   type="button"
                   onClick={() => setIsAddingNote(true)}
-                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-red-400 hover:text-red-300 transition-colors"
+                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-indigo-400 hover:text-indigo-300 transition-colors"
                 >
                   <Plus className="h-3.5 w-3.5" />
                   <span>Add your first note</span>

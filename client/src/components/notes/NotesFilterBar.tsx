@@ -58,18 +58,18 @@ export const NotesFilterBar: React.FC<NotesFilterBarProps> = ({
   }, [localSearch, search, onSearchChange]);
 
   return (
-    <div className="space-y-3 rounded-2xl border border-gray-800/90 bg-gray-900/50 p-3.5 backdrop-blur-sm">
+    <div className="space-y-3 rounded-2xl border border-white/[0.08] bg-[#111827] p-3.5 backdrop-blur-sm">
       {/* Top row: Search input + Pinned Toggle + Sort */}
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
         {/* Search input */}
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
           <input
             type="text"
             value={localSearch}
             onChange={(e) => setLocalSearch(e.target.value)}
             placeholder="Search notes by title, content, or tags..."
-            className="w-full rounded-xl border border-gray-800 bg-gray-950/70 pl-9 pr-8 py-2 text-xs sm:text-sm text-gray-100 placeholder-gray-500 focus:border-red-500/60 focus:outline-none focus:ring-1 focus:ring-red-500/60 transition-all"
+            className="w-full rounded-xl border border-white/[0.08] bg-[#0B1120] pl-9 pr-8 py-2 text-xs sm:text-sm text-white placeholder-slate-500 focus:border-indigo-500/60 focus:outline-none focus:ring-1 focus:ring-indigo-500/60 transition-all"
           />
           {localSearch && (
             <button
@@ -78,7 +78,7 @@ export const NotesFilterBar: React.FC<NotesFilterBarProps> = ({
                 setLocalSearch('');
                 onSearchChange('');
               }}
-              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white"
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white"
               title="Clear search"
             >
               <X className="h-3.5 w-3.5" />
@@ -93,7 +93,7 @@ export const NotesFilterBar: React.FC<NotesFilterBarProps> = ({
           className={`inline-flex items-center justify-center gap-1.5 rounded-xl border px-3 py-2 text-xs font-semibold transition-all ${
             pinnedOnly
               ? 'border-amber-500/40 bg-amber-500/15 text-amber-300 shadow-sm shadow-amber-500/10'
-              : 'border-gray-800 bg-gray-950/60 text-gray-400 hover:border-gray-700 hover:text-gray-200'
+              : 'border-white/[0.08] bg-[#0B1120] text-slate-400 hover:border-white/[0.15] hover:text-slate-200'
           }`}
           title="Filter by pinned notes"
         >
@@ -111,7 +111,7 @@ export const NotesFilterBar: React.FC<NotesFilterBarProps> = ({
               )
             }
             aria-label="Sort notes"
-            className="appearance-none rounded-xl border border-gray-800 bg-gray-950/70 pl-3 pr-8 py-2 text-xs font-medium text-gray-300 focus:border-red-500/60 focus:outline-none focus:ring-1 focus:ring-red-500/60 transition-all cursor-pointer"
+            className="appearance-none rounded-xl border border-white/[0.08] bg-[#0B1120] pl-3 pr-8 py-2 text-xs font-medium text-slate-300 focus:border-indigo-500/60 focus:outline-none focus:ring-1 focus:ring-indigo-500/60 transition-all cursor-pointer"
           >
             <option value="pinnedFirst">Pinned First</option>
             <option value="updated">Recently Updated</option>
@@ -119,14 +119,14 @@ export const NotesFilterBar: React.FC<NotesFilterBarProps> = ({
             <option value="oldest">Oldest First</option>
             <option value="title">Title (A-Z)</option>
           </select>
-          <ChevronDown className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400" />
+          <ChevronDown className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" />
         </div>
       </div>
 
       {/* Second row: Course & Lesson filters + Reset */}
-      <div className="flex flex-wrap items-center gap-2 pt-1 border-t border-gray-800/50">
-        <div className="flex items-center gap-1.5 text-xs text-gray-400 shrink-0">
-          <SlidersHorizontal className="h-3.5 w-3.5 text-gray-500" />
+      <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-white/[0.06]">
+        <div className="flex items-center gap-1.5 text-xs text-slate-400 shrink-0">
+          <SlidersHorizontal className="h-3.5 w-3.5 text-slate-500" />
           <span>Filter:</span>
         </div>
 
@@ -135,7 +135,7 @@ export const NotesFilterBar: React.FC<NotesFilterBarProps> = ({
           value={selectedCourseId}
           onChange={(e) => onCourseChange(e.target.value)}
           aria-label="Filter by course"
-          className="max-w-[200px] sm:max-w-[260px] truncate rounded-lg border border-gray-800 bg-gray-950/60 px-2.5 py-1 text-xs text-gray-300 focus:border-red-500/50 focus:outline-none cursor-pointer"
+          className="max-w-[200px] sm:max-w-[260px] truncate rounded-xl border border-white/[0.08] bg-[#0B1120] px-3 py-1.5 text-xs text-slate-300 focus:border-indigo-500/50 focus:outline-none cursor-pointer"
         >
           <option value="">All Courses</option>
           {courses.map((c) => (
@@ -151,7 +151,7 @@ export const NotesFilterBar: React.FC<NotesFilterBarProps> = ({
             value={selectedVideoId}
             onChange={(e) => onVideoChange(e.target.value)}
             aria-label="Filter by lesson"
-            className="max-w-[200px] sm:max-w-[240px] truncate rounded-lg border border-gray-800 bg-gray-950/60 px-2.5 py-1 text-xs text-gray-300 focus:border-red-500/50 focus:outline-none cursor-pointer"
+            className="max-w-[200px] sm:max-w-[240px] truncate rounded-xl border border-white/[0.08] bg-[#0B1120] px-3 py-1.5 text-xs text-slate-300 focus:border-indigo-500/50 focus:outline-none cursor-pointer"
           >
             <option value="">All Lessons</option>
             {videos.map((v) => (
@@ -174,8 +174,8 @@ export const NotesFilterBar: React.FC<NotesFilterBarProps> = ({
                   onClick={() => onTagChange(isSelected ? '' : tag)}
                   className={`rounded-full px-2.5 py-0.5 text-[11px] font-medium transition-all ${
                     isSelected
-                      ? 'bg-red-500 text-white shadow-sm shadow-red-500/20'
-                      : 'bg-gray-800/80 text-gray-400 hover:bg-gray-800 hover:text-gray-200'
+                      ? 'bg-indigo-600 text-white shadow-sm shadow-indigo-600/20'
+                      : 'bg-[#0B1120] border border-white/[0.08] text-slate-400 hover:border-white/[0.15] hover:text-slate-200'
                   }`}
                 >
                   #{tag}
@@ -190,7 +190,7 @@ export const NotesFilterBar: React.FC<NotesFilterBarProps> = ({
           <button
             type="button"
             onClick={onResetFilters}
-            className="ml-auto inline-flex items-center gap-1 rounded-lg px-2 py-1 text-xs font-medium text-gray-400 hover:bg-gray-800 hover:text-white transition-colors"
+            className="ml-auto inline-flex items-center gap-1 rounded-lg px-2.5 py-1 text-xs font-medium text-slate-400 hover:bg-white/[0.06] hover:text-white transition-colors"
           >
             <X className="h-3 w-3" />
             <span>Reset filters</span>

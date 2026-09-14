@@ -97,7 +97,7 @@ export const FocusNotesDrawer: React.FC<FocusNotesDrawerProps> = ({
     <div className="fixed inset-0 z-50 overflow-hidden">
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
+        className="fixed inset-0 bg-black/70 backdrop-blur-sm transition-opacity"
         onClick={onClose}
       />
 
@@ -105,17 +105,19 @@ export const FocusNotesDrawer: React.FC<FocusNotesDrawerProps> = ({
         <aside
           role="dialog"
           aria-label="Focus Mode Lesson Notes"
-          className="w-screen max-w-md bg-gray-900 border-l border-gray-800 shadow-2xl flex flex-col"
+          className="w-screen max-w-md bg-[#111827] border-l border-white/[0.08] shadow-2xl flex flex-col"
         >
           {/* Drawer Header */}
-          <div className="flex items-center justify-between border-b border-gray-800 p-4">
-            <div className="flex items-center gap-2 min-w-0 pr-2">
-              <FileText className="h-5 w-5 text-red-400 shrink-0" />
+          <div className="flex items-center justify-between border-b border-white/[0.06] p-4 bg-[#0B1120]">
+            <div className="flex items-center gap-2.5 min-w-0 pr-2">
+              <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 shrink-0">
+                <FileText className="h-4 w-4" />
+              </div>
               <div className="min-w-0">
-                <h3 className="text-sm font-bold text-white truncate">
+                <h3 className="text-sm font-bold text-white truncate font-heading">
                   Notes ({notes.length})
                 </h3>
-                <p className="text-xs text-gray-400 truncate">{videoTitle}</p>
+                <p className="text-xs text-slate-400 truncate">{videoTitle}</p>
               </div>
             </div>
 
@@ -124,7 +126,7 @@ export const FocusNotesDrawer: React.FC<FocusNotesDrawerProps> = ({
                 <button
                   type="button"
                   onClick={() => setIsAddingNote(true)}
-                  className="inline-flex items-center gap-1 rounded-lg bg-red-600 px-2.5 py-1 text-xs font-semibold text-white hover:bg-red-500"
+                  className="inline-flex items-center gap-1 rounded-xl bg-indigo-600 px-2.5 py-1.5 text-xs font-semibold text-white hover:bg-indigo-500 shadow-md shadow-indigo-600/20"
                 >
                   <Plus className="h-3 w-3" />
                   <span>Add</span>
@@ -133,7 +135,7 @@ export const FocusNotesDrawer: React.FC<FocusNotesDrawerProps> = ({
               <button
                 type="button"
                 onClick={onClose}
-                className="rounded-lg p-1.5 text-gray-400 hover:bg-gray-800 hover:text-white"
+                className="rounded-xl p-1.5 text-slate-400 hover:bg-white/[0.06] hover:text-white transition-colors"
                 aria-label="Close notes drawer"
               >
                 <X className="h-5 w-5" />
@@ -155,18 +157,18 @@ export const FocusNotesDrawer: React.FC<FocusNotesDrawerProps> = ({
             )}
 
             {isLoading ? (
-              <div className="flex items-center justify-center py-10 text-xs text-gray-500">
-                <Loader2 className="h-4 w-4 animate-spin mr-2" />
+              <div className="flex items-center justify-center py-10 text-xs text-slate-500">
+                <Loader2 className="h-4 w-4 animate-spin mr-2 text-indigo-400" />
                 Loading notes...
               </div>
             ) : notes.length === 0 ? (
-              <div className="rounded-xl border border-dashed border-gray-800 p-8 text-center space-y-2">
-                <p className="text-xs text-gray-400">No notes for this lesson yet.</p>
+              <div className="rounded-2xl border border-dashed border-white/[0.08] p-8 text-center space-y-2">
+                <p className="text-xs text-slate-400">No notes for this lesson yet.</p>
                 {!isAddingNote && (
                   <button
                     type="button"
                     onClick={() => setIsAddingNote(true)}
-                    className="inline-flex items-center gap-1.5 text-xs font-semibold text-red-400 hover:text-red-300"
+                    className="inline-flex items-center gap-1.5 text-xs font-semibold text-indigo-400 hover:text-indigo-300"
                   >
                     <Plus className="h-3.5 w-3.5" />
                     <span>Add your first note</span>

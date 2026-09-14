@@ -10,37 +10,15 @@ export const PlaceholderPage = ({
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight text-white sm:text-3xl">
+        <h1 className="text-2xl font-bold tracking-tight text-white sm:text-3xl font-heading">
           {title}
         </h1>
-        <p className="mt-1 text-sm text-gray-400">{description}</p>
+        <p className="mt-1 text-sm text-slate-400">{description}</p>
       </div>
 
-      <div className="rounded-2xl border border-gray-800 bg-gray-900/50 p-8 text-center text-sm text-gray-400">
+      <div className="rounded-2xl border border-white/[0.08] bg-[#111827] p-8 text-center text-sm text-slate-400">
         This section is reserved for future phases.
       </div>
     </div>
   );
 };
-
-export const StudyPlanPage = () => (
-  <PlaceholderPage
-    title="Study Plan"
-    description="Plan your daily learning schedule and goals."
-  />
-);
-
-export const FocusPage = () => (
-  <PlaceholderPage
-    title="Focus Sessions"
-    description="Immerse in deep learning sessions with timer and zero distractions."
-  />
-);
-
-
-export const SettingsPage = () => (
-  <PlaceholderPage
-    title="Settings"
-    description="Manage your FocusTube account preferences."
-  />
-);
