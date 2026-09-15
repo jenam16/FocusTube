@@ -22,12 +22,17 @@ import {
   NoteListItem,
   NoteDetailPanel,
   NoteModal,
+  ScreenshotCard,
+  ScreenshotViewerModal,
 } from '../components/notes';
 import { LoadingState, EmptyState, ErrorState } from '../components';
 
 export const NotesPage: React.FC = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+
+  // Tab switcher state ('all' vs 'screenshots')
+  const [activeTab, setActiveTab] = useState<'all' | 'screenshots'>('all');
 
   // Filters & Pagination State
   const [page, setPage] = useState(1);
@@ -47,6 +52,7 @@ export const NotesPage: React.FC = () => {
   const [isNoteModalOpen, setIsNoteModalOpen] = useState(false);
   const [noteToEdit, setNoteToEdit] = useState<NoteItemType | null>(null);
   const [noteToDelete, setNoteToDelete] = useState<NoteItemType | null>(null);
+  const [viewingScreenshot, setViewingScreenshot] = useState<NoteItemType | null>(null);
 
   // Available lessons for current filter course
   const [filterVideos, setFilterVideos] = useState<VideoItem[]>([]);
@@ -79,15 +85,16 @@ export const NotesPage: React.FC = () => {
   const queryParams = useMemo(
     () => ({
       page,
-      limit: 25,
+      limit: activeTab === 'screenshots' ? 24 : 25,
       search: search.trim() || undefined,
       courseId: selectedCourseId || undefined,
       videoId: selectedVideoId || undefined,
       pinned: pinnedOnly ? true : undefined,
       tag: selectedTag || undefined,
-      sortBy,
+      sortBy: activeTab === 'screenshots' && sortBy === 'pinnedFirst' ? 'created' : sortBy,
+      noteType: activeTab === 'screenshots' ? ('screenshot' as const) : undefined,
     }),
-    [page, search, selectedCourseId, selectedVideoId, pinnedOnly, selectedTag, sortBy]
+    [page, activeTab, search, selectedCourseId, selectedVideoId, pinnedOnly, selectedTag, sortBy]
   );
 
   const {
@@ -229,12 +236,29 @@ export const NotesPage: React.FC = () => {
     setNoteToDelete(note);
   };
 
+  const handleWatchScreenshot = (note: NoteItemType) => {
+    const courseId = typeof note.course === 'object' && note.course?._id ? note.course._id : note.course;
+    const videoId = typeof note.video === 'object' && note.video?._id ? note.video._id : note.video;
+    const timeParam = typeof note.timestampSeconds === 'number' && note.timestampSeconds > 0 ? `?t=${note.timestampSeconds}` : '';
+    navigate(`/watch/${courseId}/${videoId}${timeParam}`);
+  };
+
   return (
     <div className="space-y-4">
       {/* Header */}
       <NotesHeader
         totalNotes={total}
         totalPinned={totalPinned}
+        activeTab={activeTab}
+        onTabChange={(tab) => {
+          setActiveTab(tab);
+          setPage(1);
+          if (tab === 'screenshots') {
+            setSortBy('created');
+          } else {
+            setSortBy('pinnedFirst');
+          }
+        }}
         onNewNote={handleOpenCreate}
       />
 
@@ -277,10 +301,17 @@ export const NotesPage: React.FC = () => {
         <div className="rounded-2xl border border-white/[0.08] bg-[#111827]/50 p-8">
           {hasActiveFilters ? (
             <EmptyState
-              title="No notes match your filters"
+              title={activeTab === 'screenshots' ? 'No captured moments match your filters' : 'No notes match your filters'}
               description="Try adjusting your search terms, removing course or lesson filters, or clearing tag filters."
               actionLabel="Reset All Filters"
               onAction={handleResetFilters}
+            />
+          ) : activeTab === 'screenshots' ? (
+            <EmptyState
+              title="No captured moments yet"
+              description="Use the 'Capture Moment' button while watching videos to save screenshots of key slides, diagrams, and explanations."
+              actionLabel="Explore Courses"
+              onAction={() => navigate('/courses')}
             />
           ) : (
             <EmptyState
@@ -293,8 +324,57 @@ export const NotesPage: React.FC = () => {
         </div>
       )}
 
-      {/* Master-Detail Workspace Grid */}
-      {!isLoading && !error && total > 0 && (
+      {/* Captured Moments Grid View */}
+      {!isLoading && !error && total > 0 && activeTab === 'screenshots' && (
+        <div className="space-y-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {notes.map((note) => (
+              <ScreenshotCard
+                key={note._id}
+                note={note}
+                onWatch={handleWatchScreenshot}
+                onViewImage={(item) => setViewingScreenshot(item)}
+                onEdit={handleOpenEdit}
+                onDelete={handleDeletePrompt}
+                onTogglePin={(noteId) => togglePinMutation.mutate(noteId)}
+              />
+            ))}
+          </div>
+
+          {/* Pagination Controls */}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-between rounded-2xl border border-white/[0.08] bg-[#111827] px-4 py-3 text-xs text-slate-400">
+              <span>
+                Page {page} of {totalPages}
+              </span>
+
+              <div className="flex items-center gap-1.5">
+                <button
+                  type="button"
+                  disabled={page <= 1}
+                  onClick={() => setPage((p) => Math.max(1, p - 1))}
+                  className="inline-flex items-center gap-1 rounded-xl border border-white/[0.08] bg-[#0B1120] px-3 py-1.5 text-xs text-slate-300 hover:border-white/[0.15] hover:text-white disabled:opacity-40 transition-colors"
+                >
+                  <ChevronLeft className="h-3.5 w-3.5" />
+                  <span>Prev</span>
+                </button>
+                <button
+                  type="button"
+                  disabled={page >= totalPages}
+                  onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                  className="inline-flex items-center gap-1 rounded-xl border border-white/[0.08] bg-[#0B1120] px-3 py-1.5 text-xs text-slate-300 hover:border-white/[0.15] hover:text-white disabled:opacity-40 transition-colors"
+                >
+                  <span>Next</span>
+                  <ChevronRight className="h-3.5 w-3.5" />
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Master-Detail Workspace Grid (All Notes View) */}
+      {!isLoading && !error && total > 0 && activeTab === 'all' && (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
           {/* Left Column: Master Notes List */}
           <div
@@ -442,6 +522,14 @@ export const NotesPage: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* Screenshot Viewer Modal */}
+      <ScreenshotViewerModal
+        isOpen={Boolean(viewingScreenshot)}
+        note={viewingScreenshot}
+        onClose={() => setViewingScreenshot(null)}
+        onWatch={handleWatchScreenshot}
+      />
     </div>
   );
 };

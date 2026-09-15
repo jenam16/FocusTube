@@ -5,6 +5,10 @@ export interface IVideoNote extends Document {
   user: mongoose.Types.ObjectId;
   course: mongoose.Types.ObjectId;
   video: mongoose.Types.ObjectId;
+  noteType: 'text' | 'screenshot';
+  screenshotUrl?: string;
+  cloudinaryPublicId?: string;
+  youtubeVideoId?: string;
   title: string;
   content: string;
   timestampSeconds: number | null;
@@ -34,6 +38,24 @@ const videoNoteSchema = new Schema<IVideoNote>(
       required: true,
       index: true,
     },
+    noteType: {
+      type: String,
+      enum: ['text', 'screenshot'],
+      default: 'text',
+      index: true,
+    },
+    screenshotUrl: {
+      type: String,
+      default: undefined,
+    },
+    cloudinaryPublicId: {
+      type: String,
+      default: undefined,
+    },
+    youtubeVideoId: {
+      type: String,
+      default: undefined,
+    },
     title: {
       type: String,
       default: '',
@@ -42,7 +64,7 @@ const videoNoteSchema = new Schema<IVideoNote>(
     },
     content: {
       type: String,
-      required: true,
+      default: '',
       trim: true,
       maxlength: 5000,
     },
@@ -75,7 +97,10 @@ videoNoteSchema.index({ user: 1, isPinned: -1, updatedAt: -1 });
 videoNoteSchema.index({ user: 1, course: 1, updatedAt: -1 });
 // Fast lookups for tag searches
 videoNoteSchema.index({ user: 1, tags: 1 });
+// Fast lookups for screenshot notes filtered by noteType & created date
+videoNoteSchema.index({ user: 1, noteType: 1, createdAt: -1 });
+// Fast lookups for course-filtered screenshot notes
+videoNoteSchema.index({ user: 1, course: 1, noteType: 1, createdAt: -1 });
 
 export const VideoNote: Model<IVideoNote> =
   mongoose.models.VideoNote || mongoose.model<IVideoNote>('VideoNote', videoNoteSchema);
-

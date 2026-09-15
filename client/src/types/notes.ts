@@ -19,6 +19,10 @@ export interface NoteItem {
   user: string;
   course: string | NoteCourseInfo;
   video: string | NoteVideoInfo;
+  noteType?: 'text' | 'screenshot';
+  screenshotUrl?: string;
+  cloudinaryPublicId?: string;
+  youtubeVideoId?: string;
   title?: string;
   content: string;
   timestampSeconds: number | null;
@@ -63,6 +67,7 @@ export interface NotesQueryParams {
   search?: string;
   courseId?: string;
   videoId?: string;
+  noteType?: 'text' | 'screenshot';
   pinned?: boolean;
   tag?: string;
   sortBy?: 'updated' | 'created' | 'oldest' | 'title' | 'pinnedFirst';
@@ -88,6 +93,18 @@ export interface CreateNotePayload {
   tags?: string[];
 }
 
+export interface CreateScreenshotNotePayload {
+  courseId: string;
+  videoId: string;
+  youtubeVideoId?: string;
+  imageBase64: string;
+  timestampSeconds: number;
+  title?: string;
+  content?: string;
+  isPinned?: boolean;
+  tags?: string[];
+}
+
 export interface UpdateNotePayload {
   title?: string;
   content?: string;
@@ -95,4 +112,3 @@ export interface UpdateNotePayload {
   isPinned?: boolean;
   tags?: string[];
 }
-

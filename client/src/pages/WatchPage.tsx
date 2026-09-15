@@ -48,6 +48,18 @@ export const WatchPage = () => {
   const [isNotesDrawerOpen, setIsNotesDrawerOpen] = useState(false);
   const [currentPlaybackSeconds, setCurrentPlaybackSeconds] = useState(0);
   const playerRef = useRef<YTPlayerInstance | null>(null);
+  const playerContainerRef = useRef<HTMLDivElement | null>(null);
+
+  const getCurrentTimestamp = useCallback(() => {
+    try {
+      if (playerRef.current && typeof playerRef.current.getCurrentTime === 'function') {
+        return playerRef.current.getCurrentTime() || currentPlaybackSeconds;
+      }
+    } catch {
+      // Fallback
+    }
+    return currentPlaybackSeconds;
+  }, [currentPlaybackSeconds]);
 
   const isFocusMode = searchParams.get('focus') === 'true';
 
@@ -535,7 +547,7 @@ export const WatchPage = () => {
               </h1>
             </div>
 
-            <div className="flex items-center gap-2 self-start sm:self-auto shrink-0">
+            <div className="flex items-center gap-2 self-start sm:self-auto shrink-0 flex-wrap">
               {/* Bookmark Button */}
               <BookmarkButton
                 isBookmarked={isCurrentVideoBookmarked}
@@ -576,31 +588,36 @@ export const WatchPage = () => {
         )}
 
         {/* Official YouTube IFrame Player */}
-        {currentVideo.isAvailable !== false && Boolean(currentVideo.youtubeVideoId) ? (
-          <YouTubePlayer
-            key={currentVideo._id}
-            videoId={currentVideo.youtubeVideoId}
-            title={currentVideo.title}
-            initialSeconds={initialSeconds}
-            isTheaterMode={isFocusMode || isTheaterMode}
-            onToggleTheater={
-              isFocusMode ? undefined : () => setIsTheaterMode((prev) => !prev)
-            }
-            onReady={(player) => {
-              playerRef.current = player;
-            }}
-            onProgress={handleProgress}
-            onStateChange={handlePlayerStateChange}
-          />
-        ) : (
-          <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-white/[0.08] bg-[#111827]/40 p-12 text-center aspect-video">
-            <AlertCircle className="h-10 w-10 text-amber-500 mb-3" />
-            <h3 className="text-base font-bold text-white font-heading">Video unavailable</h3>
-            <p className="mt-1 max-w-sm text-xs text-slate-400">
-              This video cannot be played because it has been removed or set to private on YouTube.
-            </p>
-          </div>
-        )}
+        <div ref={playerContainerRef}>
+          {currentVideo.isAvailable !== false && Boolean(currentVideo.youtubeVideoId) ? (
+            <YouTubePlayer
+              key={currentVideo._id}
+              videoId={currentVideo.youtubeVideoId}
+              dbVideoId={currentVideo._id}
+              courseId={courseId}
+              title={currentVideo.title}
+              initialSeconds={initialSeconds}
+              isTheaterMode={isFocusMode || isTheaterMode}
+              onToggleTheater={
+                isFocusMode ? undefined : () => setIsTheaterMode((prev) => !prev)
+              }
+              onReady={(player) => {
+                playerRef.current = player;
+              }}
+              onProgress={handleProgress}
+              onStateChange={handlePlayerStateChange}
+              getCurrentTimestamp={getCurrentTimestamp}
+            />
+          ) : (
+            <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-white/[0.08] bg-[#111827]/40 p-12 text-center aspect-video">
+              <AlertCircle className="h-10 w-10 text-amber-500 mb-3" />
+              <h3 className="text-base font-bold text-white font-heading">Video unavailable</h3>
+              <p className="mt-1 max-w-sm text-xs text-slate-400">
+                This video cannot be played because it has been removed or set to private on YouTube.
+              </p>
+            </div>
+          )}
+        </div>
 
         {/* Navigation / Controls Section */}
         {isFocusMode ? (
@@ -617,6 +634,9 @@ export const WatchPage = () => {
             onOpenNotes={() => setIsNotesDrawerOpen(true)}
             isBookmarked={isCurrentVideoBookmarked}
             onToggleBookmark={handleToggleBookmark}
+            courseId={courseId}
+            getCurrentTimestamp={getCurrentTimestamp}
+            playerElement={playerContainerRef.current}
           />
         ) : (
           <>

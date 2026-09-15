@@ -4,6 +4,7 @@ import { AuthenticatedRequest } from '../middleware/auth.js';
 import { VideoNote } from '../models/VideoNote.js';
 import { Course } from '../models/Course.js';
 import { Video } from '../models/Video.js';
+import { uploadScreenshot, deleteScreenshot } from '../services/cloudinaryService.js';
 
 // GET /api/notes/video/:videoId - get notes for a specific video
 export const getVideoNotes = async (
@@ -77,6 +78,7 @@ export const getNotes = async (
       search = '',
       courseId,
       videoId,
+      noteType,
       pinned,
       tag,
       sortBy = 'pinnedFirst',
@@ -88,6 +90,11 @@ export const getNotes = async (
 
     // Base filter scoped to authenticated user
     const filter: Record<string, unknown> = { user: userId };
+
+    // Note type filter (e.g. 'text' or 'screenshot')
+    if (noteType === 'text' || noteType === 'screenshot') {
+      filter.noteType = noteType;
+    }
 
     // Course filter
     if (courseId) {
@@ -538,6 +545,145 @@ export const togglePinNote = async (
   }
 };
 
+// POST /api/notes/screenshot - create screenshot note
+export const createScreenshotNote = async (
+  req: AuthenticatedRequest,
+  res: Response
+): Promise<void> => {
+  try {
+    const userId = req.user?._id || req.userId;
+    if (!userId) {
+      res.status(401).json({ success: false, message: 'Authentication required' });
+      return;
+    }
+
+    const {
+      courseId,
+      videoId,
+      imageBase64,
+      timestampSeconds,
+      title,
+      content,
+      isPinned,
+      tags,
+    } = req.body;
+
+    if (!courseId || !videoId) {
+      res.status(400).json({
+        success: false,
+        message: 'courseId and videoId are required',
+      });
+      return;
+    }
+
+    if (!imageBase64 || typeof imageBase64 !== 'string') {
+      res.status(400).json({
+        success: false,
+        message: 'Valid imageBase64 screenshot data is required',
+      });
+      return;
+    }
+
+    // Validate image format prefix or basic base64
+    if (
+      !imageBase64.startsWith('data:image/') &&
+      !/^[A-Za-z0-9+/=]+$/.test(imageBase64.slice(0, 100))
+    ) {
+      res.status(400).json({
+        success: false,
+        message: 'Invalid image format',
+      });
+      return;
+    }
+
+    // Validate course exists
+    const course = mongoose.isValidObjectId(courseId)
+      ? await Course.findById(courseId)
+      : await Course.findOne({ playlistId: courseId });
+
+    if (!course) {
+      res.status(404).json({ success: false, message: 'Course not found' });
+      return;
+    }
+
+    // Validate video exists and belongs to course
+    const video = await Video.findOne({
+      $or: [
+        ...(mongoose.isValidObjectId(videoId) ? [{ _id: videoId }] : []),
+        { youtubeVideoId: videoId },
+      ],
+      courseId: course._id,
+    });
+
+    if (!video) {
+      res.status(404).json({
+        success: false,
+        message: 'Video not found or does not belong to the specified course',
+      });
+      return;
+    }
+
+    // Validate timestampSeconds
+    let parsedTimestamp: number | null = null;
+    if (timestampSeconds !== undefined && timestampSeconds !== null) {
+      const parsed = Number(timestampSeconds);
+      if (isNaN(parsed) || parsed < 0) {
+        res.status(400).json({
+          success: false,
+          message: 'timestampSeconds must be a non-negative number',
+        });
+        return;
+      }
+      parsedTimestamp = Math.floor(parsed);
+    }
+
+    // Default title from video context if not provided
+    const trimmedTitle =
+      typeof title === 'string' && title.trim()
+        ? title.trim().slice(0, 200)
+        : `Screenshot — ${video.title}`;
+
+    const trimmedContent = typeof content === 'string' ? content.trim().slice(0, 5000) : '';
+    const cleanTags = sanitizeTags(tags);
+
+    // Upload image to Cloudinary in structured folder
+    const folder = `focustube/screenshots/${userId}/${course._id}/${video._id}`;
+    const uploadResult = await uploadScreenshot(imageBase64, folder);
+
+    // Save note record in MongoDB
+    const note = await VideoNote.create({
+      user: userId,
+      course: course._id,
+      video: video._id,
+      noteType: 'screenshot',
+      screenshotUrl: uploadResult.secureUrl,
+      cloudinaryPublicId: uploadResult.publicId,
+      youtubeVideoId: video.youtubeVideoId,
+      title: trimmedTitle,
+      content: trimmedContent,
+      timestampSeconds: parsedTimestamp,
+      isPinned: Boolean(isPinned),
+      tags: cleanTags,
+    });
+
+    const populatedNote = await VideoNote.findById(note._id)
+      .populate('course', 'title thumbnail playlistId')
+      .populate('video', 'title position durationSeconds isAvailable youtubeVideoId');
+
+    res.status(201).json({
+      success: true,
+      message: 'Screenshot note created successfully',
+      note: populatedNote || note,
+    });
+  } catch (error: any) {
+    console.error('Error creating screenshot note:', error);
+    res.status(500).json({
+      success: false,
+      message: error?.message || 'Failed to create screenshot note',
+    });
+  }
+};
+
 // DELETE /api/notes/:noteId - delete note
 export const deleteNote = async (
   req: AuthenticatedRequest,
@@ -552,11 +698,18 @@ export const deleteNote = async (
       return;
     }
 
-    const result = await VideoNote.deleteOne({ _id: noteId, user: userId });
-    if (result.deletedCount === 0) {
+    const note = await VideoNote.findOne({ _id: noteId, user: userId });
+    if (!note) {
       res.status(404).json({ success: false, message: 'Note not found' });
       return;
     }
+
+    // If note has an associated Cloudinary asset, delete it safely
+    if (note.cloudinaryPublicId) {
+      await deleteScreenshot(note.cloudinaryPublicId);
+    }
+
+    await VideoNote.deleteOne({ _id: noteId, user: userId });
 
     res.json({
       success: true,

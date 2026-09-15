@@ -6,7 +6,9 @@ import {
   Maximize,
   Minimize,
   Maximize2,
+  Check,
 } from 'lucide-react';
+import { CaptureMomentButton } from './player/CaptureMomentButton';
 
 export interface YTPlayerInstance {
   loadVideoById: (
@@ -31,6 +33,8 @@ export interface YTPlayerEvent {
 
 interface YouTubePlayerProps {
   videoId: string;
+  dbVideoId?: string;
+  courseId?: string;
   title?: string;
   initialSeconds?: number;
   isTheaterMode?: boolean;
@@ -39,6 +43,7 @@ interface YouTubePlayerProps {
   onStateChange?: (event: YTPlayerEvent) => void;
   onProgress?: (currentTime: number, duration: number) => void;
   onError?: (event: YTPlayerEvent) => void;
+  getCurrentTimestamp?: () => number;
 }
 
 
@@ -109,6 +114,8 @@ const loadYouTubeIframeApi = (callback: () => void) => {
 
 export const YouTubePlayer = ({
   videoId,
+  dbVideoId,
+  courseId,
   title,
   initialSeconds = 0,
   isTheaterMode = false,
@@ -117,15 +124,19 @@ export const YouTubePlayer = ({
   onStateChange,
   onProgress,
   onError,
+  getCurrentTimestamp,
 }: YouTubePlayerProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const playerElementRef = useRef<HTMLDivElement>(null);
   const playerInstanceRef = useRef<YTPlayerInstance | null>(null);
+  const overlayControlsRef = useRef<HTMLDivElement>(null);
 
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [capturedToast, setCapturedToast] = useState<{ visible: boolean; timeText: string } | null>(null);
+  const toastTimeoutRef = useRef<number | null>(null);
 
   const progressTimerRef = useRef<number | null>(null);
   const hasResumedRef = useRef(false);
@@ -355,11 +366,47 @@ export const YouTubePlayer = ({
     initPlayer();
   }, [initPlayer]);
 
+  // Helper to get active playback timestamp
+  const getPlayerTimestamp = useCallback(() => {
+    if (getCurrentTimestamp) return getCurrentTimestamp();
+    if (playerInstanceRef.current?.getCurrentTime) {
+      try {
+        return playerInstanceRef.current.getCurrentTime();
+      } catch {
+        return 0;
+      }
+    }
+    return 0;
+  }, [getCurrentTimestamp]);
+
+  // Handle successful moment capture
+  const handleCaptureSuccess = useCallback((timestampSeconds: number) => {
+    const hrs = Math.floor(timestampSeconds / 3600);
+    const mins = Math.floor((timestampSeconds % 3600) / 60);
+    const secs = String(timestampSeconds % 60).padStart(2, '0');
+    const timeText =
+      hrs > 0
+        ? `${hrs}:${String(mins).padStart(2, '0')}:${secs}`
+        : `${mins}:${secs}`;
+
+    setCapturedToast({ visible: true, timeText });
+    if (toastTimeoutRef.current !== null) {
+      window.clearTimeout(toastTimeoutRef.current);
+    }
+    toastTimeoutRef.current = window.setTimeout(() => {
+      setCapturedToast(null);
+      toastTimeoutRef.current = null;
+    }, 3200);
+  }, []);
+
   // Clean up on unmount
   useEffect(() => {
     return () => {
       clearProgressTimer();
       reportProgress();
+      if (toastTimeoutRef.current !== null) {
+        window.clearTimeout(toastTimeoutRef.current);
+      }
       if (playerInstanceRef.current) {
         try {
           playerInstanceRef.current.destroy();
@@ -376,11 +423,15 @@ export const YouTubePlayer = ({
     <div
       ref={containerRef}
       className={`group/player relative w-full overflow-hidden rounded-2xl border border-gray-800 bg-gray-950 shadow-2xl transition-all duration-300 ${
-        isFullscreen ? 'rounded-none border-0' : ''
+        isFullscreen ? 'rounded-none border-0 h-screen w-screen flex items-center justify-center bg-black' : ''
       }`}
     >
       {/* 16:9 Aspect Ratio Container */}
-      <div className="relative aspect-video w-full overflow-hidden bg-black">
+      <div
+        className={`relative aspect-video w-full overflow-hidden bg-black ${
+          isFullscreen ? 'max-h-screen max-w-[177.78vh] mx-auto shadow-none' : ''
+        }`}
+      >
         {/* Actual IFrame target div */}
         <div ref={playerElementRef} className="h-full w-full" />
 
@@ -431,15 +482,39 @@ export const YouTubePlayer = ({
           </div>
         )}
 
-        {/* Floating Quick Sizing Controls (Theater / Full Size) */}
+        {/* Floating Quick Sizing & Capture Controls */}
         {!hasError && !isLoading && (
-          <div className="absolute top-3 right-3 z-30 flex items-center gap-1.5 opacity-0 group-hover/player:opacity-100 transition-opacity duration-200">
-            {onToggleTheater && (
+          <div
+            ref={overlayControlsRef}
+            className={`absolute top-3 right-3 z-30 flex items-center gap-2 transition-opacity duration-200 ${
+              isFullscreen
+                ? 'opacity-90 hover:opacity-100 group-hover/player:opacity-100'
+                : 'opacity-0 group-hover/player:opacity-100'
+            }`}
+          >
+            {/* Capture Moment Button - prominently accessible in Fullscreen & Player Hover */}
+            {courseId && (
+              <CaptureMomentButton
+                courseId={courseId}
+                videoId={dbVideoId || videoId}
+                youtubeVideoId={videoId}
+                videoTitle={title}
+                getCurrentTimestamp={getPlayerTimestamp}
+                videoElement={playerElementRef.current}
+                playerElement={containerRef.current}
+                hideElements={[overlayControlsRef.current]}
+                variant="overlay"
+                size="sm"
+                onSuccess={handleCaptureSuccess}
+              />
+            )}
+
+            {onToggleTheater && !isFullscreen && (
               <button
                 type="button"
                 onClick={onToggleTheater}
                 title={isTheaterMode ? 'Default View' : 'Theater Mode (Expand)'}
-                className="flex h-8 w-8 items-center justify-center rounded-lg bg-black/75 text-gray-300 hover:text-white hover:bg-black/90 backdrop-blur-sm transition-colors"
+                className="flex h-8 w-8 items-center justify-center rounded-xl border border-white/20 bg-black/75 text-gray-300 hover:text-white hover:bg-black/90 backdrop-blur-sm transition-all shadow-md"
                 aria-label={isTheaterMode ? 'Default View' : 'Theater Mode'}
               >
                 {isTheaterMode ? (
@@ -449,15 +524,24 @@ export const YouTubePlayer = ({
                 )}
               </button>
             )}
+
             <button
               type="button"
               onClick={toggleBrowserFullscreen}
               title={isFullscreen ? 'Exit Fullscreen' : 'Fullscreen'}
-              className="flex h-8 w-8 items-center justify-center rounded-lg bg-black/75 text-gray-300 hover:text-white hover:bg-black/90 backdrop-blur-sm transition-colors"
+              className="flex h-8 w-8 items-center justify-center rounded-xl border border-white/20 bg-black/75 text-gray-300 hover:text-white hover:bg-black/90 backdrop-blur-sm transition-all shadow-md"
               aria-label={isFullscreen ? 'Exit Fullscreen' : 'Fullscreen'}
             >
               <Maximize2 className="h-4 w-4" />
             </button>
+          </div>
+        )}
+
+        {/* Floating Capture Moment Toast Notification */}
+        {capturedToast && (
+          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-40 flex items-center gap-2 rounded-2xl border border-emerald-500/40 bg-gray-950/90 px-4 py-2.5 text-xs font-semibold text-emerald-300 shadow-2xl backdrop-blur-md pointer-events-none transition-all">
+            <Check className="h-4 w-4 text-emerald-400 shrink-0" />
+            <span>✓ Moment captured — {capturedToast.timeText}</span>
           </div>
         )}
       </div>

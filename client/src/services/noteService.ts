@@ -5,6 +5,7 @@ import {
   PaginatedNotesResponse,
   NotesQueryParams,
   CreateNotePayload,
+  CreateScreenshotNotePayload,
   UpdateNotePayload,
   NoteItem,
 } from '../types';
@@ -21,6 +22,7 @@ export const noteService = {
     if (params?.search) searchParams.set('search', params.search);
     if (params?.courseId) searchParams.set('courseId', params.courseId);
     if (params?.videoId) searchParams.set('videoId', params.videoId);
+    if (params?.noteType) searchParams.set('noteType', params.noteType);
     if (params?.pinned !== undefined) searchParams.set('pinned', String(params.pinned));
     if (params?.tag) searchParams.set('tag', params.tag);
     if (params?.sortBy) searchParams.set('sortBy', params.sortBy);
@@ -35,6 +37,15 @@ export const noteService = {
 
   createNote: async (payload: CreateNotePayload): Promise<{ success: boolean; note: NoteItem }> => {
     return request<{ success: boolean; note: NoteItem }>('/notes', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+  },
+
+  createScreenshotNote: async (
+    payload: CreateScreenshotNotePayload
+  ): Promise<{ success: boolean; note: NoteItem }> => {
+    return request<{ success: boolean; note: NoteItem }>('/notes/screenshot', {
       method: 'POST',
       body: JSON.stringify(payload),
     });
@@ -62,4 +73,3 @@ export const noteService = {
     });
   },
 };
-

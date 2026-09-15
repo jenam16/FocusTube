@@ -12,4 +12,5 @@ export * from './focus';
 export * from './tasks';
 export * from './notes';
 export * from './bookmarks';
+export * from './player';
 

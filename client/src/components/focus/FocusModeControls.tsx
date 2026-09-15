@@ -5,6 +5,7 @@ import { formatLessonNumber, formatVideoDuration } from '../../utils';
 import { CompletedBadge } from '../CompletedBadge';
 import { ProgressBar } from '../ProgressBar';
 import { BookmarkButton } from '../bookmarks/BookmarkButton';
+import { CaptureMomentButton } from '../player/CaptureMomentButton';
 
 interface FocusModeControlsProps {
   currentVideo: VideoItem;
@@ -19,6 +20,9 @@ interface FocusModeControlsProps {
   onOpenNotes?: () => void;
   isBookmarked?: boolean;
   onToggleBookmark?: () => Promise<void>;
+  courseId?: string;
+  getCurrentTimestamp?: () => number;
+  playerElement?: HTMLElement | null;
 }
 
 export const FocusModeControls: React.FC<FocusModeControlsProps> = ({
@@ -34,6 +38,9 @@ export const FocusModeControls: React.FC<FocusModeControlsProps> = ({
   onOpenNotes,
   isBookmarked = false,
   onToggleBookmark,
+  courseId,
+  getCurrentTimestamp,
+  playerElement,
 }) => {
   const isCompleted = Boolean(currentVideoProgress?.completed);
   const progressPct = currentVideoProgress?.progressPercentage || 0;
@@ -74,7 +81,19 @@ export const FocusModeControls: React.FC<FocusModeControlsProps> = ({
         </div>
 
         {/* Status / Quick Browse on Right */}
-        <div className="flex items-center gap-2 self-start sm:self-auto shrink-0">
+        <div className="flex items-center gap-2 self-start sm:self-auto shrink-0 flex-wrap">
+          {courseId && getCurrentTimestamp && (
+            <CaptureMomentButton
+              courseId={courseId}
+              videoId={currentVideo._id}
+              youtubeVideoId={currentVideo.youtubeVideoId}
+              videoTitle={currentVideo.title}
+              getCurrentTimestamp={getCurrentTimestamp}
+              playerElement={playerElement}
+              size="sm"
+            />
+          )}
+
           {onToggleBookmark && (
             <BookmarkButton
               isBookmarked={isBookmarked}
