@@ -1,6 +1,7 @@
 export * from './LandingNavbar';
 export * from './HeroSection';
 export * from './ProductPreview';
+export * from './ProblemSolutionSection';
 export * from './HowItWorksSection';
 export * from './CoreFeaturesSection';
 export * from './FocusModeSection';

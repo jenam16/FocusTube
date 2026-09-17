@@ -1,7 +1,7 @@
-﻿import React from 'react';
+import React from 'react';
 import { X, Play, Clock, Tag, Calendar, ExternalLink } from 'lucide-react';
 import { NoteItem } from '../../types';
-import { formatDuration } from '../../utils';
+import { formatVideoTime } from '../../utils';
 
 interface ScreenshotViewerModalProps {
   note: NoteItem | null;
@@ -98,7 +98,7 @@ export const ScreenshotViewerModal: React.FC<ScreenshotViewerModalProps> = ({
           {typeof note.timestampSeconds === 'number' && (
             <div className="absolute bottom-3 left-3 flex items-center gap-1.5 rounded-lg bg-black/85 backdrop-blur-md px-2.5 py-1 text-xs font-mono font-semibold text-white shadow-lg border border-white/10">
               <Clock className="h-3.5 w-3.5 text-indigo-400" />
-              <span>{formatDuration(note.timestampSeconds)}</span>
+              <span>{formatVideoTime(note.timestampSeconds)}</span>
             </div>
           )}
         </div>

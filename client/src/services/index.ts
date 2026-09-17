@@ -6,3 +6,4 @@ export * from './taskService';
 export * from './noteService';
 export * from './bookmarkService';
 export * from './analyticsService';
+export * from './aiService';

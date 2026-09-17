@@ -3,6 +3,7 @@ import {
   LandingNavbar,
   HeroSection,
   ProductPreview,
+  ProblemSolutionSection,
   HowItWorksSection,
   CoreFeaturesSection,
   FocusModeSection,
@@ -25,26 +26,29 @@ export const LandingPage: React.FC = () => {
         {/* 3. Realistic Product Workspace Preview */}
         <ProductPreview />
 
-        {/* 4. How It Works (4 Clean Steps) */}
+        {/* 4. YouTube Problem vs. FocusTube Solution */}
+        <ProblemSolutionSection />
+
+        {/* 5. How It Works (Connected Learning Journey Stepper) */}
         <HowItWorksSection />
 
-        {/* 5. Core Features (Focused 2x3 Grid) */}
+        {/* 6. Core Features (Controlled Bento Grid) */}
         <CoreFeaturesSection />
 
-        {/* 6. Focus Mode Experience */}
+        {/* 7. Focus Mode Experience (Clean Split Layout) */}
         <FocusModeSection />
 
-        {/* 7. Notes + Captured Moments */}
+        {/* 8. Notes + Captured Moments */}
         <NotesCaptureSection />
 
-        {/* 8. Progress & Learning Habit Tracking */}
+        {/* 9. Progress & Learning Habit Tracking (Minimal Metric Grid) */}
         <ProgressHabitSection />
 
-        {/* 9. Final High-Impact CTA */}
+        {/* 10. Final High-Impact CTA */}
         <FinalCTASection />
       </main>
 
-      {/* 10. Minimal Clean Footer */}
+      {/* 11. Minimal Clean Footer */}
       <LandingFooter />
     </div>
   );

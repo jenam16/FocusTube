@@ -1,7 +1,7 @@
 import React from 'react';
 import { Play, Trash2, Pin, Calendar, Tag, ExternalLink } from 'lucide-react';
 import { NoteItem } from '../../types';
-import { formatDuration } from '../../utils';
+import { formatVideoTime } from '../../utils';
 
 interface ScreenshotCardProps {
   note: NoteItem;
@@ -65,7 +65,7 @@ export const ScreenshotCard: React.FC<ScreenshotCardProps> = ({
         {typeof note.timestampSeconds === 'number' && (
           <div className="absolute bottom-2.5 left-2.5 z-10 flex items-center gap-1 rounded-lg bg-black/80 backdrop-blur-md px-2 py-0.5 text-xs font-mono font-semibold text-white shadow">
             <span>⏱</span>
-            <span>{formatDuration(note.timestampSeconds)}</span>
+            <span>{formatVideoTime(note.timestampSeconds)}</span>
           </div>
         )}
 

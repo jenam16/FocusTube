@@ -16,6 +16,7 @@ import {
   User as UserIcon,
 } from 'lucide-react';
 import { useAuth } from '../hooks';
+import { FocusAIPopover } from '../components';
 
 interface NavItem {
   label: string;
@@ -195,6 +196,9 @@ export const AppLayout: React.FC = () => {
           </div>
         </main>
       </div>
+
+      {/* Global Contextual Floating Assistant */}
+      <FocusAIPopover />
     </div>
   );
 };

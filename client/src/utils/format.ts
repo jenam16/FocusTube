@@ -21,22 +21,47 @@ export const formatDuration = (totalSeconds: number): string => {
 };
 
 /**
- * Formats a video duration into standard digital clock notation (e.g. "12:34" or "1:02:15").
+ * Formats a video duration / playback time in seconds into standard clock notation:
+ * - Total duration < 1 hour: MM:SS (e.g. "00:00", "00:03", "05:42", "42:17", "59:59")
+ * - Total duration >= 1 hour: HH:MM:SS (e.g. "01:00:00", "01:31:07", "02:15:42")
+ *
+ * Rules:
+ * 1. Never display decimal seconds or floating-point artifacts.
+ * 2. Always zero-pad minutes and seconds.
+ * 3. Use HH:MM:SS when duration >= 1 hour (3600 seconds), MM:SS when < 1 hour.
+ * 4. Current time and total duration follow identical formatting rules.
+ * 5. Safely handles null, undefined, NaN, Infinity, and negative values.
+ * 6. Integer rounding avoids invalid values such as 60 seconds.
  */
-export const formatVideoDuration = (totalSeconds: number): string => {
-  if (!totalSeconds || totalSeconds <= 0) return '00:00';
+export const formatVideoTime = (
+  totalSeconds?: number | string | null
+): string => {
+  if (totalSeconds == null) return '00:00';
+  const num =
+    typeof totalSeconds === 'string' ? parseFloat(totalSeconds) : totalSeconds;
+  if (isNaN(num) || !isFinite(num) || num <= 0) {
+    return '00:00';
+  }
 
-  const hours = Math.floor(totalSeconds / 3600);
-  const minutes = Math.floor((totalSeconds % 3600) / 60);
-  const seconds = totalSeconds % 60;
+  const total = Math.round(num);
+  if (total <= 0) return '00:00';
+
+  const hours = Math.floor(total / 3600);
+  const minutes = Math.floor((total % 3600) / 60);
+  const seconds = total % 60;
 
   const pad = (n: number) => n.toString().padStart(2, '0');
 
   if (hours > 0) {
-    return `${hours}:${pad(minutes)}:${pad(seconds)}`;
+    return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
   }
   return `${pad(minutes)}:${pad(seconds)}`;
 };
+
+/**
+ * Backwards-compatible alias for formatVideoTime.
+ */
+export const formatVideoDuration = formatVideoTime;
 
 /**
  * Formats 0-based lesson position into 2-digit representation (e.g. 0 -> "01", 9 -> "10").

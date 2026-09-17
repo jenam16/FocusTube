@@ -8,16 +8,17 @@ import {
   ChevronRight,
   ListVideo,
   Clock,
-  Sparkles,
-  XCircle,
 } from 'lucide-react';
 
 export const ProductPreview: React.FC = () => {
   return (
     <section className="relative px-4 sm:px-6 lg:px-8 pb-16 md:pb-24">
+      {/* Soft ambient backlight behind preview */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[50rem] h-[26rem] bg-indigo-500/[0.06] rounded-full blur-[140px] pointer-events-none -z-10" />
+
       <div className="mx-auto max-w-6xl">
-        {/* Browser / Application Frame Mockup */}
-        <div className="overflow-hidden rounded-2xl border border-white/[0.12] bg-[#0B1120] shadow-2xl shadow-indigo-950/40">
+        {/* Browser / Application Frame Mockup with top highlight */}
+        <div className="relative overflow-hidden rounded-2xl border border-white/[0.10] bg-[#0B1120] shadow-2xl shadow-black/80 before:absolute before:inset-x-0 before:top-0 before:h-px before:bg-gradient-to-r before:from-transparent before:via-white/20 before:to-transparent">
           {/* Top Window Bar */}
           <div className="flex h-11 items-center justify-between border-b border-white/[0.08] bg-[#111827] px-4">
             <div className="flex items-center gap-2">
@@ -130,7 +131,7 @@ export const ProductPreview: React.FC = () => {
                     <ListVideo className="h-4 w-4 text-indigo-400" />
                     <span>Syllabus (14/32)</span>
                   </div>
-                  <span className="text-xs font-semibold text-indigo-400">44% Course Total</span>
+                  <span className="text-xs font-semibold text-indigo-400 font-mono">44% Total</span>
                 </div>
 
                 {/* Lesson List Preview */}
@@ -194,35 +195,6 @@ export const ProductPreview: React.FC = () => {
                 </p>
               </div>
             </div>
-          </div>
-        </div>
-
-        {/* The Contrast: YouTube vs FocusTube */}
-        <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="rounded-2xl border border-rose-500/20 bg-rose-500/5 p-5 text-left">
-            <div className="flex items-center gap-2 font-bold text-rose-300 text-sm mb-2 font-heading">
-              <XCircle className="h-4 w-4 text-rose-400 shrink-0" />
-              <span>Normal YouTube Learning</span>
-            </div>
-            <ul className="space-y-1.5 text-xs text-slate-400">
-              <li>• Algorithmic recommendations pull you into irrelevant video rabbit holes</li>
-              <li>• Comment sections provoke distractions and arguments</li>
-              <li>• Hard to remember which video or timestamp you watched last week</li>
-              <li>• Important slides, code snippets, and diagrams get lost</li>
-            </ul>
-          </div>
-
-          <div className="rounded-2xl border border-indigo-500/20 bg-indigo-500/5 p-5 text-left">
-            <div className="flex items-center gap-2 font-bold text-indigo-300 text-sm mb-2 font-heading">
-              <Sparkles className="h-4 w-4 text-indigo-400 shrink-0" />
-              <span>With FocusTube</span>
-            </div>
-            <ul className="space-y-1.5 text-xs text-slate-300">
-              <li>• Distraction-free player without sidebar recommendations or comments</li>
-              <li>• Second-by-second progress tracking with seamless continuation</li>
-              <li>• Dedicated Focus Mode centered purely on your current lesson</li>
-              <li>• Video-only screenshot captures and timestamped notes saved in your workspace</li>
-            </ul>
           </div>
         </div>
       </div>

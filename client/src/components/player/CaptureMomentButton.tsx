@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Camera, Loader2, Check } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
 import { noteService } from '../../services';
-import { capturePlayerScreen } from '../../utils';
+import { capturePlayerScreen, formatVideoTime } from '../../utils';
 
 interface CaptureMomentButtonProps {
   courseId: string;
@@ -62,14 +62,8 @@ export const CaptureMomentButton: React.FC<CaptureMomentButtonProps> = ({
 
       setStatus('uploading');
 
-      // 2. Format timestamp for title (H:MM:SS or MM:SS)
-      const hrs = Math.floor(timestampSeconds / 3600);
-      const mins = Math.floor((timestampSeconds % 3600) / 60);
-      const secs = String(timestampSeconds % 60).padStart(2, '0');
-      const formattedTime =
-        hrs > 0
-          ? `${hrs}:${String(mins).padStart(2, '0')}:${secs}`
-          : `${mins}:${secs}`;
+      // 2. Format timestamp for title using centralized formatVideoTime
+      const formattedTime = formatVideoTime(timestampSeconds);
 
       const title = videoTitle
         ? `${videoTitle} — ${formattedTime}`

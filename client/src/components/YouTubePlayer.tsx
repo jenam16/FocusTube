@@ -7,8 +7,10 @@ import {
   Minimize,
   Maximize2,
   Check,
+  Gauge,
 } from 'lucide-react';
 import { CaptureMomentButton } from './player/CaptureMomentButton';
+import { formatVideoTime } from '../utils';
 
 export interface YTPlayerInstance {
   loadVideoById: (
@@ -24,6 +26,9 @@ export interface YTPlayerInstance {
   getCurrentTime?: () => number;
   getDuration?: () => number;
   getPlayerState?: () => number;
+  getPlaybackRate?: () => number;
+  setPlaybackRate?: (rate: number) => void;
+  getAvailablePlaybackRates?: () => number[];
 }
 
 export interface YTPlayerEvent {
@@ -56,6 +61,7 @@ interface YTNamespace {
       events?: {
         onReady?: (event: YTPlayerEvent) => void;
         onStateChange?: (event: YTPlayerEvent) => void;
+        onPlaybackRateChange?: (event: YTPlayerEvent) => void;
         onError?: (event: YTPlayerEvent) => void;
       };
     }
@@ -112,6 +118,29 @@ const loadYouTubeIframeApi = (callback: () => void) => {
   }
 };
 
+const PLAYBACK_SPEED_STORAGE_KEY = 'focustube_preferred_playback_rate';
+
+const getStoredPlaybackRate = (): number => {
+  try {
+    const val = sessionStorage.getItem(PLAYBACK_SPEED_STORAGE_KEY);
+    if (val) {
+      const num = parseFloat(val);
+      if (!isNaN(num) && num > 0) return num;
+    }
+  } catch {
+    // Ignore storage exceptions
+  }
+  return 1;
+};
+
+const setStoredPlaybackRate = (rate: number) => {
+  try {
+    sessionStorage.setItem(PLAYBACK_SPEED_STORAGE_KEY, String(rate));
+  } catch {
+    // Ignore storage exceptions
+  }
+};
+
 export const YouTubePlayer = ({
   videoId,
   dbVideoId,
@@ -137,6 +166,14 @@ export const YouTubePlayer = ({
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [capturedToast, setCapturedToast] = useState<{ visible: boolean; timeText: string } | null>(null);
   const toastTimeoutRef = useRef<number | null>(null);
+
+  const [playbackRate, setPlaybackRate] = useState<number>(getStoredPlaybackRate);
+  const [availableRates, setAvailableRates] = useState<number[]>([
+    0.5, 0.75, 1, 1.25, 1.5, 1.75, 2,
+  ]);
+  const [isSpeedMenuOpen, setIsSpeedMenuOpen] = useState(false);
+  const speedMenuRef = useRef<HTMLDivElement>(null);
+  const speedButtonRef = useRef<HTMLButtonElement>(null);
 
   const progressTimerRef = useRef<number | null>(null);
   const hasResumedRef = useRef(false);
@@ -221,6 +258,78 @@ export const YouTubePlayer = ({
     }
   }, []);
 
+  const syncPlaybackRate = useCallback((player: YTPlayerInstance) => {
+    try {
+      if (typeof player.getAvailablePlaybackRates === 'function') {
+        const rates = player.getAvailablePlaybackRates();
+        if (Array.isArray(rates) && rates.length > 0) {
+          setAvailableRates(rates);
+        }
+      }
+
+      let currentRate = 1;
+      if (typeof player.getPlaybackRate === 'function') {
+        currentRate = player.getPlaybackRate() || 1;
+      }
+
+      const preferred = getStoredPlaybackRate();
+      if (preferred !== 1 && typeof player.setPlaybackRate === 'function') {
+        const rates =
+          typeof player.getAvailablePlaybackRates === 'function'
+            ? player.getAvailablePlaybackRates()
+            : [];
+        if (!rates || rates.length === 0 || rates.includes(preferred)) {
+          player.setPlaybackRate(preferred);
+          currentRate = preferred;
+        }
+      }
+
+      setPlaybackRate(currentRate);
+    } catch {
+      // Ignore if player not ready
+    }
+  }, []);
+
+  const handleSelectPlaybackRate = useCallback((rate: number) => {
+    setIsSpeedMenuOpen(false);
+    setStoredPlaybackRate(rate);
+    if (
+      playerInstanceRef.current &&
+      typeof playerInstanceRef.current.setPlaybackRate === 'function'
+    ) {
+      playerInstanceRef.current.setPlaybackRate(rate);
+    }
+  }, []);
+
+  // Close speed dropdown on outside click or Escape
+  useEffect(() => {
+    if (!isSpeedMenuOpen) return;
+
+    const handleClickOutside = (e: MouseEvent) => {
+      if (
+        speedMenuRef.current &&
+        !speedMenuRef.current.contains(e.target as Node) &&
+        speedButtonRef.current &&
+        !speedButtonRef.current.contains(e.target as Node)
+      ) {
+        setIsSpeedMenuOpen(false);
+      }
+    };
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setIsSpeedMenuOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isSpeedMenuOpen]);
+
   const handlePlayerStateChange = useCallback(
     (event: YTPlayerEvent) => {
       const state = event.data;
@@ -287,6 +396,11 @@ export const YouTubePlayer = ({
           });
           hasResumedRef.current = startSec > 0;
           setIsLoading(false);
+          setTimeout(() => {
+            if (playerInstanceRef.current) {
+              syncPlaybackRate(playerInstanceRef.current);
+            }
+          }, 300);
           return;
         } catch (e: unknown) {
           void e;
@@ -319,6 +433,7 @@ export const YouTubePlayer = ({
               onReady: (event: YTPlayerEvent) => {
                 setIsLoading(false);
                 setHasError(false);
+                syncPlaybackRate(event.target);
                 if (startSec > 0 && !hasResumedRef.current) {
                   hasResumedRef.current = true;
                   try {
@@ -331,7 +446,25 @@ export const YouTubePlayer = ({
                 }
                 if (onReadyRef.current) onReadyRef.current(event.target);
               },
-              onStateChange: handlePlayerStateChange,
+              onStateChange: (event: YTPlayerEvent) => {
+                if (typeof event.target.getAvailablePlaybackRates === 'function') {
+                  const rates = event.target.getAvailablePlaybackRates();
+                  if (Array.isArray(rates) && rates.length > 0) {
+                    setAvailableRates(rates);
+                  }
+                }
+                handlePlayerStateChange(event);
+              },
+              onPlaybackRateChange: (event: YTPlayerEvent) => {
+                const newRate = typeof event.data === 'number' ? event.data : 1;
+                setPlaybackRate(newRate);
+                if (typeof event.target.getAvailablePlaybackRates === 'function') {
+                  const rates = event.target.getAvailablePlaybackRates();
+                  if (Array.isArray(rates) && rates.length > 0) {
+                    setAvailableRates(rates);
+                  }
+                }
+              },
               onError: (event: YTPlayerEvent) => {
                 setIsLoading(false);
                 setHasError(true);
@@ -359,7 +492,7 @@ export const YouTubePlayer = ({
         setErrorMessage('Failed to initialize video player.');
       }
     });
-  }, [videoId, initialSeconds, handlePlayerStateChange]);
+  }, [videoId, initialSeconds, handlePlayerStateChange, syncPlaybackRate]);
 
   // Trigger init / update when videoId changes
   useEffect(() => {
@@ -381,14 +514,7 @@ export const YouTubePlayer = ({
 
   // Handle successful moment capture
   const handleCaptureSuccess = useCallback((timestampSeconds: number) => {
-    const hrs = Math.floor(timestampSeconds / 3600);
-    const mins = Math.floor((timestampSeconds % 3600) / 60);
-    const secs = String(timestampSeconds % 60).padStart(2, '0');
-    const timeText =
-      hrs > 0
-        ? `${hrs}:${String(mins).padStart(2, '0')}:${secs}`
-        : `${mins}:${secs}`;
-
+    const timeText = formatVideoTime(timestampSeconds);
     setCapturedToast({ visible: true, timeText });
     if (toastTimeoutRef.current !== null) {
       window.clearTimeout(toastTimeoutRef.current);
@@ -508,6 +634,69 @@ export const YouTubePlayer = ({
                 onSuccess={handleCaptureSuccess}
               />
             )}
+
+            {/* Playback Speed Control */}
+            <div className="relative">
+              <button
+                ref={speedButtonRef}
+                type="button"
+                onClick={() => {
+                  if (!isSpeedMenuOpen && playerInstanceRef.current?.getAvailablePlaybackRates) {
+                    const rates = playerInstanceRef.current.getAvailablePlaybackRates();
+                    if (Array.isArray(rates) && rates.length > 0) {
+                      setAvailableRates(rates);
+                    }
+                  }
+                  setIsSpeedMenuOpen((prev) => !prev);
+                }}
+                title="Playback speed"
+                aria-label={`Playback speed: ${playbackRate}x`}
+                aria-expanded={isSpeedMenuOpen}
+                aria-haspopup="true"
+                className={`flex h-8 items-center gap-1.5 rounded-xl border px-2.5 backdrop-blur-sm transition-all shadow-md text-xs font-semibold font-mono ${
+                  isSpeedMenuOpen
+                    ? 'border-indigo-500 bg-indigo-950/90 text-white ring-1 ring-indigo-500'
+                    : 'border-white/20 bg-black/75 text-gray-200 hover:text-white hover:bg-black/90'
+                }`}
+              >
+                <Gauge className="h-3.5 w-3.5 text-indigo-400" />
+                <span>{playbackRate}x</span>
+              </button>
+
+              {/* Speed Options Dropdown */}
+              {isSpeedMenuOpen && (
+                <div
+                  ref={speedMenuRef}
+                  role="menu"
+                  aria-label="Playback speed options"
+                  className="absolute right-0 top-10 z-50 w-36 overflow-hidden rounded-xl border border-white/[0.12] bg-[#0B1120]/95 p-1 shadow-2xl backdrop-blur-xl animate-in fade-in zoom-in-95 duration-150"
+                >
+                  <div className="px-2.5 py-1.5 text-[11px] font-semibold text-slate-400 border-b border-white/[0.08] mb-1">
+                    Playback speed
+                  </div>
+                  <div className="max-h-56 overflow-y-auto space-y-0.5 scrollbar-thin scrollbar-thumb-slate-700">
+                    {availableRates.map((rate) => (
+                      <button
+                        key={rate}
+                        type="button"
+                        role="menuitem"
+                        onClick={() => handleSelectPlaybackRate(rate)}
+                        className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-mono transition-colors ${
+                          playbackRate === rate
+                            ? 'bg-indigo-600/30 text-indigo-300 font-bold border border-indigo-500/30'
+                            : 'text-slate-300 hover:bg-slate-800 hover:text-white'
+                        }`}
+                      >
+                        <span>{rate}x</span>
+                        {playbackRate === rate && (
+                          <Check className="h-3.5 w-3.5 text-indigo-400" />
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
 
             {onToggleTheater && !isFullscreen && (
               <button

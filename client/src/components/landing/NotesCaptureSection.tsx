@@ -11,7 +11,10 @@ import {
 
 export const NotesCaptureSection: React.FC = () => {
   return (
-    <section id="notes" className="relative py-16 md:py-24 bg-[#0F172A] border-t border-white/[0.08]">
+    <section id="notes" className="relative py-16 md:py-24 bg-[#0F172A] border-t border-white/[0.08] overflow-hidden">
+      {/* Subtle ambient lighting */}
+      <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-[40rem] h-[22rem] bg-indigo-500/[0.06] rounded-full blur-[140px] pointer-events-none -z-10" />
+
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-14">
@@ -53,8 +56,8 @@ export const NotesCaptureSection: React.FC = () => {
         {/* Realistic Note & Captured Moment Cards Showcase */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
           {/* Left Column: Feature Highlights */}
-          <div className="lg:col-span-5 space-y-6">
-            <div className="rounded-2xl border border-white/[0.08] bg-[#111827] p-6 space-y-3">
+          <div className="lg:col-span-5 space-y-5">
+            <div className="rounded-2xl border border-white/[0.08] bg-white/[0.03] hover:bg-white/[0.045] hover:border-white/[0.16] p-6 space-y-2.5 transition-all duration-200">
               <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
                 <Camera className="h-4 w-4" />
               </div>
@@ -62,11 +65,11 @@ export const NotesCaptureSection: React.FC = () => {
                 Clean Video-Only Capture
               </h3>
               <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
-                Save an exact frame from the lesson without taking screenshots of your whole monitor or browser tabs. Letterbox bars and toolbars are automatically cropped out.
+                Save an exact frame from the lesson without capturing your desktop or browser tabs. Letterbox bars and toolbars are automatically cropped out.
               </p>
             </div>
 
-            <div className="rounded-2xl border border-white/[0.08] bg-[#111827] p-6 space-y-3">
+            <div className="rounded-2xl border border-white/[0.08] bg-white/[0.03] hover:bg-white/[0.045] hover:border-white/[0.16] p-6 space-y-2.5 transition-all duration-200">
               <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-teal-500/10 text-teal-400 border border-teal-500/20">
                 <Clock className="h-4 w-4" />
               </div>
@@ -74,11 +77,11 @@ export const NotesCaptureSection: React.FC = () => {
                 One-Click "Watch Moment"
               </h3>
               <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
-                Every captured snapshot and note is automatically tied to the exact second in the video. Click "Watch Moment" anytime to jump back and review.
+                Every snapshot is tied to the exact second in the video. Click "Watch Moment" anytime to jump back and review.
               </p>
             </div>
 
-            <div className="rounded-2xl border border-white/[0.08] bg-[#111827] p-6 space-y-3">
+            <div className="rounded-2xl border border-white/[0.08] bg-white/[0.03] hover:bg-white/[0.045] hover:border-white/[0.16] p-6 space-y-2.5 transition-all duration-200">
               <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-amber-500/10 text-amber-400 border border-amber-500/20">
                 <Bookmark className="h-4 w-4" />
               </div>
@@ -93,7 +96,7 @@ export const NotesCaptureSection: React.FC = () => {
 
           {/* Right Column: High-Fidelity Captured Moment Card Mockup */}
           <div className="lg:col-span-7">
-            <div className="rounded-2xl border border-white/[0.12] bg-[#111827] p-5 sm:p-6 shadow-2xl shadow-indigo-950/30">
+            <div className="rounded-2xl border border-white/[0.10] bg-[#111827] p-5 sm:p-6 shadow-2xl shadow-black/80">
               {/* Header inside Note Card */}
               <div className="flex items-center justify-between pb-4 border-b border-white/[0.08]">
                 <div className="flex items-center gap-2 text-xs font-semibold text-slate-400">
@@ -166,7 +169,7 @@ export const NotesCaptureSection: React.FC = () => {
                   <Play className="h-3.5 w-3.5 fill-current" />
                   <span>Watch Moment at 14:28</span>
                 </div>
-                <span className="text-xs text-slate-400">
+                <span className="text-xs text-slate-400 font-mono">
                   Replays directly at 14:28
                 </span>
               </div>

@@ -7,6 +7,7 @@ import taskRoutes from './taskRoutes.js';
 import analyticsRoutes from './analyticsRoutes.js';
 import noteRoutes from './noteRoutes.js';
 import bookmarkRoutes from './bookmarkRoutes.js';
+import aiRoutes from './aiRoutes.js';
 
 const router = Router();
 
@@ -25,6 +26,7 @@ router.use('/tasks', taskRoutes);
 router.use('/analytics', analyticsRoutes);
 router.use('/notes', noteRoutes);
 router.use('/bookmarks', bookmarkRoutes);
+router.use('/ai', aiRoutes);
 
 export default router;
 

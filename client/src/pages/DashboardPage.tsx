@@ -30,7 +30,12 @@ import {
   DailyTaskList,
   StreakBadge,
 } from '../components';
-import { formatDuration, formatLessonNumber, formatVideoDuration, formatTimeAgo } from '../utils';
+import {
+  formatDuration,
+  formatLessonNumber,
+  formatVideoTime,
+  formatTimeAgo,
+} from '../utils';
 
 export const DashboardPage = () => {
   const { user } = useAuth();
@@ -337,8 +342,8 @@ export const DashboardPage = () => {
                           </span>
                           {!isAdvancingToNext && recent.durationSeconds > 0 && (
                             <span>
-                              {formatVideoDuration(recent.watchedSeconds)} /{' '}
-                              {formatVideoDuration(recent.durationSeconds)}
+                              {formatVideoTime(recent.watchedSeconds)} /{' '}
+                              {formatVideoTime(recent.durationSeconds)}
                             </span>
                           )}
                         </div>
