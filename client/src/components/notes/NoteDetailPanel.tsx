@@ -34,7 +34,7 @@ export const NoteDetailPanel: React.FC<NoteDetailPanelProps> = ({
 
   if (!note) {
     return (
-      <div className="flex h-full min-h-[400px] flex-col items-center justify-center rounded-2xl border border-white/[0.08] bg-[#111827]/50 p-8 text-center">
+      <div className="flex h-full min-h-[400px] flex-col items-center justify-center rounded-2xl border border-white/[0.07] bg-[#0B101E] p-8 text-center shadow-lg shadow-black/20">
         <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/[0.04] text-slate-500 mb-3 border border-white/[0.06]">
           <FileText className="h-6 w-6" />
         </div>
@@ -79,9 +79,9 @@ export const NoteDetailPanel: React.FC<NoteDetailPanelProps> = ({
   const displayTitle = note.title && note.title.trim() ? note.title.trim() : 'Untitled Note';
 
   return (
-    <div className="flex flex-col h-full rounded-2xl border border-white/[0.08] bg-[#111827] overflow-hidden backdrop-blur-sm">
+    <div className="flex flex-col h-full rounded-2xl border border-white/[0.07] bg-[#0B101E] overflow-hidden backdrop-blur-sm shadow-xl shadow-black/20">
       {/* Top action toolbar */}
-      <div className="flex items-center justify-between gap-3 border-b border-white/[0.06] p-4 bg-[#0B1120]">
+      <div className="flex items-center justify-between gap-3 border-b border-white/[0.07] p-4 bg-[#070B14]/90">
         <div className="flex items-center gap-2.5 min-w-0">
           <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 shrink-0">
             <BookOpen className="h-4 w-4" />
@@ -104,7 +104,7 @@ export const NoteDetailPanel: React.FC<NoteDetailPanelProps> = ({
             className={`rounded-xl border p-2 text-xs font-medium transition-all ${
               note.isPinned
                 ? 'border-amber-500/30 bg-amber-500/10 text-amber-300 hover:bg-amber-500/20'
-                : 'border-white/[0.08] bg-[#111827] text-slate-400 hover:text-white hover:border-white/[0.15]'
+                : 'border-white/[0.08] bg-[#0D1527] text-slate-400 hover:text-white hover:border-white/[0.18]'
             }`}
             title={note.isPinned ? 'Unpin note' : 'Pin note to top'}
           >
@@ -114,7 +114,7 @@ export const NoteDetailPanel: React.FC<NoteDetailPanelProps> = ({
           <button
             type="button"
             onClick={() => onEdit(note)}
-            className="rounded-xl border border-white/[0.08] bg-[#111827] p-2 text-slate-400 hover:border-white/[0.15] hover:text-white transition-all"
+            className="rounded-xl border border-white/[0.08] bg-[#0D1527] p-2 text-slate-400 hover:border-white/[0.18] hover:text-white transition-all"
             title="Edit note"
           >
             <Edit2 className="h-4 w-4" />
@@ -123,7 +123,7 @@ export const NoteDetailPanel: React.FC<NoteDetailPanelProps> = ({
           <button
             type="button"
             onClick={() => onDelete(note)}
-            className="rounded-xl border border-white/[0.08] bg-[#111827] p-2 text-slate-400 hover:border-rose-500/40 hover:bg-rose-500/10 hover:text-rose-400 transition-all"
+            className="rounded-xl border border-white/[0.08] bg-[#0D1527] p-2 text-slate-400 hover:border-rose-500/40 hover:bg-rose-500/10 hover:text-rose-400 transition-all"
             title="Delete note"
           >
             <Trash2 className="h-4 w-4" />
@@ -135,7 +135,7 @@ export const NoteDetailPanel: React.FC<NoteDetailPanelProps> = ({
       <div className="flex-1 overflow-y-auto p-5 space-y-4">
         {/* Watch lesson button / timestamp jump */}
         {courseId && videoId && (
-          <div className="flex items-center justify-between gap-3 rounded-2xl border border-white/[0.06] bg-[#0B1120] p-3.5">
+          <div className="flex items-center justify-between gap-3 rounded-2xl border border-white/[0.06] bg-[#070B14]/80 p-3.5">
             <div className="flex items-center gap-3 min-w-0">
               {note.timestampSeconds !== null && note.timestampSeconds !== undefined ? (
                 <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-500/15 text-indigo-400 border border-indigo-500/30 shrink-0 font-mono text-xs font-bold">

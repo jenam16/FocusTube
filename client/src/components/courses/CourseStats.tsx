@@ -18,7 +18,7 @@ export const CourseStats = ({ course }: CourseStatsProps) => {
   return (
     <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
       {/* Total Lessons */}
-      <div className="flex items-center gap-3 rounded-2xl border border-white/[0.08] bg-[#111827] p-3.5 sm:p-4 shadow-xs">
+      <div className="flex items-center gap-3 rounded-2xl border border-white/[0.07] bg-[#0B101E] p-3.5 sm:p-4 shadow-lg shadow-black/20">
         <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-indigo-500/25 bg-indigo-500/15 text-indigo-400">
           <BookOpen className="h-5 w-5" />
         </div>
@@ -31,7 +31,7 @@ export const CourseStats = ({ course }: CourseStatsProps) => {
       </div>
 
       {/* Total Duration */}
-      <div className="flex items-center gap-3 rounded-2xl border border-white/[0.08] bg-[#111827] p-3.5 sm:p-4 shadow-xs">
+      <div className="flex items-center gap-3 rounded-2xl border border-white/[0.07] bg-[#0B101E] p-3.5 sm:p-4 shadow-lg shadow-black/20">
         <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-teal-500/25 bg-teal-500/15 text-teal-400">
           <Clock className="h-5 w-5" />
         </div>
@@ -44,7 +44,7 @@ export const CourseStats = ({ course }: CourseStatsProps) => {
       </div>
 
       {/* Channel */}
-      <div className="flex items-center gap-3 rounded-2xl border border-white/[0.08] bg-[#111827] p-3.5 sm:p-4 shadow-xs">
+      <div className="flex items-center gap-3 rounded-2xl border border-white/[0.07] bg-[#0B101E] p-3.5 sm:p-4 shadow-lg shadow-black/20">
         <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-sky-500/25 bg-sky-500/15 text-sky-400">
           <User className="h-5 w-5" />
         </div>
@@ -57,7 +57,7 @@ export const CourseStats = ({ course }: CourseStatsProps) => {
       </div>
 
       {/* Imported Date */}
-      <div className="flex items-center gap-3 rounded-2xl border border-white/[0.08] bg-[#111827] p-3.5 sm:p-4 shadow-xs">
+      <div className="flex items-center gap-3 rounded-2xl border border-white/[0.07] bg-[#0B101E] p-3.5 sm:p-4 shadow-lg shadow-black/20">
         <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-emerald-500/25 bg-emerald-500/15 text-emerald-400">
           <Calendar className="h-5 w-5" />
         </div>

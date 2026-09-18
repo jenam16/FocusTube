@@ -55,14 +55,14 @@ export const AnalyticsPage: React.FC = () => {
           {/* Key Metrics Cards */}
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {/* Completed Videos */}
-            <div className="rounded-2xl border border-white/[0.08] bg-[#111827] p-5 space-y-2">
+            <div className="rounded-2xl border border-white/[0.07] bg-[#0B101E] p-5 space-y-2 shadow-lg shadow-black/20 hover:border-indigo-500/30 transition-all duration-200">
               <div className="flex items-center justify-between text-slate-400">
                 <span className="text-xs font-semibold">Completed Lessons</span>
                 <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
                   <CheckCircle2 className="h-4 w-4" />
                 </div>
               </div>
-              <div className="text-2xl font-bold text-white font-heading">
+              <div className="text-2xl font-bold text-white font-heading tracking-tight">
                 {stats.completedVideos}
               </div>
               <p className="text-[11px] text-slate-500">
@@ -71,14 +71,14 @@ export const AnalyticsPage: React.FC = () => {
             </div>
 
             {/* Completed Courses */}
-            <div className="rounded-2xl border border-white/[0.08] bg-[#111827] p-5 space-y-2">
+            <div className="rounded-2xl border border-white/[0.07] bg-[#0B101E] p-5 space-y-2 shadow-lg shadow-black/20 hover:border-indigo-500/30 transition-all duration-200">
               <div className="flex items-center justify-between text-slate-400">
                 <span className="text-xs font-semibold">Completed Courses</span>
                 <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
                   <BookOpen className="h-4 w-4" />
                 </div>
               </div>
-              <div className="text-2xl font-bold text-white font-heading">
+              <div className="text-2xl font-bold text-white font-heading tracking-tight">
                 {stats.completedCourses} / {stats.totalCourses}
               </div>
               <p className="text-[11px] text-slate-500">
@@ -87,14 +87,14 @@ export const AnalyticsPage: React.FC = () => {
             </div>
 
             {/* Learning Streak */}
-            <div className="rounded-2xl border border-white/[0.08] bg-[#111827] p-5 space-y-2">
+            <div className="rounded-2xl border border-white/[0.07] bg-[#0B101E] p-5 space-y-2 shadow-lg shadow-black/20 hover:border-indigo-500/30 transition-all duration-200">
               <div className="flex items-center justify-between text-slate-400">
                 <span className="text-xs font-semibold">Current Streak</span>
                 <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-amber-500/10 text-amber-400 border border-amber-500/20">
                   <Flame className="h-4 w-4" />
                 </div>
               </div>
-              <div className="text-2xl font-bold text-white font-heading">
+              <div className="text-2xl font-bold text-white font-heading tracking-tight">
                 {stats.currentStreak} {stats.currentStreak === 1 ? 'day' : 'days'}
               </div>
               <p className="text-[11px] text-slate-500">
@@ -103,14 +103,14 @@ export const AnalyticsPage: React.FC = () => {
             </div>
 
             {/* Daily Tasks Completion Rate */}
-            <div className="rounded-2xl border border-white/[0.08] bg-[#111827] p-5 space-y-2">
+            <div className="rounded-2xl border border-white/[0.07] bg-[#0B101E] p-5 space-y-2 shadow-lg shadow-black/20 hover:border-indigo-500/30 transition-all duration-200">
               <div className="flex items-center justify-between text-slate-400">
                 <span className="text-xs font-semibold">Tasks Completed</span>
                 <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-teal-500/10 text-teal-400 border border-teal-500/20">
                   <ListTodo className="h-4 w-4" />
                 </div>
               </div>
-              <div className="text-2xl font-bold text-white font-heading">
+              <div className="text-2xl font-bold text-white font-heading tracking-tight">
                 {stats.tasks.completed} / {stats.tasks.total}
               </div>
               <div className="pt-1">
@@ -120,16 +120,16 @@ export const AnalyticsPage: React.FC = () => {
           </div>
 
           {/* Deterministic Learning Insights */}
-          <div className="rounded-2xl border border-white/[0.08] bg-[#111827] p-5 space-y-3">
+          <div className="rounded-2xl border border-white/[0.07] bg-[#0B101E] p-5 space-y-3 shadow-lg shadow-black/20">
             <div className="flex items-center gap-2">
               <Sparkles className="h-4 w-4 text-amber-400" />
-              <h3 className="text-sm font-bold text-white">Learning Insights</h3>
+              <h3 className="text-sm font-bold text-white font-heading">Learning Insights</h3>
             </div>
             <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
               {stats.insights.map((insight, idx) => (
                 <div
                   key={idx}
-                  className="rounded-xl border border-white/[0.06] bg-[#0B1120] p-3 text-xs text-slate-300 leading-relaxed flex items-start gap-2.5"
+                  className="rounded-xl border border-white/[0.06] bg-[#070B14]/80 p-3 text-xs text-slate-300 leading-relaxed flex items-start gap-2.5"
                 >
                   <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-indigo-500/10 text-[11px] font-bold text-indigo-400 border border-indigo-500/20">
                     {idx + 1}
@@ -141,10 +141,10 @@ export const AnalyticsPage: React.FC = () => {
           </div>
 
           {/* Weekly Completion Breakdown (Past 7 Days) */}
-          <div className="rounded-2xl border border-white/[0.08] bg-[#111827] p-5 space-y-4">
+          <div className="rounded-2xl border border-white/[0.07] bg-[#0B101E] p-5 space-y-4 shadow-lg shadow-black/20">
             <div className="flex items-center gap-2">
               <TrendingUp className="h-4 w-4 text-indigo-400" />
-              <h3 className="text-sm font-bold text-white">
+              <h3 className="text-sm font-bold text-white font-heading">
                 Activity in the Last 7 Days
               </h3>
             </div>
@@ -159,8 +159,8 @@ export const AnalyticsPage: React.FC = () => {
                     key={day.date}
                     className={`flex flex-col items-center justify-between rounded-xl border p-2.5 space-y-2 transition-all ${
                       hasActivity
-                        ? 'border-indigo-500/30 bg-indigo-500/10'
-                        : 'border-white/[0.06] bg-[#0B1120]'
+                        ? 'border-indigo-500/40 bg-indigo-500/10 shadow-sm'
+                        : 'border-white/[0.05] bg-[#070B14]'
                     }`}
                   >
                     <span className="text-[11px] font-semibold text-slate-400">
@@ -190,15 +190,15 @@ export const AnalyticsPage: React.FC = () => {
 
           {/* Course Completion Breakdown */}
           {stats.courseStats.length > 0 && (
-            <div className="rounded-2xl border border-white/[0.08] bg-[#111827] p-5 space-y-4">
+            <div className="rounded-2xl border border-white/[0.07] bg-[#0B101E] p-5 space-y-4 shadow-lg shadow-black/20">
               <div className="flex items-center gap-2">
                 <BookOpen className="h-4 w-4 text-indigo-400" />
-                <h3 className="text-sm font-bold text-white">
+                <h3 className="text-sm font-bold text-white font-heading">
                   Course Completion Status
                 </h3>
               </div>
 
-              <div className="divide-y divide-white/[0.06] rounded-xl border border-white/[0.06] bg-[#0B1120]">
+              <div className="divide-y divide-white/[0.06] rounded-xl border border-white/[0.06] bg-[#070B14]/80">
                 {stats.courseStats.map((cs) => (
                   <div
                     key={cs.courseId}

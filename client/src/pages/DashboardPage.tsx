@@ -140,33 +140,33 @@ export const DashboardPage = () => {
         <>
           {/* Actual Stats Bar */}
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-            <div className="flex items-center gap-3.5 rounded-2xl border border-white/[0.08] bg-[#111827] p-4 shadow-xs">
-              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-indigo-500/15 text-indigo-400 border border-indigo-500/25">
+            <div className="flex items-center gap-4 rounded-2xl border border-white/[0.07] bg-[#0B101E]/90 p-5 shadow-xs transition-all hover:border-indigo-500/30">
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 shadow-xs">
                 <BookOpen className="h-5 w-5" />
               </div>
               <div>
-                <p className="text-xs font-medium text-slate-400">My Courses</p>
-                <p className="text-xl font-bold text-white font-heading">{courseCount}</p>
+                <p className="text-xs font-medium uppercase tracking-wider text-slate-400">My Courses</p>
+                <p className="text-2xl font-bold tracking-tight text-white font-heading">{courseCount}</p>
               </div>
             </div>
 
-            <div className="flex items-center gap-3.5 rounded-2xl border border-white/[0.08] bg-[#111827] p-4 shadow-xs">
-              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-teal-500/15 text-teal-400 border border-teal-500/25">
+            <div className="flex items-center gap-4 rounded-2xl border border-white/[0.07] bg-[#0B101E]/90 p-5 shadow-xs transition-all hover:border-teal-500/30">
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-teal-500/10 text-teal-400 border border-teal-500/20 shadow-xs">
                 <Video className="h-5 w-5" />
               </div>
               <div>
-                <p className="text-xs font-medium text-slate-400">Total Lessons</p>
-                <p className="text-xl font-bold text-white font-heading">{totalVideosCount}</p>
+                <p className="text-xs font-medium uppercase tracking-wider text-slate-400">Total Lessons</p>
+                <p className="text-2xl font-bold tracking-tight text-white font-heading">{totalVideosCount}</p>
               </div>
             </div>
 
-            <div className="flex items-center gap-3.5 rounded-2xl border border-white/[0.08] bg-[#111827] p-4 shadow-xs">
-              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-amber-500/15 text-amber-400 border border-amber-500/25">
+            <div className="flex items-center gap-4 rounded-2xl border border-white/[0.07] bg-[#0B101E]/90 p-5 shadow-xs transition-all hover:border-amber-500/30">
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-amber-500/10 text-amber-400 border border-amber-500/20 shadow-xs">
                 <Clock className="h-5 w-5" />
               </div>
               <div>
-                <p className="text-xs font-medium text-slate-400">Total Content</p>
-                <p className="text-xl font-bold text-white font-heading">
+                <p className="text-xs font-medium uppercase tracking-wider text-slate-400">Total Content</p>
+                <p className="text-2xl font-bold tracking-tight text-white font-heading">
                   {formatDuration(totalDurationSum)}
                 </p>
               </div>
@@ -259,7 +259,7 @@ export const DashboardPage = () => {
               if (!targetVideo) return null;
 
               return (
-                <div className="overflow-hidden rounded-2xl border border-indigo-500/25 bg-gradient-to-br from-indigo-950/20 via-[#111827] to-slate-900/80 p-5 sm:p-6 backdrop-blur-md shadow-xl">
+                <div className="overflow-hidden rounded-2xl border border-white/[0.08] bg-gradient-to-br from-[#0D1527] via-[#090E1A] to-[#0B1020] p-6 shadow-xl backdrop-blur-md transition-all hover:border-indigo-500/25">
                   <div className="flex flex-col gap-5 sm:gap-6 lg:flex-row lg:items-center lg:justify-between">
                     {/* Thumbnail */}
                     <Link
@@ -279,14 +279,14 @@ export const DashboardPage = () => {
                       )}
                       {/* Play overlay */}
                       <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover/thumb:opacity-100 transition-opacity">
-                        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-indigo-600 text-white shadow-lg shadow-indigo-600/40">
+                        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-tr from-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-600/40">
                           <Play className="h-5 w-5 fill-current ml-0.5" />
                         </div>
                       </div>
                       {/* Bottom progress bar */}
-                      <div className="absolute bottom-0 left-0 right-0 h-1.5 bg-slate-850">
+                      <div className="absolute bottom-0 left-0 right-0 h-1.5 bg-black/60">
                         <div
-                          className="h-full bg-indigo-500 transition-all duration-300"
+                          className="h-full bg-gradient-to-r from-indigo-500 to-cyan-400 transition-all duration-300"
                           style={{
                             width: `${
                               isAdvancingToNext
@@ -341,7 +341,7 @@ export const DashboardPage = () => {
                               : `${recent.progressPercentage}% watched`}
                           </span>
                           {!isAdvancingToNext && recent.durationSeconds > 0 && (
-                            <span>
+                            <span className="font-mono text-[11px] text-slate-400">
                               {formatVideoTime(recent.watchedSeconds)} /{' '}
                               {formatVideoTime(recent.durationSeconds)}
                             </span>
@@ -358,7 +358,7 @@ export const DashboardPage = () => {
                     <div className="shrink-0 flex items-center pt-2 sm:pt-0">
                       <Link
                         to={`/watch/${recent.course._id}/${targetVideo._id}`}
-                        className="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-xl bg-indigo-600 px-5 py-3 text-xs sm:text-sm font-semibold text-white shadow-md shadow-indigo-600/25 transition-all hover:bg-indigo-500 hover:shadow-indigo-600/35 active:scale-[0.98]"
+                        className="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-indigo-600 via-indigo-500 to-purple-600 px-5 py-3 text-xs sm:text-sm font-semibold text-white shadow-lg shadow-indigo-600/30 transition-all hover:opacity-95 hover:shadow-indigo-600/40 active:scale-[0.98]"
                       >
                         <Play className="h-4 w-4 fill-current" />
                         <span>{isAdvancingToNext ? 'Start Next Lesson' : 'Resume Lesson'}</span>
@@ -402,7 +402,7 @@ export const DashboardPage = () => {
             </div>
 
             {/* Bookmarks Preview Widget (5 cols) */}
-            <div className="lg:col-span-5 rounded-2xl border border-white/[0.08] bg-[#111827] p-5 space-y-4 shadow-xs">
+            <div className="lg:col-span-5 rounded-2xl border border-white/[0.07] bg-[#0B101E]/90 p-5 space-y-4 shadow-xs backdrop-blur-md">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Bookmark className="h-4 w-4 text-amber-400" />
@@ -427,7 +427,7 @@ export const DashboardPage = () => {
                     <Link
                       key={b._id}
                       to={`/watch/${b.course._id}/${b.video._id}`}
-                      className="flex items-center justify-between gap-3 py-2.5 px-1.5 hover:bg-slate-800/40 rounded-xl group transition-colors"
+                      className="flex items-center justify-between gap-3 py-2.5 px-2 hover:bg-white/[0.04] rounded-xl group transition-colors"
                     >
                       <div className="min-w-0 flex-1">
                         <span className="text-[11px] text-slate-400 block truncate">

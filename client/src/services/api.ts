@@ -3,9 +3,11 @@ const API_BASE_URL =
 
 export class ApiRequestError extends Error {
   status: number;
-  constructor(message: string, status: number) {
+  data?: any;
+  constructor(message: string, status: number, data?: any) {
     super(message);
     this.status = status;
+    this.data = data;
     this.name = 'ApiRequestError';
   }
 }
@@ -37,8 +39,9 @@ export async function request<T>(
   if (!response.ok) {
     const errorMessage =
       data?.message || `Request failed with status ${response.status}`;
-    throw new ApiRequestError(errorMessage, response.status);
+    throw new ApiRequestError(errorMessage, response.status, data);
   }
+
 
   return data as T;
 }

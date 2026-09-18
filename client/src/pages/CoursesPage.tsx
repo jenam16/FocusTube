@@ -55,7 +55,7 @@ export const CoursesPage = () => {
         <button
           type="button"
           onClick={() => setIsImportModalOpen(true)}
-          className="inline-flex items-center justify-center gap-2 rounded-xl bg-indigo-600 px-4 py-2.5 text-xs sm:text-sm font-semibold text-white shadow-md shadow-indigo-600/20 transition-all hover:bg-indigo-500 hover:shadow-indigo-600/30 active:scale-[0.98]"
+          className="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-indigo-600 via-indigo-600 to-purple-600 px-4 py-2.5 text-xs sm:text-sm font-semibold text-white shadow-lg shadow-indigo-600/25 transition-all hover:from-indigo-500 hover:to-purple-500 hover:shadow-indigo-600/35 active:scale-[0.98]"
         >
           <PlusCircle className="h-4 w-4" />
           <span>Import Playlist</span>
@@ -72,19 +72,19 @@ export const CoursesPage = () => {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Search courses by title or channel..."
-              className="w-full rounded-xl border border-white/[0.08] bg-[#111827] py-2.5 pl-10 pr-4 text-xs sm:text-sm text-white placeholder-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500/40 transition-colors"
+              className="w-full rounded-xl border border-white/[0.07] bg-[#0B101E] py-2.5 pl-10 pr-4 text-xs sm:text-sm text-white placeholder-slate-500 focus:border-indigo-500/60 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all"
             />
           </div>
 
           {/* Filter Pills */}
-          <div className="flex items-center gap-1.5 p-1 rounded-xl bg-[#111827] border border-white/[0.08] self-start sm:self-auto">
+          <div className="flex items-center gap-1.5 p-1 rounded-xl bg-[#0B101E] border border-white/[0.07] self-start sm:self-auto shadow-xs">
             <button
               type="button"
               onClick={() => setStatusFilter('all')}
               className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition-all ${
                 statusFilter === 'all'
-                  ? 'bg-indigo-600 text-white shadow-xs'
-                  : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                  ? 'bg-gradient-to-r from-indigo-600 to-indigo-500 text-white shadow-sm shadow-indigo-600/25'
+                  : 'text-slate-400 hover:text-white hover:bg-white/[0.04]'
               }`}
             >
               All ({courses.length})
@@ -94,8 +94,8 @@ export const CoursesPage = () => {
               onClick={() => setStatusFilter('in-progress')}
               className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition-all ${
                 statusFilter === 'in-progress'
-                  ? 'bg-indigo-600 text-white shadow-xs'
-                  : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                  ? 'bg-gradient-to-r from-indigo-600 to-indigo-500 text-white shadow-sm shadow-indigo-600/25'
+                  : 'text-slate-400 hover:text-white hover:bg-white/[0.04]'
               }`}
             >
               In Progress ({inProgressCount})
@@ -105,8 +105,8 @@ export const CoursesPage = () => {
               onClick={() => setStatusFilter('completed')}
               className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition-all ${
                 statusFilter === 'completed'
-                  ? 'bg-indigo-600 text-white shadow-xs'
-                  : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                  ? 'bg-gradient-to-r from-indigo-600 to-indigo-500 text-white shadow-sm shadow-indigo-600/25'
+                  : 'text-slate-400 hover:text-white hover:bg-white/[0.04]'
               }`}
             >
               Completed ({completedCount})
@@ -140,7 +140,7 @@ export const CoursesPage = () => {
 
       {/* Filtered empty state */}
       {!isLoading && !error && courses.length > 0 && filteredCourses.length === 0 && (
-        <div className="py-16 text-center text-sm text-slate-400 rounded-2xl border border-dashed border-white/[0.08] bg-[#111827]/40">
+        <div className="py-16 text-center text-sm text-slate-400 rounded-2xl border border-dashed border-white/[0.07] bg-[#0B101E]">
           No courses matching &quot;{searchTerm}&quot; in this filter.
         </div>
       )}

@@ -40,10 +40,10 @@ export const ScreenshotCard: React.FC<ScreenshotCardProps> = ({
 
   return (
     <div
-      className={`group relative flex flex-col overflow-hidden rounded-2xl border transition-all duration-200 hover:shadow-xl hover:shadow-indigo-500/5 ${
+      className={`group relative flex flex-col overflow-hidden rounded-2xl border transition-all duration-300 hover:shadow-xl hover:shadow-indigo-950/40 ${
         note.isPinned
-          ? 'border-amber-500/40 bg-[#131B2E] shadow-sm shadow-amber-500/5'
-          : 'border-white/[0.08] bg-[#111827] hover:border-white/[0.15]'
+          ? 'border-amber-500/40 bg-[#0E1528] shadow-sm shadow-amber-500/5'
+          : 'border-white/[0.07] bg-[#0B101E] hover:border-indigo-500/40'
       }`}
     >
       {/* Screenshot Image Preview Container */}

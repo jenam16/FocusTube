@@ -105,7 +105,7 @@ export const OverdueBanner: React.FC<OverdueBannerProps> = ({
                     <button
                       type="button"
                       onClick={() => navigate(`/watch/${courseObj._id}/${videoObj._id}`)}
-                      className="inline-flex items-center gap-1 rounded-lg bg-red-600/90 px-2.5 py-1 text-[11px] font-semibold text-white hover:bg-red-500 transition-colors shadow-sm"
+                      className="inline-flex items-center gap-1 rounded-lg bg-gradient-to-r from-indigo-600 to-indigo-500 px-2.5 py-1 text-[11px] font-semibold text-white hover:from-indigo-500 hover:to-indigo-400 transition-all shadow-xs"
                     >
                       <Play className="h-3 w-3 fill-current" />
                       <span>Learn</span>

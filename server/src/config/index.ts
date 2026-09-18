@@ -18,10 +18,25 @@ export const config = {
     apiSecret: process.env.CLOUDINARY_API_SECRET || '',
   },
   geminiApiKey: process.env.GEMINI_API_KEY || '',
+  resend: {
+    apiKey: process.env.RESEND_API_KEY || '',
+    fromEmail: process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev',
+    fromName: process.env.RESEND_FROM_NAME || 'FocusTube',
+  },
+  frontendUrl:
+    process.env.FRONTEND_URL ||
+    process.env.CLIENT_URL ||
+    'http://localhost:5173',
 };
 
 console.log("Cloudinary Config:", {
   cloudName: process.env.CLOUDINARY_CLOUD_NAME,
   apiKey: process.env.CLOUDINARY_API_KEY ? "LOADED" : "MISSING",
   apiSecret: process.env.CLOUDINARY_API_SECRET ? "LOADED" : "MISSING",
+});
+
+console.log("Resend Config:", {
+  fromEmail: config.resend.fromEmail,
+  fromName: config.resend.fromName,
+  apiKey: config.resend.apiKey ? "LOADED" : "MISSING",
 });

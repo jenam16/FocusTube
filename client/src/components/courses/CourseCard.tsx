@@ -14,7 +14,7 @@ export const CourseCard = ({ course }: CourseCardProps) => {
   const isCompleted = progress >= 100;
 
   return (
-    <div className="group flex flex-col overflow-hidden rounded-2xl border border-white/[0.08] bg-[#111827] transition-all duration-200 hover:-translate-y-1 hover:border-indigo-500/30 hover:shadow-xl hover:shadow-indigo-500/5">
+    <div className="group flex flex-col overflow-hidden rounded-2xl border border-white/[0.07] bg-[#0B101E] transition-all duration-300 hover:-translate-y-1 hover:border-indigo-500/40 hover:shadow-xl hover:shadow-indigo-950/30">
       {/* Thumbnail Container */}
       <Link
         to={`/courses/${course._id}`}
@@ -25,11 +25,11 @@ export const CourseCard = ({ course }: CourseCardProps) => {
           <img
             src={course.thumbnail}
             alt={course.title}
-            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
             loading="lazy"
           />
         ) : (
-          <div className="flex h-full w-full items-center justify-center bg-slate-900 text-slate-600">
+          <div className="flex h-full w-full items-center justify-center bg-slate-950 text-slate-600">
             <PlaySquare className="h-12 w-12" />
           </div>
         )}
@@ -43,12 +43,12 @@ export const CourseCard = ({ course }: CourseCardProps) => {
 
         {/* Video Count & Duration Badges */}
         <div className="absolute bottom-2.5 right-2.5 flex items-center gap-1.5">
-          <span className="inline-flex items-center gap-1 rounded-md bg-black/80 px-2 py-0.5 text-[11px] font-medium text-slate-200 backdrop-blur-sm border border-white/[0.08]">
+          <span className="inline-flex items-center gap-1 rounded-lg bg-black/80 px-2 py-0.5 text-[11px] font-medium text-slate-200 backdrop-blur-md border border-white/[0.08]">
             <Video className="h-3 w-3 text-slate-400" />
             {course.totalVideos} {course.totalVideos === 1 ? 'lesson' : 'lessons'}
           </span>
           {course.totalDurationSeconds > 0 && (
-            <span className="inline-flex items-center gap-1 rounded-md bg-black/80 px-2 py-0.5 text-[11px] font-medium text-indigo-300 backdrop-blur-sm border border-white/[0.08]">
+            <span className="inline-flex items-center gap-1 rounded-lg bg-black/80 px-2 py-0.5 text-[11px] font-medium text-indigo-300 backdrop-blur-md border border-white/[0.08]">
               <Clock className="h-3 w-3" />
               {formatDuration(course.totalDurationSeconds)}
             </span>
@@ -67,9 +67,9 @@ export const CourseCard = ({ course }: CourseCardProps) => {
           )}
           <Link
             to={`/courses/${course._id}`}
-            className="mt-1.5 block focus:outline-none"
+            className="mt-2 block focus:outline-none"
           >
-            <h3 className="line-clamp-2 text-base font-semibold text-slate-100 group-hover:text-indigo-300 transition-colors font-heading leading-snug">
+            <h3 className="line-clamp-2 text-base font-semibold text-slate-100 group-hover:text-indigo-300 transition-colors font-heading leading-snug tracking-tight">
               {course.title}
             </h3>
           </Link>
@@ -81,9 +81,9 @@ export const CourseCard = ({ course }: CourseCardProps) => {
         </div>
 
         {/* Progress Display */}
-        <div className="mt-4 pt-3 border-t border-white/[0.06]">
+        <div className="mt-5 pt-3.5 border-t border-white/[0.06]">
           <div className="mb-1.5 flex items-center justify-between text-xs text-slate-400">
-            <span>Progress</span>
+            <span className="font-medium">Progress</span>
             <span
               className={`font-semibold ${
                 isCompleted ? 'text-emerald-400' : 'text-slate-300'
@@ -96,13 +96,13 @@ export const CourseCard = ({ course }: CourseCardProps) => {
         </div>
 
         {/* Action footer */}
-        <div className="mt-3.5 flex items-center justify-between pt-1">
+        <div className="mt-4 flex items-center justify-between pt-1">
           <span className="text-[11px] font-medium text-slate-400">
             {course.totalVideos} Lessons · {formatDuration(course.totalDurationSeconds)}
           </span>
           <Link
             to={`/courses/${course._id}`}
-            className="inline-flex items-center gap-1.5 rounded-lg border border-white/[0.08] bg-slate-800/80 px-3 py-1.5 text-xs font-semibold text-slate-200 transition-all group-hover:border-indigo-500/40 group-hover:bg-indigo-600 group-hover:text-white shadow-xs"
+            className="inline-flex items-center gap-1.5 rounded-xl border border-white/[0.08] bg-[#0D1527] px-3 py-1.5 text-xs font-semibold text-slate-200 transition-all group-hover:border-indigo-500/40 group-hover:bg-indigo-600 group-hover:text-white shadow-xs"
           >
             <span>Open Course</span>
             <ArrowRight className="h-3.5 w-3.5" />

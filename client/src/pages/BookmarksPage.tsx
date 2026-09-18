@@ -78,11 +78,11 @@ export const BookmarksPage: React.FC = () => {
             return (
               <div
                 key={b._id}
-                className="group flex flex-col justify-between rounded-2xl border border-white/[0.08] bg-[#111827] p-4 transition-all duration-200 hover:-translate-y-0.5 hover:border-white/[0.15] hover:shadow-xl hover:shadow-black/40"
+                className="group flex flex-col justify-between rounded-2xl border border-white/[0.07] bg-[#0B101E] p-4 transition-all duration-300 hover:-translate-y-1 hover:border-indigo-500/40 hover:shadow-xl hover:shadow-indigo-950/30"
               >
                 <div className="space-y-3">
                   {/* Thumbnail and Course info */}
-                  <div className="relative aspect-video w-full overflow-hidden rounded-xl border border-white/[0.08] bg-[#0B1120]">
+                  <div className="relative aspect-video w-full overflow-hidden rounded-xl border border-white/[0.08] bg-[#070B14]">
                     {b.course.thumbnail ? (
                       <img
                         src={b.course.thumbnail}
@@ -99,7 +99,7 @@ export const BookmarksPage: React.FC = () => {
                     )}
 
                     {b.video.durationSeconds > 0 && (
-                      <div className="absolute bottom-2 right-2 rounded-lg bg-black/85 px-2 py-0.5 text-[10px] font-medium text-white backdrop-blur-sm border border-white/10 font-mono">
+                      <div className="absolute bottom-2 right-2 rounded-lg bg-black/85 px-2 py-0.5 text-[10px] font-medium text-white backdrop-blur-md border border-white/10 font-mono">
                         {formatVideoDuration(b.video.durationSeconds)}
                       </div>
                     )}
@@ -110,7 +110,7 @@ export const BookmarksPage: React.FC = () => {
                       {b.course.title}
                     </span>
                     <h3
-                      className={`mt-0.5 text-sm font-semibold line-clamp-2 ${
+                      className={`mt-0.5 text-sm font-semibold line-clamp-2 font-heading tracking-tight ${
                         isAvailable ? 'text-white' : 'text-slate-500 line-through'
                       }`}
                     >
@@ -131,7 +131,7 @@ export const BookmarksPage: React.FC = () => {
                   {isAvailable ? (
                     <Link
                       to={`/watch/${b.course._id}/${b.video._id}`}
-                      className="inline-flex items-center gap-1.5 rounded-xl bg-indigo-600 px-3.5 py-1.5 text-xs font-semibold text-white shadow-md shadow-indigo-600/20 hover:bg-indigo-500 transition-colors"
+                      className="inline-flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 px-3.5 py-1.5 text-xs font-semibold text-white shadow-md shadow-indigo-600/20 transition-all active:scale-[0.98]"
                     >
                       <Play className="h-3 w-3 fill-current" />
                       <span>Watch Lesson</span>

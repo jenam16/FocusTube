@@ -49,9 +49,9 @@ export const StudyTaskCard: React.FC<StudyTaskCardProps> = ({
   };
 
   const priorityStyles: Record<TaskPriority, { badge: string; text: string }> = {
-    high: { badge: 'bg-red-500/15 border-red-500/30 text-red-400', text: 'High' },
+    high: { badge: 'bg-rose-500/15 border-rose-500/30 text-rose-400', text: 'High' },
     medium: { badge: 'bg-amber-500/15 border-amber-500/30 text-amber-400', text: 'Medium' },
-    low: { badge: 'bg-blue-500/15 border-blue-500/30 text-blue-400', text: 'Low' },
+    low: { badge: 'bg-indigo-500/15 border-indigo-500/30 text-indigo-400', text: 'Low' },
   };
 
   const currentPriority = priorityStyles[task.priority || 'medium'];
@@ -60,8 +60,8 @@ export const StudyTaskCard: React.FC<StudyTaskCardProps> = ({
     <div
       className={`group relative flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 rounded-2xl border p-3.5 transition-all ${
         task.completed
-          ? 'border-gray-800/50 bg-gray-950/40 opacity-75'
-          : 'border-gray-800 bg-gray-900/50 hover:border-gray-700/80 hover:bg-gray-900/80'
+          ? 'border-white/[0.04] bg-[#070B14]/60 opacity-60'
+          : 'border-white/[0.07] bg-[#0B101E] hover:border-white/[0.15] hover:bg-[#0D1527] shadow-sm'
       }`}
     >
       {/* Checkbox & Task Details */}
@@ -69,7 +69,7 @@ export const StudyTaskCard: React.FC<StudyTaskCardProps> = ({
         <button
           type="button"
           onClick={() => onToggleComplete(task)}
-          className="mt-0.5 sm:mt-0 text-gray-400 hover:text-red-400 transition-colors shrink-0"
+          className="mt-0.5 sm:mt-0 text-slate-400 hover:text-indigo-400 transition-colors shrink-0"
           title={task.completed ? 'Mark as incomplete' : 'Mark as completed'}
         >
           {task.completed ? (
@@ -83,7 +83,7 @@ export const StudyTaskCard: React.FC<StudyTaskCardProps> = ({
           <div className="flex items-center gap-2 flex-wrap">
             <span
               className={`text-xs sm:text-sm font-semibold truncate ${
-                task.completed ? 'line-through text-gray-400' : 'text-gray-100'
+                task.completed ? 'line-through text-slate-500' : 'text-slate-100'
               }`}
             >
               {task.title}
@@ -101,13 +101,13 @@ export const StudyTaskCard: React.FC<StudyTaskCardProps> = ({
 
           {/* Course / Video info */}
           {courseObj && (
-            <div className="flex items-center gap-1.5 text-xs text-gray-400">
-              <BookOpen className="h-3 w-3 text-red-400 shrink-0" />
+            <div className="flex items-center gap-1.5 text-xs text-slate-400">
+              <BookOpen className="h-3 w-3 text-indigo-400 shrink-0" />
               <span className="truncate max-w-[200px] sm:max-w-[280px]">
                 {courseObj.title}
               </span>
               {videoObj && (
-                <span className="text-gray-500 truncate">
+                <span className="text-slate-500 truncate">
                   • L{videoObj.position}: {videoObj.title}
                 </span>
               )}
@@ -116,7 +116,7 @@ export const StudyTaskCard: React.FC<StudyTaskCardProps> = ({
 
           {/* Description if present */}
           {task.description && (
-            <p className="text-[11px] text-gray-400 line-clamp-1">
+            <p className="text-[11px] text-slate-400 line-clamp-1">
               {task.description}
             </p>
           )}
@@ -124,14 +124,14 @@ export const StudyTaskCard: React.FC<StudyTaskCardProps> = ({
       </div>
 
       {/* Action Buttons: Learning / Focus & CRUD */}
-      <div className="flex items-center gap-1.5 self-end sm:self-auto shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-gray-800/40 w-full sm:w-auto justify-end">
+      <div className="flex items-center gap-1.5 self-end sm:self-auto shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-white/[0.06] w-full sm:w-auto justify-end">
         {/* Start Learning / Focus if video linked */}
         {courseObj && (
           <>
             <button
               type="button"
               onClick={handleStartLearning}
-              className="inline-flex items-center gap-1 rounded-xl bg-red-600/90 px-3 py-1.5 text-xs font-semibold text-white hover:bg-red-500 transition-all shadow-sm"
+              className="inline-flex items-center gap-1 rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 px-3 py-1.5 text-xs font-semibold text-white transition-all shadow-md shadow-indigo-600/20 active:scale-[0.98]"
               title="Open video lesson in player"
             >
               <Play className="h-3 w-3 fill-current" />
@@ -141,7 +141,7 @@ export const StudyTaskCard: React.FC<StudyTaskCardProps> = ({
             <button
               type="button"
               onClick={handleStartFocus}
-              className="inline-flex items-center gap-1 rounded-xl border border-red-500/30 bg-red-500/10 px-2.5 py-1.5 text-xs font-semibold text-red-400 hover:bg-red-500/20 transition-all"
+              className="inline-flex items-center gap-1 rounded-xl border border-indigo-500/30 bg-indigo-500/10 px-2.5 py-1.5 text-xs font-semibold text-indigo-300 hover:bg-indigo-500/20 hover:text-white transition-all"
               title="Launch Focus Mode"
             >
               <Timer className="h-3 w-3" />
@@ -154,7 +154,7 @@ export const StudyTaskCard: React.FC<StudyTaskCardProps> = ({
         <button
           type="button"
           onClick={() => onReschedule(task)}
-          className="rounded-lg border border-gray-800 bg-gray-950/60 p-1.5 text-gray-400 hover:border-gray-700 hover:text-white transition-colors"
+          className="rounded-lg border border-white/[0.08] bg-[#0D1527] p-1.5 text-slate-400 hover:border-white/[0.18] hover:text-white transition-all"
           title="Reschedule task date"
         >
           <Calendar className="h-3.5 w-3.5" />
@@ -164,7 +164,7 @@ export const StudyTaskCard: React.FC<StudyTaskCardProps> = ({
         <button
           type="button"
           onClick={() => onEdit(task)}
-          className="rounded-lg border border-gray-800 bg-gray-950/60 p-1.5 text-gray-400 hover:border-gray-700 hover:text-white transition-colors"
+          className="rounded-lg border border-white/[0.08] bg-[#0D1527] p-1.5 text-slate-400 hover:border-white/[0.18] hover:text-white transition-all"
           title="Edit task"
         >
           <Edit2 className="h-3.5 w-3.5" />
@@ -174,7 +174,7 @@ export const StudyTaskCard: React.FC<StudyTaskCardProps> = ({
         <button
           type="button"
           onClick={() => onDelete(task)}
-          className="rounded-lg border border-gray-800 bg-gray-950/60 p-1.5 text-gray-400 hover:border-red-500/40 hover:bg-red-500/10 hover:text-red-400 transition-colors"
+          className="rounded-lg border border-white/[0.08] bg-[#0D1527] p-1.5 text-slate-400 hover:border-rose-500/40 hover:bg-rose-500/10 hover:text-rose-400 transition-all"
           title="Delete task"
         >
           <Trash2 className="h-3.5 w-3.5" />

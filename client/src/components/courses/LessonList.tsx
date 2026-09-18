@@ -77,7 +77,7 @@ export const LessonList = ({
 
       {/* Lesson List Container */}
       <div
-        className={`space-y-1.5 overflow-y-auto rounded-2xl border border-white/[0.08] bg-[#111827] p-2 shadow-xs ${maxHeightClass}`}
+        className={`space-y-1.5 overflow-y-auto rounded-2xl border border-white/[0.07] bg-[#0B101E] p-2 shadow-lg shadow-black/20 ${maxHeightClass}`}
       >
         {sortedVideos.map((video) => (
           <LessonItem

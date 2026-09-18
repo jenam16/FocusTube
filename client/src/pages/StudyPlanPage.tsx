@@ -232,7 +232,7 @@ export const StudyPlanPage: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setDrilldownDateStr(null)}
-                className="inline-flex items-center gap-1.5 rounded-xl border border-white/[0.08] bg-[#111827] px-3.5 py-1.5 text-xs font-semibold text-slate-300 hover:bg-[#1E293B] hover:text-white transition-colors"
+                className="inline-flex items-center gap-1.5 rounded-xl border border-white/[0.08] bg-[#0D1527] px-3.5 py-1.5 text-xs font-semibold text-slate-300 hover:border-white/[0.18] hover:bg-[#131D36] hover:text-white transition-all"
               >
                 <ArrowLeft className="h-4 w-4" />
                 <span>Back to {activeTab === 'upcoming' ? 'Upcoming' : 'History'}</span>
@@ -262,7 +262,7 @@ export const StudyPlanPage: React.FC = () => {
           />
 
           {/* Date Progress Bar Card */}
-          <div className="rounded-2xl border border-white/[0.08] bg-[#111827] p-4 space-y-2">
+          <div className="rounded-2xl border border-white/[0.07] bg-[#0B101E] p-4 space-y-2 shadow-lg shadow-black/20">
             <div className="flex items-center justify-between text-xs font-semibold">
               <span className="text-slate-200">
                 Daily Goal Progress
@@ -289,7 +289,7 @@ export const StudyPlanPage: React.FC = () => {
 
           {/* Empty Date Tasks */}
           {!isLoadingDateTasks && !dateTasksError && totalDateTasks === 0 && (
-            <div className="rounded-2xl border border-white/[0.08] bg-[#111827]/50 p-8">
+            <div className="rounded-2xl border border-white/[0.07] bg-[#0B101E] p-8 shadow-lg shadow-black/20">
               <EmptyState
                 title="No tasks scheduled for this day"
                 description="Plan your learning goals or add video lessons to stay on track."
@@ -331,7 +331,7 @@ export const StudyPlanPage: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => setShowCompleted((prev) => !prev)}
-                    className="flex items-center justify-between w-full rounded-2xl bg-[#111827] border border-white/[0.08] px-4 py-3 text-xs font-semibold text-slate-300 hover:bg-[#1E293B] transition-colors"
+                    className="flex items-center justify-between w-full rounded-2xl bg-[#0B101E] border border-white/[0.07] px-4 py-3 text-xs font-semibold text-slate-300 hover:bg-[#0D1527] transition-all shadow-sm"
                   >
                     <div className="flex items-center gap-2">
                       <CheckCircle2 className="h-4 w-4 text-emerald-400" />
@@ -385,7 +385,7 @@ export const StudyPlanPage: React.FC = () => {
           {isLoadingUpcoming && <LoadingState count={3} />}
 
           {!isLoadingUpcoming && upcomingSummaries.length === 0 && (
-            <div className="rounded-2xl border border-white/[0.08] bg-[#111827]/50 p-8">
+            <div className="rounded-2xl border border-white/[0.07] bg-[#0B101E] p-8 shadow-lg shadow-black/20">
               <EmptyState
                 title="Nothing planned ahead yet"
                 description="Schedule learning tasks for tomorrow or upcoming days to build a consistent streak."
@@ -409,7 +409,7 @@ export const StudyPlanPage: React.FC = () => {
                       setDrilldownDateStr(summary.date);
                     }
                   }}
-                  className="group rounded-2xl border border-white/[0.08] bg-[#111827] p-4 hover:border-white/[0.15] hover:bg-[#111827]/90 cursor-pointer transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-black/30 space-y-3"
+                  className="group rounded-2xl border border-white/[0.07] bg-[#0B101E] p-4 hover:border-indigo-500/40 hover:bg-[#0D1527] cursor-pointer transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-indigo-950/20 space-y-3"
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
@@ -454,7 +454,7 @@ export const StudyPlanPage: React.FC = () => {
           {isLoadingHistory && <LoadingState count={3} />}
 
           {!isLoadingHistory && historySummaries.length === 0 && (
-            <div className="rounded-2xl border border-white/[0.08] bg-[#111827]/50 p-8">
+            <div className="rounded-2xl border border-white/[0.07] bg-[#0B101E] p-8 shadow-lg shadow-black/20">
               <EmptyState
                 title="No history recorded yet"
                 description="Past days will appear here as you schedule and accomplish daily study goals."
@@ -477,7 +477,7 @@ export const StudyPlanPage: React.FC = () => {
                         setDrilldownDateStr(summary.date);
                       }
                     }}
-                    className="group rounded-2xl border border-white/[0.08] bg-[#111827] p-4 hover:border-white/[0.15] hover:bg-[#111827]/90 cursor-pointer transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-black/30 space-y-3"
+                    className="group rounded-2xl border border-white/[0.07] bg-[#0B101E] p-4 hover:border-indigo-500/40 hover:bg-[#0D1527] cursor-pointer transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-indigo-950/20 space-y-3"
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
@@ -506,7 +506,7 @@ export const StudyPlanPage: React.FC = () => {
 
               {/* History Pagination */}
               {historyTotalPages > 1 && (
-                <div className="flex items-center justify-between rounded-2xl border border-white/[0.08] bg-[#111827] p-3 text-xs text-slate-400">
+                <div className="flex items-center justify-between rounded-2xl border border-white/[0.07] bg-[#0B101E] p-3 text-xs text-slate-400 shadow-md shadow-black/20">
                   <span>
                     Page {historyPage} of {historyTotalPages}
                   </span>
@@ -515,7 +515,7 @@ export const StudyPlanPage: React.FC = () => {
                       type="button"
                       disabled={historyPage <= 1}
                       onClick={() => setHistoryPage((p) => Math.max(1, p - 1))}
-                      className="rounded-xl border border-white/[0.08] bg-[#0B1120] px-3.5 py-1.5 hover:border-white/[0.15] hover:text-white disabled:opacity-40 transition-colors"
+                      className="rounded-xl border border-white/[0.08] bg-[#0D1527] px-3.5 py-1.5 hover:border-white/[0.18] hover:bg-[#131D36] hover:text-white disabled:opacity-40 transition-all"
                     >
                       Prev
                     </button>
@@ -523,7 +523,7 @@ export const StudyPlanPage: React.FC = () => {
                       type="button"
                       disabled={historyPage >= historyTotalPages}
                       onClick={() => setHistoryPage((p) => Math.min(historyTotalPages, p + 1))}
-                      className="rounded-xl border border-white/[0.08] bg-[#0B1120] px-3.5 py-1.5 hover:border-white/[0.15] hover:text-white disabled:opacity-40 transition-colors"
+                      className="rounded-xl border border-white/[0.08] bg-[#0D1527] px-3.5 py-1.5 hover:border-white/[0.18] hover:bg-[#131D36] hover:text-white disabled:opacity-40 transition-all"
                     >
                       Next
                     </button>

@@ -54,39 +54,39 @@ export const AppLayout: React.FC = () => {
   };
 
   return (
-    <div className="flex h-screen overflow-hidden bg-[#0F172A] text-slate-100 font-sans">
+    <div className="flex h-screen overflow-hidden bg-[#060913] text-slate-100 font-sans selection:bg-indigo-500/30 selection:text-indigo-200">
       {/* Mobile Drawer Backdrop */}
       {mobileMenuOpen && (
         <div
-          className="fixed inset-0 z-40 bg-black/70 backdrop-blur-sm lg:hidden transition-opacity"
+          className="fixed inset-0 z-40 bg-black/80 backdrop-blur-md lg:hidden transition-opacity"
           onClick={() => setMobileMenuOpen(false)}
         />
       )}
 
       {/* Sidebar (Desktop + Mobile Drawer) */}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 flex w-64 flex-col border-r border-white/[0.08] bg-[#0B1120] transition-transform duration-200 ease-in-out lg:static lg:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-50 flex w-64 flex-col border-r border-white/[0.06] bg-[#080D1A] transition-transform duration-200 ease-in-out lg:static lg:translate-x-0 ${
           mobileMenuOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full'
         }`}
       >
         {/* Brand Header */}
-        <div className="flex h-16 items-center justify-between border-b border-white/[0.08] px-6">
+        <div className="flex h-16 items-center justify-between border-b border-white/[0.06] px-6">
           <NavLink to="/dashboard" className="flex items-center gap-2.5 group">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-600 text-white shadow-md shadow-indigo-600/30 group-hover:bg-indigo-500 transition-colors">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 via-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-600/30 group-hover:scale-105 transition-transform duration-200">
               <PlaySquare className="h-5 w-5" />
             </div>
             <div className="flex flex-col">
               <span className="text-lg font-bold tracking-tight text-white font-heading">
                 Focus<span className="text-indigo-400">Tube</span>
               </span>
-              <span className="text-[10px] font-medium uppercase tracking-widest text-slate-400">
-                Learning SaaS
+              <span className="text-[9px] font-semibold uppercase tracking-widest text-slate-400">
+                Workspace
               </span>
             </div>
           </NavLink>
           <button
             type="button"
-            className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-800 hover:text-white lg:hidden transition-colors"
+            className="rounded-lg p-1.5 text-slate-400 hover:bg-white/[0.05] hover:text-white lg:hidden transition-colors"
             onClick={() => setMobileMenuOpen(false)}
             aria-label="Close menu"
           >
@@ -96,7 +96,7 @@ export const AppLayout: React.FC = () => {
 
         {/* Navigation Links */}
         <nav className="flex-1 space-y-1 overflow-y-auto px-3 py-5">
-          <p className="px-3 pb-2 text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+          <p className="px-3 pb-2 text-[10px] font-bold uppercase tracking-wider text-slate-400">
             Workspace
           </p>
           {navItems.map((item) => {
@@ -109,8 +109,8 @@ export const AppLayout: React.FC = () => {
                 className={({ isActive }) =>
                   `group flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm font-medium transition-all duration-150 ${
                     isActive
-                      ? 'bg-indigo-500/12 text-indigo-300 font-semibold border-l-2 border-indigo-500 shadow-sm'
-                      : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-100 border-l-2 border-transparent'
+                      ? 'bg-gradient-to-r from-indigo-500/15 to-transparent text-indigo-300 font-semibold border-l-2 border-indigo-500 shadow-xs'
+                      : 'text-slate-400 hover:bg-white/[0.04] hover:text-slate-100 border-l-2 border-transparent'
                   }`
                 }
               >
@@ -122,8 +122,8 @@ export const AppLayout: React.FC = () => {
         </nav>
 
         {/* User Footer Profile & Sign Out */}
-        <div className="border-t border-white/[0.08] p-3">
-          <div className="flex items-center justify-between rounded-xl bg-slate-900/60 p-2.5 border border-white/[0.06]">
+        <div className="border-t border-white/[0.06] p-3">
+          <div className="flex items-center justify-between rounded-xl bg-[#0B101E] p-2.5 border border-white/[0.06] shadow-xs">
             <div className="flex items-center gap-2.5 overflow-hidden">
               <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-indigo-500/15 text-indigo-300 border border-indigo-500/25">
                 <UserIcon className="h-4 w-4" />
@@ -143,7 +143,7 @@ export const AppLayout: React.FC = () => {
               disabled={isLoggingOut}
               title="Sign Out"
               aria-label="Sign Out"
-              className="rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-slate-800 hover:text-rose-400 disabled:opacity-50"
+              className="rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-rose-500/15 hover:text-rose-300 disabled:opacity-50"
             >
               <LogOut className="h-4 w-4" />
             </button>
@@ -154,20 +154,20 @@ export const AppLayout: React.FC = () => {
       {/* Main Column */}
       <div className="flex flex-1 flex-col overflow-hidden">
         {/* Top Navbar */}
-        <header className="flex h-16 items-center justify-between border-b border-white/[0.08] bg-[#0B1120]/70 px-4 backdrop-blur-md sm:px-6">
+        <header className="flex h-16 items-center justify-between border-b border-white/[0.06] bg-[#080D1A]/80 px-4 backdrop-blur-xl sm:px-6">
           <div className="flex items-center gap-3">
             <button
               type="button"
-              className="rounded-lg p-2 text-slate-400 hover:bg-slate-800 hover:text-white lg:hidden transition-colors"
+              className="rounded-lg p-2 text-slate-400 hover:bg-white/[0.05] hover:text-white lg:hidden transition-colors"
               onClick={() => setMobileMenuOpen(true)}
               aria-label="Open menu"
             >
               <Menu className="h-5 w-5" />
             </button>
-            <div className="hidden sm:flex items-center gap-2">
-              <span className="inline-block h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-              <p className="text-xs font-medium text-slate-400">
-                Distraction-Free YouTube Learning
+            <div className="hidden sm:flex items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-3 py-1">
+              <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              <p className="text-[11px] font-semibold text-emerald-300">
+                Distraction-Free Focus
               </p>
             </div>
           </div>
@@ -181,7 +181,7 @@ export const AppLayout: React.FC = () => {
               type="button"
               onClick={handleLogout}
               disabled={isLoggingOut}
-              className="flex items-center gap-1.5 rounded-lg border border-white/[0.1] bg-slate-800/80 px-3 py-1.5 text-xs font-medium text-slate-300 transition-all hover:border-indigo-500/40 hover:bg-indigo-500/10 hover:text-indigo-300"
+              className="flex items-center gap-1.5 rounded-xl border border-white/[0.08] bg-white/[0.04] px-3 py-1.5 text-xs font-medium text-slate-300 transition-all hover:border-indigo-500/40 hover:bg-indigo-500/10 hover:text-indigo-300"
             >
               <LogOut className="h-3.5 w-3.5" />
               <span>Sign Out</span>
@@ -190,7 +190,7 @@ export const AppLayout: React.FC = () => {
         </header>
 
         {/* Main Content Area */}
-        <main className="flex-1 overflow-y-auto bg-[#0F172A] p-4 sm:p-6 lg:p-8">
+        <main className="flex-1 overflow-y-auto bg-[#060913] bg-[radial-gradient(ellipse_80%_60%_at_50%_-10%,rgba(99,102,241,0.07),rgba(6,9,19,0))] p-4 sm:p-6 lg:p-8">
           <div className="mx-auto max-w-6xl">
             <Outlet />
           </div>

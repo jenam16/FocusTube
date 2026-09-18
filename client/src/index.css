@@ -3,12 +3,14 @@
 @layer base {
   body {
     font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    background-color: #0F172A;
+    background-color: #060913;
     color: #F8FAFC;
+    letter-spacing: -0.011em;
   }
 
   h1, h2, h3, h4, h5, h6 {
     font-family: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif;
+    letter-spacing: -0.025em;
   }
 
   /* Custom subtle dark scrollbars */
@@ -22,11 +24,20 @@
   }
 
   ::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 0.1);
     border-radius: 9999px;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.22);
+    background: rgba(255, 255, 255, 0.2);
   }
+}
+
+/* Subtle ambient radial glow */
+.bg-ambient-glow {
+  background: radial-gradient(circle at 50% -20%, rgba(99, 102, 241, 0.12) 0%, rgba(6, 9, 19, 0) 70%);
+}
+
+.bg-ambient-card {
+  background: radial-gradient(ellipse at top left, rgba(99, 102, 241, 0.06) 0%, rgba(11, 16, 30, 0.95) 70%);
 }

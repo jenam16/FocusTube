@@ -51,11 +51,24 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const register = async (payload: RegisterPayload) => {
     const response = await authService.register(payload);
-    setUser(response.user);
+    // If backend returns a verified user directly (for example in special environments or backward compatibility)
+    if (response.user && response.emailVerified) {
+      setUser(response.user);
+      try {
+        await authService.syncUser();
+      } catch {
+        // Safe non-blocking sync
+      }
+    }
+    return response;
+  };
+
+  const setAuthenticatedUser = (verifiedUser: User) => {
+    setUser(verifiedUser);
     try {
-      await authService.syncUser();
+      authService.syncUser().catch(() => {});
     } catch {
-      // Safe non-blocking sync
+      // Non-blocking sync
     }
   };
 
@@ -77,9 +90,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         register,
         logout,
         refreshUser,
+        setAuthenticatedUser,
       }}
     >
       {children}
     </AuthContext.Provider>
   );
 };
+

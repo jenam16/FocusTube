@@ -488,16 +488,16 @@ export const WatchPage = () => {
         />
       ) : (
         /* Top Bar: Back to Course Navigation */
-        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-gray-800 pb-4">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/[0.07] pb-4">
           <Link
             to={`/courses/${course._id}`}
-            className="inline-flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs font-medium text-gray-400 transition-colors hover:bg-gray-800 hover:text-white"
+            className="inline-flex items-center gap-2 rounded-xl border border-white/[0.07] bg-[#0B101E] px-3 py-1.5 text-xs font-medium text-slate-300 transition-all hover:bg-[#0D1527] hover:border-white/[0.15] hover:text-white"
           >
             <ArrowLeft className="h-4 w-4" />
             <span>Back to Course</span>
           </Link>
 
-          <span className="truncate text-xs font-medium text-gray-400">
+          <span className="truncate text-xs font-medium text-slate-400 max-w-md">
             {course.title}
           </span>
         </div>
@@ -558,7 +558,7 @@ export const WatchPage = () => {
               <button
                 type="button"
                 onClick={() => handleToggleFocusMode(true)}
-                className="inline-flex items-center gap-1.5 rounded-xl border border-indigo-500/30 bg-indigo-500/10 px-3 py-1.5 text-xs font-medium text-indigo-300 hover:bg-indigo-500/20 hover:text-white transition-all active:scale-[0.98]"
+                className="inline-flex items-center gap-1.5 rounded-xl border border-indigo-500/30 bg-gradient-to-r from-indigo-500/15 to-purple-500/15 hover:from-indigo-500/25 hover:to-purple-500/25 px-3 py-1.5 text-xs font-medium text-indigo-300 hover:text-white transition-all active:scale-[0.98] shadow-xs"
                 title="Enter Focus Mode"
               >
                 <Focus className="h-3.5 w-3.5 text-indigo-400" />
@@ -569,7 +569,7 @@ export const WatchPage = () => {
               <button
                 type="button"
                 onClick={() => setIsTheaterMode((prev) => !prev)}
-                className="hidden sm:inline-flex items-center gap-1.5 rounded-xl border border-white/[0.08] bg-slate-800/80 px-3 py-1.5 text-xs font-medium text-slate-300 hover:bg-slate-700 hover:text-white transition-colors"
+                className="hidden sm:inline-flex items-center gap-1.5 rounded-xl border border-white/[0.08] bg-[#0B101E] px-3 py-1.5 text-xs font-medium text-slate-300 hover:bg-[#0D1527] hover:border-white/[0.15] hover:text-white transition-all"
               >
                 {isTheaterMode ? (
                   <>
@@ -609,7 +609,7 @@ export const WatchPage = () => {
               getCurrentTimestamp={getCurrentTimestamp}
             />
           ) : (
-            <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-white/[0.08] bg-[#111827]/40 p-12 text-center aspect-video">
+            <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-white/[0.07] bg-[#0B101E] p-12 text-center aspect-video">
               <AlertCircle className="h-10 w-10 text-amber-500 mb-3" />
               <h3 className="text-base font-bold text-white font-heading">Video unavailable</h3>
               <p className="mt-1 max-w-sm text-xs text-slate-400">
@@ -641,13 +641,13 @@ export const WatchPage = () => {
         ) : (
           <>
             {/* Navigation Buttons: Previous & Next Lesson (Skips unavailable) */}
-            <div className="flex items-center justify-between gap-4 rounded-2xl border border-white/[0.08] bg-[#111827] p-4 shadow-xs">
+            <div className="flex items-center justify-between gap-4 rounded-2xl border border-white/[0.07] bg-[#0B101E] p-4 shadow-lg shadow-black/20">
               {/* Previous Lesson Button */}
               {previousVideo ? (
                 <button
                   type="button"
                   onClick={() => handleNavigateVideo(previousVideo._id)}
-                  className="inline-flex items-center gap-2 rounded-xl border border-white/[0.08] bg-slate-800/80 px-4 py-2 text-xs font-semibold text-slate-200 transition-colors hover:border-white/[0.15] hover:bg-slate-700 hover:text-white active:scale-95"
+                  className="inline-flex items-center gap-2 rounded-xl border border-white/[0.08] bg-[#0D1527] px-4 py-2 text-xs font-semibold text-slate-200 transition-all hover:border-white/[0.18] hover:bg-[#131D36] hover:text-white active:scale-95"
                 >
                   <ChevronLeft className="h-4 w-4" />
                   <span>Previous Lesson</span>
@@ -656,7 +656,7 @@ export const WatchPage = () => {
                 <button
                   type="button"
                   disabled
-                  className="inline-flex items-center gap-2 rounded-xl border border-white/[0.04] bg-slate-900/40 px-4 py-2 text-xs font-semibold text-slate-600 opacity-40 cursor-not-allowed"
+                  className="inline-flex items-center gap-2 rounded-xl border border-white/[0.04] bg-slate-900/30 px-4 py-2 text-xs font-semibold text-slate-600 opacity-40 cursor-not-allowed"
                 >
                   <ChevronLeft className="h-4 w-4" />
                   <span>Previous Lesson</span>
@@ -664,7 +664,7 @@ export const WatchPage = () => {
               )}
 
               <div className="hidden sm:block text-xs text-slate-400 font-medium">
-                Lesson {lessonNumber} / {totalLessons}
+                Lesson {lessonNumber} of {totalLessons}
               </div>
 
               {/* Next Lesson Button */}
@@ -672,7 +672,7 @@ export const WatchPage = () => {
                 <button
                   type="button"
                   onClick={() => handleNavigateVideo(nextVideo._id)}
-                  className="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2 text-xs font-semibold text-white shadow-md shadow-indigo-600/25 transition-all hover:bg-indigo-500 active:scale-95"
+                  className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 px-4 py-2 text-xs font-semibold text-white shadow-md shadow-indigo-600/25 transition-all active:scale-95"
                 >
                   <span>Next Lesson</span>
                   <ChevronRight className="h-4 w-4" />
@@ -681,7 +681,7 @@ export const WatchPage = () => {
                 <button
                   type="button"
                   disabled
-                  className="inline-flex items-center gap-2 rounded-xl border border-white/[0.04] bg-slate-900/40 px-4 py-2 text-xs font-semibold text-slate-600 opacity-40 cursor-not-allowed"
+                  className="inline-flex items-center gap-2 rounded-xl border border-white/[0.04] bg-slate-900/30 px-4 py-2 text-xs font-semibold text-slate-600 opacity-40 cursor-not-allowed"
                 >
                   <span>Next Lesson</span>
                   <ChevronRight className="h-4 w-4" />
@@ -698,7 +698,7 @@ export const WatchPage = () => {
             />
 
             {/* Quick Lesson Navigator / Full Syllabus Below Player */}
-            <div className="mt-8 space-y-3 rounded-2xl border border-white/[0.08] bg-[#111827] p-5 shadow-xs">
+            <div className="mt-8 space-y-3 rounded-2xl border border-white/[0.07] bg-[#0B101E] p-5 shadow-lg shadow-black/20">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Layers className="h-4 w-4 text-indigo-400" />
@@ -709,7 +709,7 @@ export const WatchPage = () => {
                 </span>
               </div>
 
-              <div className="divide-y divide-white/[0.06] max-h-80 overflow-y-auto rounded-xl border border-white/[0.08] bg-slate-950/40">
+              <div className="divide-y divide-white/[0.06] max-h-80 overflow-y-auto rounded-xl border border-white/[0.07] bg-[#060913]/90">
                 {sortedVideos.map((vid, idx) => {
                   const isCurrent = vid._id === currentVideo._id;
                   const isAvailable = vid.isAvailable !== false;
@@ -728,8 +728,8 @@ export const WatchPage = () => {
                         !isAvailable
                           ? 'opacity-40 cursor-not-allowed'
                           : isCurrent
-                            ? 'bg-indigo-500/10 border-l-4 border-indigo-500'
-                            : 'hover:bg-slate-800/40'
+                            ? 'bg-indigo-600/10 border-l-4 border-indigo-500'
+                            : 'hover:bg-white/[0.03]'
                       }`}
                     >
                       <span
@@ -738,7 +738,7 @@ export const WatchPage = () => {
                             ? 'bg-indigo-600 text-white shadow-xs'
                             : vidProg?.completed
                               ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/25'
-                              : 'bg-slate-800 text-slate-400'
+                              : 'bg-slate-800/80 text-slate-400'
                         }`}
                       >
                         {vidProg?.completed && !isCurrent ? (

@@ -69,9 +69,9 @@ export const FocusSyllabusDrawer: React.FC<FocusSyllabusDrawerProps> = ({
       />
 
       {/* Drawer Panel */}
-      <div className="relative z-10 flex h-full w-full max-w-md flex-col border-l border-white/[0.08] bg-[#0B1120] shadow-2xl animate-in slide-in-from-right duration-200">
+      <div className="relative z-10 flex h-full w-full max-w-md flex-col border-l border-white/[0.07] bg-[#0B101E] shadow-2xl animate-in slide-in-from-right duration-200">
         {/* Drawer Header */}
-        <div className="flex items-center justify-between border-b border-white/[0.06] px-5 py-4 bg-[#111827]">
+        <div className="flex items-center justify-between border-b border-white/[0.07] px-5 py-4 bg-[#070B14]/90">
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-indigo-400">
               <BookOpen className="h-3.5 w-3.5" />
@@ -123,7 +123,7 @@ export const FocusSyllabusDrawer: React.FC<FocusSyllabusDrawerProps> = ({
                     ? 'opacity-40 cursor-not-allowed bg-transparent'
                     : isCurrent
                       ? 'bg-indigo-600/15 border border-indigo-500/40 text-white shadow-sm'
-                      : 'hover:bg-[#111827] text-slate-300'
+                      : 'hover:bg-[#0D1527] text-slate-300'
                 }`}
               >
                 {/* Lesson number / check badge */}
@@ -135,7 +135,7 @@ export const FocusSyllabusDrawer: React.FC<FocusSyllabusDrawerProps> = ({
                         ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
                         : isCompleted
                           ? 'bg-emerald-950/80 text-emerald-400 border border-emerald-700/50'
-                          : 'bg-[#111827] text-slate-400 border border-white/[0.08]'
+                          : 'bg-[#0D1527] text-slate-400 border border-white/[0.08]'
                   }`}
                 >
                   {isCurrent ? (

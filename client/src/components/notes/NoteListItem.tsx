@@ -62,8 +62,8 @@ export const NoteListItem: React.FC<NoteListItemProps> = ({
       }}
       className={`group relative flex flex-col text-left rounded-2xl p-4 transition-all cursor-pointer border ${
         isSelected
-          ? 'border-indigo-500/60 bg-[#111827] shadow-lg shadow-indigo-500/10 ring-1 ring-indigo-500/40'
-          : 'border-white/[0.08] bg-[#111827]/70 hover:border-white/[0.15] hover:bg-[#111827]'
+          ? 'border-indigo-500/60 bg-[#0D1527] shadow-lg shadow-indigo-950/40 ring-1 ring-indigo-500/40'
+          : 'border-white/[0.07] bg-[#0B101E] hover:border-white/[0.15] hover:bg-[#0D1527]'
       }`}
     >
       {/* Top Header: Course badge + Timestamp + Pin button */}
@@ -132,7 +132,7 @@ export const NoteListItem: React.FC<NoteListItemProps> = ({
               {note.tags.slice(0, 3).map((tag) => (
                 <span
                   key={tag}
-                  className="rounded-md bg-[#0B1120] border border-white/[0.06] px-1.5 py-0.5 text-[10px] text-slate-400"
+                  className="rounded-md bg-[#070B14] border border-white/[0.06] px-1.5 py-0.5 text-[10px] text-slate-400"
                 >
                   #{tag}
                 </span>

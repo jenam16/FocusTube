@@ -42,7 +42,7 @@ export const VideoNavigation = ({
   return (
     <div className="space-y-4">
       {/* Current Watching Header */}
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between border-b border-white/[0.08] pb-3">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between border-b border-white/[0.07] pb-3">
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2 text-xs font-semibold uppercase tracking-wider text-indigo-400">
             <span>Currently watching</span>
@@ -73,7 +73,7 @@ export const VideoNavigation = ({
             ) : null}
           </div>
 
-          <h2 className="mt-1 line-clamp-2 text-lg font-bold text-white sm:text-xl font-heading">
+          <h2 className="mt-1 line-clamp-2 text-lg font-bold text-white sm:text-xl font-heading tracking-tight">
             {formatLessonNumber(currentVideo.position)} — {currentVideo.title}
           </h2>
         </div>
@@ -95,7 +95,7 @@ export const VideoNavigation = ({
               className={`inline-flex items-center gap-1.5 rounded-xl border px-3 py-1.5 text-xs font-semibold transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 active:scale-[0.98] ${
                 isFocusMode
                   ? 'border-indigo-500 bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
-                  : 'border-indigo-500/30 bg-indigo-950/30 text-indigo-300 hover:border-indigo-500/60 hover:bg-indigo-900/40 hover:text-white'
+                  : 'border-indigo-500/30 bg-gradient-to-r from-indigo-500/15 to-purple-500/15 text-indigo-300 hover:from-indigo-500/25 hover:to-purple-500/25 hover:text-white shadow-xs'
               }`}
               aria-label={isFocusMode ? 'Exit Focus Mode' : 'Enter Focus Mode'}
               title="Focus Mode (Distraction-Free Learning)"
@@ -110,7 +110,7 @@ export const VideoNavigation = ({
             <button
               type="button"
               onClick={onToggleTheater}
-              className="hidden sm:inline-flex items-center gap-1.5 rounded-xl border border-white/[0.08] bg-slate-800/80 px-3 py-1.5 text-xs font-medium text-slate-300 hover:bg-slate-700 hover:text-white transition-colors shrink-0"
+              className="hidden sm:inline-flex items-center gap-1.5 rounded-xl border border-white/[0.08] bg-[#0B101E] px-3 py-1.5 text-xs font-medium text-slate-300 hover:bg-[#0D1527] hover:border-white/[0.15] hover:text-white transition-all shrink-0"
             >
               {isTheaterMode ? (
                 <>
@@ -120,7 +120,7 @@ export const VideoNavigation = ({
               ) : (
                 <>
                   <Maximize className="h-3.5 w-3.5" />
-                  <span>Big Screen (Theater)</span>
+                  <span>Big Screen</span>
                 </>
               )}
             </button>
@@ -136,7 +136,7 @@ export const VideoNavigation = ({
           disabled={!hasPrevious}
           className={`inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-semibold transition-all ${
             hasPrevious
-              ? 'border border-white/[0.08] bg-slate-800/80 text-slate-200 hover:border-white/[0.15] hover:bg-slate-700 hover:text-white active:scale-95'
+              ? 'border border-white/[0.08] bg-[#0D1527] text-slate-200 hover:border-white/[0.18] hover:bg-[#131D36] hover:text-white active:scale-95'
               : 'border border-white/[0.04] bg-slate-900/30 text-slate-600 opacity-40 cursor-not-allowed'
           }`}
           aria-label="Previous playable video"
@@ -145,8 +145,8 @@ export const VideoNavigation = ({
           <span>Previous Lesson</span>
         </button>
 
-        <span className="text-xs font-medium text-slate-500">
-          Lesson {currentIndex + 1} / {totalVideos}
+        <span className="text-xs font-medium text-slate-400">
+          Lesson {currentIndex + 1} of {totalVideos}
         </span>
 
         <button
@@ -155,7 +155,7 @@ export const VideoNavigation = ({
           disabled={!hasNext}
           className={`inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-xs font-semibold transition-all ${
             hasNext
-              ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/25 hover:bg-indigo-500 active:scale-95'
+              ? 'bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white shadow-md shadow-indigo-600/25 active:scale-95'
               : 'border border-white/[0.04] bg-slate-900/30 text-slate-600 opacity-40 cursor-not-allowed'
           }`}
           aria-label="Next playable video"

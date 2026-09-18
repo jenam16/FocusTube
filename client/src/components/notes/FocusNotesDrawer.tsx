@@ -105,10 +105,10 @@ export const FocusNotesDrawer: React.FC<FocusNotesDrawerProps> = ({
         <aside
           role="dialog"
           aria-label="Focus Mode Lesson Notes"
-          className="w-screen max-w-md bg-[#111827] border-l border-white/[0.08] shadow-2xl flex flex-col"
+          className="w-screen max-w-md bg-[#0B101E] border-l border-white/[0.07] shadow-2xl flex flex-col"
         >
           {/* Drawer Header */}
-          <div className="flex items-center justify-between border-b border-white/[0.06] p-4 bg-[#0B1120]">
+          <div className="flex items-center justify-between border-b border-white/[0.07] p-4 bg-[#070B14]/90">
             <div className="flex items-center gap-2.5 min-w-0 pr-2">
               <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 shrink-0">
                 <FileText className="h-4 w-4" />
@@ -126,9 +126,9 @@ export const FocusNotesDrawer: React.FC<FocusNotesDrawerProps> = ({
                 <button
                   type="button"
                   onClick={() => setIsAddingNote(true)}
-                  className="inline-flex items-center gap-1 rounded-xl bg-indigo-600 px-2.5 py-1.5 text-xs font-semibold text-white hover:bg-indigo-500 shadow-md shadow-indigo-600/20"
+                  className="inline-flex items-center gap-1 rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 px-3 py-1.5 text-xs font-semibold text-white shadow-md shadow-indigo-600/25 transition-all"
                 >
-                  <Plus className="h-3 w-3" />
+                  <Plus className="h-3.5 w-3.5" />
                   <span>Add</span>
                 </button>
               )}

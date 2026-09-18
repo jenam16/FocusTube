@@ -1,3 +1,4 @@
+import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
 import { Response, CookieOptions } from 'express';
 import { config } from '../config/index.js';
@@ -31,3 +32,24 @@ export const clearAuthCookie = (res: Response): void => {
     maxAge: 0,
   });
 };
+
+/**
+ * Generates a cryptographically random verification token (hex)
+ * and its corresponding SHA-256 hash for secure storage.
+ */
+export const generateVerificationToken = (): {
+  rawToken: string;
+  tokenHash: string;
+} => {
+  const rawToken = crypto.randomBytes(32).toString('hex');
+  const tokenHash = hashVerificationToken(rawToken);
+  return { rawToken, tokenHash };
+};
+
+/**
+ * Computes a SHA-256 hash of a raw verification token.
+ */
+export const hashVerificationToken = (rawToken: string): string => {
+  return crypto.createHash('sha256').update(rawToken).digest('hex');
+};
+

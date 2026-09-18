@@ -11,4 +11,8 @@ export * from './AnalyticsPage';
 export * from './StudyPlanPage';
 export * from './FocusPage';
 export * from './SettingsPage';
+export * from './VerifyEmailPage';
+export * from './ForgotPasswordPage';
+export * from './ResetPasswordPage';
 export * from './PlaceholderPage';
+

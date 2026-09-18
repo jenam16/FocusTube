@@ -36,10 +36,10 @@ export const SettingsPage: React.FC = () => {
       </div>
 
       {/* Account Profile Card */}
-      <div className="rounded-2xl border border-white/[0.08] bg-[#111827] p-6 space-y-6">
+      <div className="rounded-2xl border border-white/[0.07] bg-[#0B101E] p-6 space-y-6 shadow-lg shadow-black/20">
         <div className="flex items-center gap-2.5 pb-4 border-b border-white/[0.06]">
           <User className="h-5 w-5 text-indigo-400" />
-          <h2 className="text-base font-bold text-white">Account Profile</h2>
+          <h2 className="text-base font-bold text-white font-heading">Account Profile</h2>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -51,7 +51,7 @@ export const SettingsPage: React.FC = () => {
               type="text"
               readOnly
               value={user?.name || 'Learner'}
-              className="w-full rounded-xl border border-white/[0.08] bg-[#0B1120] px-3.5 py-2 text-sm text-slate-200 cursor-not-allowed select-none"
+              className="w-full rounded-xl border border-white/[0.08] bg-[#070B14] px-3.5 py-2 text-sm text-slate-200 cursor-not-allowed select-none"
             />
           </div>
 
@@ -63,7 +63,7 @@ export const SettingsPage: React.FC = () => {
               type="email"
               readOnly
               value={user?.email || 'user@example.com'}
-              className="w-full rounded-xl border border-white/[0.08] bg-[#0B1120] px-3.5 py-2 text-sm text-slate-200 cursor-not-allowed select-none"
+              className="w-full rounded-xl border border-white/[0.08] bg-[#070B14] px-3.5 py-2 text-sm text-slate-200 cursor-not-allowed select-none"
             />
           </div>
         </div>
@@ -74,14 +74,14 @@ export const SettingsPage: React.FC = () => {
       </div>
 
       {/* Learning & Player Experience */}
-      <div className="rounded-2xl border border-white/[0.08] bg-[#111827] p-6 space-y-5">
+      <div className="rounded-2xl border border-white/[0.07] bg-[#0B101E] p-6 space-y-5 shadow-lg shadow-black/20">
         <div className="flex items-center gap-2.5 pb-4 border-b border-white/[0.06]">
           <Sliders className="h-5 w-5 text-teal-400" />
-          <h2 className="text-base font-bold text-white">Playback & Learning Preferences</h2>
+          <h2 className="text-base font-bold text-white font-heading">Playback & Learning Preferences</h2>
         </div>
 
         <div className="space-y-4">
-          <label className="flex items-center justify-between p-3 rounded-xl bg-[#0B1120] border border-white/[0.06] cursor-pointer hover:border-white/[0.12] transition-colors">
+          <label className="flex items-center justify-between p-3 rounded-xl bg-[#070B14]/80 border border-white/[0.06] cursor-pointer hover:border-white/[0.12] transition-colors">
             <div className="space-y-0.5">
               <span className="text-xs sm:text-sm font-semibold text-white block">
                 Continuous Playback (Autoplay Next)
@@ -98,7 +98,7 @@ export const SettingsPage: React.FC = () => {
             />
           </label>
 
-          <label className="flex items-center justify-between p-3 rounded-xl bg-[#0B1120] border border-white/[0.06] cursor-pointer hover:border-white/[0.12] transition-colors">
+          <label className="flex items-center justify-between p-3 rounded-xl bg-[#070B14]/80 border border-white/[0.06] cursor-pointer hover:border-white/[0.12] transition-colors">
             <div className="space-y-0.5">
               <span className="text-xs sm:text-sm font-semibold text-white block">
                 Auto-Save Exact Resume Position
@@ -115,7 +115,7 @@ export const SettingsPage: React.FC = () => {
             />
           </label>
 
-          <label className="flex items-center justify-between p-3 rounded-xl bg-[#0B1120] border border-white/[0.06] cursor-pointer hover:border-white/[0.12] transition-colors">
+          <label className="flex items-center justify-between p-3 rounded-xl bg-[#070B14]/80 border border-white/[0.06] cursor-pointer hover:border-white/[0.12] transition-colors">
             <div className="space-y-0.5">
               <span className="text-xs sm:text-sm font-semibold text-white block">
                 Focus Mode Notes Drawer
@@ -146,7 +146,7 @@ export const SettingsPage: React.FC = () => {
           <button
             type="button"
             onClick={handleSavePreferences}
-            className="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2 text-xs font-semibold text-white shadow-md shadow-indigo-600/20 hover:bg-indigo-500 transition-colors"
+            className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 px-4 py-2 text-xs font-semibold text-white shadow-md shadow-indigo-600/20 active:scale-[0.98] transition-all"
           >
             <span>Save Preferences</span>
           </button>
@@ -154,21 +154,21 @@ export const SettingsPage: React.FC = () => {
       </div>
 
       {/* Appearance */}
-      <div className="rounded-2xl border border-white/[0.08] bg-[#111827] p-6 space-y-4">
+      <div className="rounded-2xl border border-white/[0.07] bg-[#0B101E] p-6 space-y-4 shadow-lg shadow-black/20">
         <div className="flex items-center gap-2.5 pb-4 border-b border-white/[0.06]">
           <Palette className="h-5 w-5 text-indigo-400" />
-          <h2 className="text-base font-bold text-white">Appearance & Theme</h2>
+          <h2 className="text-base font-bold text-white font-heading">Appearance & Theme</h2>
         </div>
 
-        <div className="flex items-center justify-between p-3.5 rounded-xl bg-[#0B1120] border border-white/[0.06]">
+        <div className="flex items-center justify-between p-3.5 rounded-xl bg-[#070B14]/80 border border-white/[0.06]">
           <div className="flex items-center gap-3">
             <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
               <Moon className="h-4 w-4" />
             </div>
             <div>
-              <span className="text-sm font-semibold text-white block">Focus Dark Mode</span>
+              <span className="text-sm font-semibold text-white block font-heading">Focus Dark SaaS Theme</span>
               <span className="text-xs text-slate-400 block">
-                Optimized deep midnight palette (#0F172A) engineered for prolonged screen time and zero eye strain.
+                Deep near-black palette (#060913) with high-contrast surfaces engineered for long-session flow.
               </span>
             </div>
           </div>

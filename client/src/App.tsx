@@ -7,6 +7,9 @@ import {
   LandingPage,
   LoginPage,
   RegisterPage,
+  VerifyEmailPage,
+  ForgotPasswordPage,
+  ResetPasswordPage,
   DashboardPage,
   CoursesPage,
   CourseDetailPage,
@@ -36,6 +39,13 @@ export default function App() {
           <Routes>
             {/* Public Landing Route */}
             <Route path="/" element={<LandingPage />} />
+
+            {/* Email Verification Route */}
+            <Route path="/verify-email" element={<VerifyEmailPage />} />
+
+            {/* Password Reset Routes */}
+            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+            <Route path="/reset-password" element={<ResetPasswordPage />} />
 
             {/* Guest / Public Auth Routes */}
             <Route element={<PublicOnlyRoute />}>

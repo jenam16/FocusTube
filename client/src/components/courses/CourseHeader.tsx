@@ -35,7 +35,7 @@ export const CourseHeader = ({
       <div>
         <Link
           to="/courses"
-          className="inline-flex items-center gap-2 rounded-xl px-3 py-1.5 text-xs font-semibold text-slate-400 transition-colors hover:bg-slate-800/60 hover:text-white border border-transparent hover:border-white/[0.06]"
+          className="inline-flex items-center gap-2 rounded-xl px-3 py-1.5 text-xs font-semibold text-slate-300 transition-all hover:bg-[#0D1527] hover:text-white border border-white/[0.07] bg-[#0B101E]"
         >
           <ArrowLeft className="h-4 w-4" />
           <span>Back to Courses</span>
@@ -43,7 +43,7 @@ export const CourseHeader = ({
       </div>
 
       {/* Hero Banner */}
-      <div className="overflow-hidden rounded-2xl border border-white/[0.08] bg-[#111827] p-6 sm:p-8 backdrop-blur-md shadow-sm">
+      <div className="overflow-hidden rounded-2xl border border-white/[0.07] bg-[#0B101E] p-6 sm:p-8 backdrop-blur-md shadow-xl shadow-black/20">
         <div className="flex flex-col gap-6 md:flex-row md:items-start">
           {/* Thumbnail */}
           <div className="relative aspect-video w-full shrink-0 overflow-hidden rounded-xl border border-white/[0.08] bg-slate-950 md:w-80 lg:w-96 shadow-md">
@@ -55,11 +55,11 @@ export const CourseHeader = ({
                 loading="eager"
               />
             ) : (
-              <div className="flex h-full w-full items-center justify-center bg-slate-900 text-slate-600">
+              <div className="flex h-full w-full items-center justify-center bg-slate-950 text-slate-600">
                 <PlaySquare className="h-12 w-12" />
               </div>
             )}
-            <div className="absolute bottom-2.5 right-2.5 rounded-md bg-black/80 px-2 py-0.5 text-xs font-medium text-white backdrop-blur-sm border border-white/[0.08]">
+            <div className="absolute bottom-2.5 right-2.5 rounded-lg bg-black/80 px-2 py-0.5 text-xs font-medium text-white backdrop-blur-md border border-white/[0.08]">
               {course.totalVideos} {course.totalVideos === 1 ? 'Lesson' : 'Lessons'}
             </div>
           </div>
@@ -88,7 +88,7 @@ export const CourseHeader = ({
             </div>
 
             {/* Course Progress Section */}
-            <div className="rounded-xl border border-white/[0.06] bg-slate-950/60 p-4">
+            <div className="rounded-xl border border-white/[0.06] bg-[#070B14]/80 p-4">
               <div className="mb-2 flex items-center justify-between text-xs">
                 <div className="flex items-center gap-2">
                   <span className="text-slate-400 font-medium">Course Progress</span>
@@ -108,7 +108,7 @@ export const CourseHeader = ({
               {firstVideo && (
                 <Link
                   to={`/watch/${course._id}/${firstVideo._id}`}
-                  className="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-5 py-2.5 text-xs font-semibold text-white shadow-md shadow-indigo-600/20 transition-all hover:bg-indigo-500 hover:shadow-indigo-600/30 active:scale-[0.98]"
+                  className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 px-5 py-2.5 text-xs font-semibold text-white shadow-lg shadow-indigo-600/25 transition-all active:scale-[0.98]"
                 >
                   <Play className="h-3.5 w-3.5 fill-current" />
                   <span>
@@ -125,7 +125,7 @@ export const CourseHeader = ({
                 href={`https://www.youtube.com/playlist?list=${course.playlistId}`}
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex items-center gap-1.5 rounded-xl border border-white/[0.08] bg-slate-800/80 px-3.5 py-2.5 text-xs font-medium text-slate-300 transition-colors hover:border-white/[0.15] hover:bg-slate-700 hover:text-white"
+                className="inline-flex items-center gap-1.5 rounded-xl border border-white/[0.08] bg-[#0D1527] px-3.5 py-2.5 text-xs font-medium text-slate-300 transition-all hover:border-white/[0.18] hover:bg-[#131D36] hover:text-white"
               >
                 <span>Original YouTube Playlist</span>
                 <ExternalLink className="h-3.5 w-3.5 text-slate-400" />

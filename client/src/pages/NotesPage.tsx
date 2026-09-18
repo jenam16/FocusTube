@@ -298,7 +298,7 @@ export const NotesPage: React.FC = () => {
 
       {/* Empty states */}
       {!isLoading && !error && total === 0 && (
-        <div className="rounded-2xl border border-white/[0.08] bg-[#111827]/50 p-8">
+        <div className="rounded-2xl border border-white/[0.07] bg-[#0B101E] p-8 shadow-lg shadow-black/20">
           {hasActiveFilters ? (
             <EmptyState
               title={activeTab === 'screenshots' ? 'No captured moments match your filters' : 'No notes match your filters'}
@@ -343,7 +343,7 @@ export const NotesPage: React.FC = () => {
 
           {/* Pagination Controls */}
           {totalPages > 1 && (
-            <div className="flex items-center justify-between rounded-2xl border border-white/[0.08] bg-[#111827] px-4 py-3 text-xs text-slate-400">
+            <div className="flex items-center justify-between rounded-2xl border border-white/[0.07] bg-[#0B101E] px-4 py-3 text-xs text-slate-400 shadow-md shadow-black/20">
               <span>
                 Page {page} of {totalPages}
               </span>
@@ -353,7 +353,7 @@ export const NotesPage: React.FC = () => {
                   type="button"
                   disabled={page <= 1}
                   onClick={() => setPage((p) => Math.max(1, p - 1))}
-                  className="inline-flex items-center gap-1 rounded-xl border border-white/[0.08] bg-[#0B1120] px-3 py-1.5 text-xs text-slate-300 hover:border-white/[0.15] hover:text-white disabled:opacity-40 transition-colors"
+                  className="inline-flex items-center gap-1 rounded-xl border border-white/[0.08] bg-[#0D1527] px-3 py-1.5 text-xs text-slate-300 hover:border-white/[0.18] hover:bg-[#131D36] hover:text-white disabled:opacity-40 transition-all"
                 >
                   <ChevronLeft className="h-3.5 w-3.5" />
                   <span>Prev</span>
@@ -362,7 +362,7 @@ export const NotesPage: React.FC = () => {
                   type="button"
                   disabled={page >= totalPages}
                   onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                  className="inline-flex items-center gap-1 rounded-xl border border-white/[0.08] bg-[#0B1120] px-3 py-1.5 text-xs text-slate-300 hover:border-white/[0.15] hover:text-white disabled:opacity-40 transition-colors"
+                  className="inline-flex items-center gap-1 rounded-xl border border-white/[0.08] bg-[#0D1527] px-3 py-1.5 text-xs text-slate-300 hover:border-white/[0.18] hover:bg-[#131D36] hover:text-white disabled:opacity-40 transition-all"
                 >
                   <span>Next</span>
                   <ChevronRight className="h-3.5 w-3.5" />
@@ -396,7 +396,7 @@ export const NotesPage: React.FC = () => {
 
             {/* Pagination Controls */}
             {totalPages > 1 && (
-              <div className="flex items-center justify-between rounded-2xl border border-white/[0.08] bg-[#111827] px-4 py-3 text-xs text-slate-400">
+              <div className="flex items-center justify-between rounded-2xl border border-white/[0.07] bg-[#0B101E] px-4 py-3 text-xs text-slate-400 shadow-md shadow-black/20">
                 <span>
                   Page {page} of {totalPages}
                 </span>
@@ -406,7 +406,7 @@ export const NotesPage: React.FC = () => {
                     type="button"
                     disabled={page <= 1}
                     onClick={() => setPage((p) => Math.max(1, p - 1))}
-                    className="inline-flex items-center gap-1 rounded-xl border border-white/[0.08] bg-[#0B1120] px-3 py-1.5 text-xs text-slate-300 hover:border-white/[0.15] hover:text-white disabled:opacity-40 transition-colors"
+                    className="inline-flex items-center gap-1 rounded-xl border border-white/[0.08] bg-[#0D1527] px-3 py-1.5 text-xs text-slate-300 hover:border-white/[0.18] hover:bg-[#131D36] hover:text-white disabled:opacity-40 transition-all"
                   >
                     <ChevronLeft className="h-3.5 w-3.5" />
                     <span>Prev</span>
@@ -415,7 +415,7 @@ export const NotesPage: React.FC = () => {
                     type="button"
                     disabled={page >= totalPages}
                     onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                    className="inline-flex items-center gap-1 rounded-xl border border-white/[0.08] bg-[#0B1120] px-3 py-1.5 text-xs text-slate-300 hover:border-white/[0.15] hover:text-white disabled:opacity-40 transition-colors"
+                    className="inline-flex items-center gap-1 rounded-xl border border-white/[0.08] bg-[#0D1527] px-3 py-1.5 text-xs text-slate-300 hover:border-white/[0.18] hover:bg-[#131D36] hover:text-white disabled:opacity-40 transition-all"
                   >
                     <span>Next</span>
                     <ChevronRight className="h-3.5 w-3.5" />
