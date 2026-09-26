@@ -262,12 +262,12 @@ export const StudyPlanPage: React.FC = () => {
           />
 
           {/* Date Progress Bar Card */}
-          <div className="rounded-2xl border border-white/[0.07] bg-[#0B101E] p-4 space-y-2 shadow-lg shadow-black/20">
+          <div className="rounded-2xl border border-app bg-surface p-4 space-y-2 shadow-sm">
             <div className="flex items-center justify-between text-xs font-semibold">
-              <span className="text-slate-200">
+              <span className="text-primary">
                 Daily Goal Progress
               </span>
-              <span className="text-slate-400">
+              <span className="text-secondary">
                 {completedCount} of {totalDateTasks} completed ({completionPercent}%)
               </span>
             </div>
@@ -289,7 +289,7 @@ export const StudyPlanPage: React.FC = () => {
 
           {/* Empty Date Tasks */}
           {!isLoadingDateTasks && !dateTasksError && totalDateTasks === 0 && (
-            <div className="rounded-2xl border border-white/[0.07] bg-[#0B101E] p-8 shadow-lg shadow-black/20">
+            <div className="rounded-2xl border border-app bg-surface p-8 shadow-sm">
               <EmptyState
                 title="No tasks scheduled for this day"
                 description="Plan your learning goals or add video lessons to stay on track."
@@ -305,7 +305,7 @@ export const StudyPlanPage: React.FC = () => {
               {/* Incomplete Tasks */}
               {activeTasks.length > 0 ? (
                 <div className="space-y-2.5">
-                  <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 px-1">
+                  <h3 className="text-xs font-bold uppercase tracking-wider text-secondary px-1">
                     To-Do ({activeTasks.length})
                   </h3>
                   {activeTasks.map((task) => (
@@ -320,24 +320,24 @@ export const StudyPlanPage: React.FC = () => {
                   ))}
                 </div>
               ) : (
-                <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/10 p-4 text-center text-xs font-semibold text-emerald-400">
+                <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/10 p-4 text-center text-xs font-semibold text-emerald-500">
                   🎉 All tasks for this date are completed! Excellent focus.
                 </div>
               )}
 
               {/* Completed Tasks (Collapsible Section) */}
               {completedTasks.length > 0 && (
-                <div className="pt-3 border-t border-white/[0.06] space-y-3">
+                <div className="pt-3 border-t border-subtle space-y-3">
                   <button
                     type="button"
                     onClick={() => setShowCompleted((prev) => !prev)}
-                    className="flex items-center justify-between w-full rounded-2xl bg-[#0B101E] border border-white/[0.07] px-4 py-3 text-xs font-semibold text-slate-300 hover:bg-[#0D1527] transition-all shadow-sm"
+                    className="flex items-center justify-between w-full rounded-2xl bg-surface border border-app px-4 py-3 text-xs font-semibold text-secondary hover:bg-surface-elevated hover:text-primary transition-all shadow-xs"
                   >
                     <div className="flex items-center gap-2">
-                      <CheckCircle2 className="h-4 w-4 text-emerald-400" />
+                      <CheckCircle2 className="h-4 w-4 text-emerald-500" />
                       <span>Completed ({completedTasks.length})</span>
                     </div>
-                    <div className="flex items-center gap-1 text-slate-500">
+                    <div className="flex items-center gap-1 text-muted">
                       <span>{showCompleted ? 'Hide' : 'Show'}</span>
                       {showCompleted ? (
                         <ChevronUp className="h-4 w-4" />
@@ -375,8 +375,8 @@ export const StudyPlanPage: React.FC = () => {
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-base font-bold text-white font-heading">Upcoming Learning Schedule</h2>
-              <p className="text-xs text-slate-400">
+              <h2 className="text-base font-bold text-primary font-heading">Upcoming Learning Schedule</h2>
+              <p className="text-xs text-secondary">
                 Tasks planned for tomorrow and the next 30 days.
               </p>
             </div>
@@ -385,7 +385,7 @@ export const StudyPlanPage: React.FC = () => {
           {isLoadingUpcoming && <LoadingState count={3} />}
 
           {!isLoadingUpcoming && upcomingSummaries.length === 0 && (
-            <div className="rounded-2xl border border-white/[0.07] bg-[#0B101E] p-8 shadow-lg shadow-black/20">
+            <div className="rounded-2xl border border-app bg-surface p-8 shadow-sm">
               <EmptyState
                 title="Nothing planned ahead yet"
                 description="Schedule learning tasks for tomorrow or upcoming days to build a consistent streak."
@@ -409,24 +409,24 @@ export const StudyPlanPage: React.FC = () => {
                       setDrilldownDateStr(summary.date);
                     }
                   }}
-                  className="group rounded-2xl border border-white/[0.07] bg-[#0B101E] p-4 hover:border-indigo-500/40 hover:bg-[#0D1527] cursor-pointer transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-indigo-950/20 space-y-3"
+                  className="group rounded-2xl border border-app bg-surface p-4 hover:border-indigo-500/40 hover:bg-surface-elevated cursor-pointer transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg space-y-3"
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <CalendarDays className="h-4 w-4 text-indigo-400" />
-                      <span className="text-sm font-bold text-slate-100 group-hover:text-white font-heading">
+                      <CalendarDays className="h-4 w-4 text-indigo-500" />
+                      <span className="text-sm font-bold text-primary group-hover:text-indigo-500 font-heading">
                         {formatDateDisplay(summary.date)}
                       </span>
                     </div>
-                    <ChevronRight className="h-4 w-4 text-slate-600 group-hover:text-slate-300 transition-colors" />
+                    <ChevronRight className="h-4 w-4 text-muted group-hover:text-secondary transition-colors" />
                   </div>
 
                   <div className="space-y-1.5">
-                    <div className="flex items-center justify-between text-xs text-slate-400">
+                    <div className="flex items-center justify-between text-xs text-secondary">
                       <span>
                         {summary.completedTasks} / {summary.totalTasks} completed
                       </span>
-                      <span className="font-semibold text-slate-300">
+                      <span className="font-semibold text-primary">
                         {summary.completionPercentage}%
                       </span>
                     </div>
@@ -445,8 +445,8 @@ export const StudyPlanPage: React.FC = () => {
       {activeTab === 'history' && !drilldownDateStr && (
         <div className="space-y-4">
           <div>
-            <h2 className="text-base font-bold text-white font-heading">Study History</h2>
-            <p className="text-xs text-slate-400">
+            <h2 className="text-base font-bold text-primary font-heading">Study History</h2>
+            <p className="text-xs text-secondary">
               Review your completed learning goals and tasks from past days.
             </p>
           </div>
@@ -454,7 +454,7 @@ export const StudyPlanPage: React.FC = () => {
           {isLoadingHistory && <LoadingState count={3} />}
 
           {!isLoadingHistory && historySummaries.length === 0 && (
-            <div className="rounded-2xl border border-white/[0.07] bg-[#0B101E] p-8 shadow-lg shadow-black/20">
+            <div className="rounded-2xl border border-app bg-surface p-8 shadow-sm">
               <EmptyState
                 title="No history recorded yet"
                 description="Past days will appear here as you schedule and accomplish daily study goals."
@@ -477,24 +477,24 @@ export const StudyPlanPage: React.FC = () => {
                         setDrilldownDateStr(summary.date);
                       }
                     }}
-                    className="group rounded-2xl border border-white/[0.07] bg-[#0B101E] p-4 hover:border-indigo-500/40 hover:bg-[#0D1527] cursor-pointer transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-indigo-950/20 space-y-3"
+                    className="group rounded-2xl border border-app bg-surface p-4 hover:border-indigo-500/40 hover:bg-surface-elevated cursor-pointer transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg space-y-3"
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        <HistoryIcon className="h-4 w-4 text-slate-400 group-hover:text-indigo-400 transition-colors" />
-                        <span className="text-sm font-bold text-slate-200 group-hover:text-white font-heading">
+                        <HistoryIcon className="h-4 w-4 text-muted group-hover:text-indigo-500 transition-colors" />
+                        <span className="text-sm font-bold text-primary group-hover:text-indigo-500 font-heading">
                           {formatDateDisplay(summary.date)}
                         </span>
                       </div>
-                      <ChevronRight className="h-4 w-4 text-slate-600 group-hover:text-slate-300 transition-colors" />
+                      <ChevronRight className="h-4 w-4 text-muted group-hover:text-secondary transition-colors" />
                     </div>
 
                     <div className="space-y-1.5">
-                      <div className="flex items-center justify-between text-xs text-slate-400">
+                      <div className="flex items-center justify-between text-xs text-secondary">
                         <span>
                           {summary.completedTasks} / {summary.totalTasks} completed
                         </span>
-                        <span className="font-semibold text-slate-300">
+                        <span className="font-semibold text-primary">
                           {summary.completionPercentage}%
                         </span>
                       </div>
@@ -506,7 +506,7 @@ export const StudyPlanPage: React.FC = () => {
 
               {/* History Pagination */}
               {historyTotalPages > 1 && (
-                <div className="flex items-center justify-between rounded-2xl border border-white/[0.07] bg-[#0B101E] p-3 text-xs text-slate-400 shadow-md shadow-black/20">
+                <div className="flex items-center justify-between rounded-2xl border border-app bg-surface p-3 text-xs text-secondary shadow-sm">
                   <span>
                     Page {historyPage} of {historyTotalPages}
                   </span>
@@ -515,7 +515,7 @@ export const StudyPlanPage: React.FC = () => {
                       type="button"
                       disabled={historyPage <= 1}
                       onClick={() => setHistoryPage((p) => Math.max(1, p - 1))}
-                      className="rounded-xl border border-white/[0.08] bg-[#0D1527] px-3.5 py-1.5 hover:border-white/[0.18] hover:bg-[#131D36] hover:text-white disabled:opacity-40 transition-all"
+                      className="rounded-xl border border-app bg-surface-elevated px-3.5 py-1.5 hover:border-indigo-500/30 hover:text-primary disabled:opacity-40 transition-all text-secondary"
                     >
                       Prev
                     </button>
@@ -523,7 +523,7 @@ export const StudyPlanPage: React.FC = () => {
                       type="button"
                       disabled={historyPage >= historyTotalPages}
                       onClick={() => setHistoryPage((p) => Math.min(historyTotalPages, p + 1))}
-                      className="rounded-xl border border-white/[0.08] bg-[#0D1527] px-3.5 py-1.5 hover:border-white/[0.18] hover:bg-[#131D36] hover:text-white disabled:opacity-40 transition-all"
+                      className="rounded-xl border border-app bg-surface-elevated px-3.5 py-1.5 hover:border-indigo-500/30 hover:text-primary disabled:opacity-40 transition-all text-secondary"
                     >
                       Next
                     </button>
@@ -572,23 +572,23 @@ export const StudyPlanPage: React.FC = () => {
             role="dialog"
             aria-modal="true"
             aria-labelledby="delete-task-title"
-            className="w-full max-w-sm rounded-3xl border border-white/[0.08] bg-[#111827] p-6 shadow-2xl space-y-4"
+            className="w-full max-w-sm rounded-3xl border border-app bg-surface p-6 shadow-2xl space-y-4"
           >
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-rose-500/10 text-rose-400 border border-rose-500/20">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-rose-500/10 text-rose-500 border border-rose-500/20">
                 <AlertTriangle className="h-5 w-5" />
               </div>
               <div>
-                <h4 id="delete-task-title" className="text-base font-bold text-white font-heading">
+                <h4 id="delete-task-title" className="text-base font-bold text-primary font-heading">
                   Delete Task?
                 </h4>
-                <p className="text-xs text-slate-400">
+                <p className="text-xs text-secondary">
                   This task will be permanently removed.
                 </p>
               </div>
             </div>
 
-            <p className="text-xs text-slate-300 line-clamp-3 bg-[#0B1120] p-3.5 rounded-2xl border border-white/[0.06]">
+            <p className="text-xs text-primary line-clamp-3 bg-secondary p-3.5 rounded-2xl border border-app">
               "{taskToDelete.title}"
             </p>
 
@@ -597,7 +597,7 @@ export const StudyPlanPage: React.FC = () => {
                 type="button"
                 disabled={deleteMutation.isPending}
                 onClick={() => setTaskToDelete(null)}
-                className="rounded-xl border border-white/[0.08] bg-[#0B1120] px-3.5 py-2 text-xs font-semibold text-slate-300 hover:border-white/[0.15] hover:text-white transition-colors"
+                className="rounded-xl border border-app bg-surface-elevated px-3.5 py-2 text-xs font-semibold text-secondary hover:border-indigo-500/30 hover:text-primary transition-colors"
               >
                 Cancel
               </button>

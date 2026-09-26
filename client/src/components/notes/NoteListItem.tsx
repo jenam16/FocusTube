@@ -62,19 +62,19 @@ export const NoteListItem: React.FC<NoteListItemProps> = ({
       }}
       className={`group relative flex flex-col text-left rounded-2xl p-4 transition-all cursor-pointer border ${
         isSelected
-          ? 'border-indigo-500/60 bg-[#0D1527] shadow-lg shadow-indigo-950/40 ring-1 ring-indigo-500/40'
-          : 'border-white/[0.07] bg-[#0B101E] hover:border-white/[0.15] hover:bg-[#0D1527]'
+          ? 'border-indigo-500/60 bg-surface-elevated shadow-md ring-1 ring-indigo-500/40'
+          : 'border-app bg-surface hover:border-indigo-500/30 hover:bg-surface-elevated'
       }`}
     >
       {/* Top Header: Course badge + Timestamp + Pin button */}
       <div className="flex items-center justify-between gap-2 mb-2">
         <div className="flex items-center gap-1.5 min-w-0">
-          <BookOpen className="h-3 w-3 text-indigo-400 shrink-0" />
-          <span className="text-[11px] font-medium text-slate-400 truncate max-w-[140px] sm:max-w-[180px]">
+          <BookOpen className="h-3 w-3 text-indigo-500 shrink-0" />
+          <span className="text-[11px] font-medium text-secondary truncate max-w-[140px] sm:max-w-[180px]">
             {courseTitle}
           </span>
           {videoPosition && (
-            <span className="text-[10px] text-slate-500 shrink-0">
+            <span className="text-[10px] text-muted shrink-0">
               • L{videoPosition}
             </span>
           )}
@@ -83,12 +83,12 @@ export const NoteListItem: React.FC<NoteListItemProps> = ({
         <div className="flex items-center gap-1.5 shrink-0">
           {/* Timestamp badge */}
           {note.timestampSeconds !== null && note.timestampSeconds !== undefined ? (
-            <span className="inline-flex items-center gap-1 rounded-md bg-indigo-500/10 border border-indigo-500/20 px-1.5 py-0.5 text-[10px] font-semibold text-indigo-400 font-mono">
+            <span className="inline-flex items-center gap-1 rounded-md bg-indigo-500/10 border border-indigo-500/20 px-1.5 py-0.5 text-[10px] font-semibold text-indigo-500 font-mono">
               <Play className="h-2.5 w-2.5 fill-current" />
               {formatVideoDuration(note.timestampSeconds)}
             </span>
           ) : (
-            <span className="inline-flex items-center gap-1 text-[10px] text-slate-500">
+            <span className="inline-flex items-center gap-1 text-[10px] text-muted">
               <Clock className="h-2.5 w-2.5" />
             </span>
           )}
@@ -104,8 +104,8 @@ export const NoteListItem: React.FC<NoteListItemProps> = ({
             }}
             className={`rounded p-1 transition-all ${
               note.isPinned
-                ? 'text-amber-400 hover:text-amber-300'
-                : 'text-slate-600 hover:text-slate-300 opacity-0 group-hover:opacity-100'
+                ? 'text-amber-500 hover:text-amber-400'
+                : 'text-muted hover:text-secondary opacity-0 group-hover:opacity-100'
             }`}
             title={note.isPinned ? 'Unpin note' : 'Pin note to top'}
           >
@@ -115,30 +115,30 @@ export const NoteListItem: React.FC<NoteListItemProps> = ({
       </div>
 
       {/* Note Title */}
-      <h3 className="text-xs sm:text-sm font-semibold text-slate-100 line-clamp-1 group-hover:text-white transition-colors">
+      <h3 className="text-xs sm:text-sm font-semibold text-primary line-clamp-1 group-hover:text-indigo-500 transition-colors">
         {displayTitle}
       </h3>
 
       {/* Content Preview */}
-      <p className="mt-1 text-xs text-slate-400 line-clamp-2 leading-relaxed whitespace-pre-wrap">
+      <p className="mt-1 text-xs text-secondary line-clamp-2 leading-relaxed whitespace-pre-wrap">
         {note.content}
       </p>
 
       {/* Footer: Tags + Lesson pill + Updated Time */}
-      <div className="mt-3 flex items-center justify-between gap-2 pt-2 border-t border-white/[0.06] text-[11px] text-slate-500">
+      <div className="mt-3 flex items-center justify-between gap-2 pt-2 border-t border-subtle text-[11px] text-muted">
         <div className="flex items-center gap-1.5 flex-wrap min-w-0">
           {note.tags && note.tags.length > 0 && (
             <div className="flex items-center gap-1 flex-wrap">
               {note.tags.slice(0, 3).map((tag) => (
                 <span
                   key={tag}
-                  className="rounded-md bg-[#070B14] border border-white/[0.06] px-1.5 py-0.5 text-[10px] text-slate-400"
+                  className="rounded-md bg-secondary border border-app px-1.5 py-0.5 text-[10px] text-secondary"
                 >
                   #{tag}
                 </span>
               ))}
               {note.tags.length > 3 && (
-                <span className="text-[10px] text-slate-500">
+                <span className="text-[10px] text-muted">
                   +{note.tags.length - 3}
                 </span>
               )}
@@ -148,7 +148,7 @@ export const NoteListItem: React.FC<NoteListItemProps> = ({
 
         <div className="flex items-center gap-1 shrink-0">
           <span>{formatDate(note.updatedAt || note.createdAt)}</span>
-          <ChevronRight className="h-3 w-3 text-slate-600 group-hover:text-slate-400 transition-colors" />
+          <ChevronRight className="h-3 w-3 text-muted group-hover:text-secondary transition-colors" />
         </div>
       </div>
     </div>

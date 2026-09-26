@@ -298,7 +298,7 @@ export const NotesPage: React.FC = () => {
 
       {/* Empty states */}
       {!isLoading && !error && total === 0 && (
-        <div className="rounded-2xl border border-white/[0.07] bg-[#0B101E] p-8 shadow-lg shadow-black/20">
+        <div className="rounded-2xl border border-app bg-surface p-8 shadow-sm">
           {hasActiveFilters ? (
             <EmptyState
               title={activeTab === 'screenshots' ? 'No captured moments match your filters' : 'No notes match your filters'}
@@ -343,7 +343,7 @@ export const NotesPage: React.FC = () => {
 
           {/* Pagination Controls */}
           {totalPages > 1 && (
-            <div className="flex items-center justify-between rounded-2xl border border-white/[0.07] bg-[#0B101E] px-4 py-3 text-xs text-slate-400 shadow-md shadow-black/20">
+            <div className="flex items-center justify-between rounded-2xl border border-app bg-surface px-4 py-3 text-xs text-secondary shadow-sm">
               <span>
                 Page {page} of {totalPages}
               </span>
@@ -353,7 +353,7 @@ export const NotesPage: React.FC = () => {
                   type="button"
                   disabled={page <= 1}
                   onClick={() => setPage((p) => Math.max(1, p - 1))}
-                  className="inline-flex items-center gap-1 rounded-xl border border-white/[0.08] bg-[#0D1527] px-3 py-1.5 text-xs text-slate-300 hover:border-white/[0.18] hover:bg-[#131D36] hover:text-white disabled:opacity-40 transition-all"
+                  className="inline-flex items-center gap-1 rounded-xl border border-app bg-surface-elevated px-3 py-1.5 text-xs text-secondary hover:border-indigo-500/30 hover:text-primary disabled:opacity-40 transition-all"
                 >
                   <ChevronLeft className="h-3.5 w-3.5" />
                   <span>Prev</span>
@@ -362,7 +362,7 @@ export const NotesPage: React.FC = () => {
                   type="button"
                   disabled={page >= totalPages}
                   onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                  className="inline-flex items-center gap-1 rounded-xl border border-white/[0.08] bg-[#0D1527] px-3 py-1.5 text-xs text-slate-300 hover:border-white/[0.18] hover:bg-[#131D36] hover:text-white disabled:opacity-40 transition-all"
+                  className="inline-flex items-center gap-1 rounded-xl border border-app bg-surface-elevated px-3 py-1.5 text-xs text-secondary hover:border-indigo-500/30 hover:text-primary disabled:opacity-40 transition-all"
                 >
                   <span>Next</span>
                   <ChevronRight className="h-3.5 w-3.5" />
@@ -396,7 +396,7 @@ export const NotesPage: React.FC = () => {
 
             {/* Pagination Controls */}
             {totalPages > 1 && (
-              <div className="flex items-center justify-between rounded-2xl border border-white/[0.07] bg-[#0B101E] px-4 py-3 text-xs text-slate-400 shadow-md shadow-black/20">
+              <div className="flex items-center justify-between rounded-2xl border border-app bg-surface px-4 py-3 text-xs text-secondary shadow-sm">
                 <span>
                   Page {page} of {totalPages}
                 </span>
@@ -406,7 +406,7 @@ export const NotesPage: React.FC = () => {
                     type="button"
                     disabled={page <= 1}
                     onClick={() => setPage((p) => Math.max(1, p - 1))}
-                    className="inline-flex items-center gap-1 rounded-xl border border-white/[0.08] bg-[#0D1527] px-3 py-1.5 text-xs text-slate-300 hover:border-white/[0.18] hover:bg-[#131D36] hover:text-white disabled:opacity-40 transition-all"
+                    className="inline-flex items-center gap-1 rounded-xl border border-app bg-surface-elevated px-3 py-1.5 text-xs text-secondary hover:border-indigo-500/30 hover:text-primary disabled:opacity-40 transition-all"
                   >
                     <ChevronLeft className="h-3.5 w-3.5" />
                     <span>Prev</span>
@@ -415,7 +415,7 @@ export const NotesPage: React.FC = () => {
                     type="button"
                     disabled={page >= totalPages}
                     onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                    className="inline-flex items-center gap-1 rounded-xl border border-white/[0.08] bg-[#0D1527] px-3 py-1.5 text-xs text-slate-300 hover:border-white/[0.18] hover:bg-[#131D36] hover:text-white disabled:opacity-40 transition-all"
+                    className="inline-flex items-center gap-1 rounded-xl border border-app bg-surface-elevated px-3 py-1.5 text-xs text-secondary hover:border-indigo-500/30 hover:text-primary disabled:opacity-40 transition-all"
                   >
                     <span>Next</span>
                     <ChevronRight className="h-3.5 w-3.5" />
@@ -437,7 +437,7 @@ export const NotesPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setSelectedNote(null)}
-                  className="inline-flex items-center gap-1.5 rounded-xl border border-white/[0.08] bg-[#111827] px-3.5 py-2 text-xs font-semibold text-slate-300 hover:text-white transition-colors"
+                  className="inline-flex items-center gap-1.5 rounded-xl border border-app bg-surface px-3.5 py-2 text-xs font-semibold text-secondary hover:text-primary transition-colors"
                 >
                   <ArrowLeft className="h-4 w-4" />
                   <span>Back to notes list</span>
@@ -478,23 +478,23 @@ export const NotesPage: React.FC = () => {
             role="dialog"
             aria-modal="true"
             aria-labelledby="delete-note-title"
-            className="w-full max-w-sm rounded-3xl border border-white/[0.08] bg-[#111827] p-6 shadow-2xl space-y-4"
+            className="w-full max-w-sm rounded-3xl border border-app bg-surface p-6 shadow-2xl space-y-4"
           >
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-rose-500/10 text-rose-400 border border-rose-500/20">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-rose-500/10 text-rose-500 border border-rose-500/20">
                 <AlertTriangle className="h-5 w-5" />
               </div>
               <div>
-                <h4 id="delete-note-title" className="text-base font-bold text-white font-heading">
+                <h4 id="delete-note-title" className="text-base font-bold text-primary font-heading">
                   Delete Note?
                 </h4>
-                <p className="text-xs text-slate-400">
+                <p className="text-xs text-secondary">
                   This action cannot be undone.
                 </p>
               </div>
             </div>
 
-            <p className="text-xs text-slate-300 line-clamp-3 bg-[#0B1120] p-3.5 rounded-2xl border border-white/[0.06]">
+            <p className="text-xs text-primary line-clamp-3 bg-secondary p-3.5 rounded-2xl border border-app">
               "{noteToDelete.content}"
             </p>
 
@@ -503,7 +503,7 @@ export const NotesPage: React.FC = () => {
                 type="button"
                 disabled={deleteMutation.isPending}
                 onClick={() => setNoteToDelete(null)}
-                className="rounded-xl border border-white/[0.08] bg-[#0B1120] px-3.5 py-2 text-xs font-semibold text-slate-300 hover:border-white/[0.15] hover:text-white transition-colors"
+                className="rounded-xl border border-app bg-surface-elevated px-3.5 py-2 text-xs font-semibold text-secondary hover:border-indigo-500/30 hover:text-primary transition-colors"
               >
                 Cancel
               </button>

@@ -192,17 +192,17 @@ export const NoteModal: React.FC<NoteModalProps> = ({
         role="dialog"
         aria-modal="true"
         aria-labelledby="note-modal-title"
-        className="w-full max-w-xl rounded-3xl border border-white/[0.08] bg-[#111827] shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
+        className="w-full max-w-xl rounded-3xl border border-app bg-surface shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
       >
         {/* Modal Header */}
-        <div className="flex items-center justify-between border-b border-white/[0.06] p-4 sm:px-6 bg-[#0B1120]">
-          <h3 id="note-modal-title" className="text-base sm:text-lg font-bold text-white font-heading">
+        <div className="flex items-center justify-between border-b border-app p-4 sm:px-6 bg-secondary">
+          <h3 id="note-modal-title" className="text-base sm:text-lg font-bold text-primary font-heading">
             {isEditMode ? 'Edit Note' : 'Create New Note'}
           </h3>
           <button
             type="button"
             onClick={onClose}
-            className="rounded-xl p-1.5 text-slate-400 hover:bg-white/[0.06] hover:text-white transition-colors"
+            className="rounded-xl p-1.5 text-secondary hover:bg-surface-elevated hover:text-primary transition-colors"
           >
             <X className="h-5 w-5" />
           </button>
@@ -211,7 +211,7 @@ export const NoteModal: React.FC<NoteModalProps> = ({
         {/* Modal Form */}
         <form onSubmit={handleSubmit} className="flex flex-col flex-1 overflow-y-auto p-4 sm:p-6 space-y-4">
           {errorMsg && (
-            <div className="rounded-xl border border-rose-500/30 bg-rose-500/10 p-3 text-xs font-semibold text-rose-400">
+            <div className="rounded-xl border border-rose-500/30 bg-rose-500/10 p-3 text-xs font-semibold text-rose-500">
               {errorMsg}
             </div>
           )}
@@ -220,13 +220,13 @@ export const NoteModal: React.FC<NoteModalProps> = ({
           {!isEditMode && (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-                  Course <span className="text-rose-400">*</span>
+                <label className="block text-xs font-semibold text-secondary mb-1.5">
+                  Course <span className="text-rose-500">*</span>
                 </label>
                 <select
                   value={courseId}
                   onChange={(e) => setCourseId(e.target.value)}
-                  className="w-full rounded-xl border border-white/[0.08] bg-[#0B1120] p-2.5 text-xs text-white focus:border-indigo-500 focus:outline-none"
+                  className="w-full rounded-xl border border-app bg-secondary p-2.5 text-xs text-primary focus:border-indigo-500 focus:outline-none"
                   required
                 >
                   {courses.map((c) => (
@@ -238,14 +238,14 @@ export const NoteModal: React.FC<NoteModalProps> = ({
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-                  Lesson <span className="text-rose-400">*</span>
+                <label className="block text-xs font-semibold text-secondary mb-1.5">
+                  Lesson <span className="text-rose-500">*</span>
                 </label>
                 <select
                   value={videoId}
                   disabled={isLoadingVideos || availableVideos.length === 0}
                   onChange={(e) => setVideoId(e.target.value)}
-                  className="w-full rounded-xl border border-white/[0.08] bg-[#0B1120] p-2.5 text-xs text-white focus:border-indigo-500 focus:outline-none disabled:opacity-50"
+                  className="w-full rounded-xl border border-app bg-secondary p-2.5 text-xs text-primary focus:border-indigo-500 focus:outline-none disabled:opacity-50"
                   required
                 >
                   {isLoadingVideos ? (
@@ -266,8 +266,8 @@ export const NoteModal: React.FC<NoteModalProps> = ({
 
           {/* Note Title */}
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-              Title <span className="text-slate-500 text-[11px]">(optional)</span>
+            <label className="block text-xs font-semibold text-secondary mb-1.5">
+              Title <span className="text-muted text-[11px]">(optional)</span>
             </label>
             <input
               type="text"
@@ -275,17 +275,17 @@ export const NoteModal: React.FC<NoteModalProps> = ({
               onChange={(e) => setTitle(e.target.value)}
               placeholder="e.g., Key takeaway on useEffect cleanup"
               maxLength={200}
-              className="w-full rounded-xl border border-white/[0.08] bg-[#0B1120] p-2.5 text-xs sm:text-sm text-white placeholder-slate-500 focus:border-indigo-500 focus:outline-none"
+              className="w-full rounded-xl border border-app bg-secondary p-2.5 text-xs sm:text-sm text-primary placeholder:text-muted focus:border-indigo-500 focus:outline-none"
             />
           </div>
 
           {/* Note Content */}
           <div>
             <div className="flex items-center justify-between mb-1.5">
-              <label className="block text-xs font-semibold text-slate-300">
-                Content <span className="text-rose-400">*</span>
+              <label className="block text-xs font-semibold text-secondary">
+                Content <span className="text-rose-500">*</span>
               </label>
-              <span className="text-[11px] text-slate-500">
+              <span className="text-[11px] text-muted">
                 {content.length} / 5000
               </span>
             </div>
@@ -295,7 +295,7 @@ export const NoteModal: React.FC<NoteModalProps> = ({
               onChange={(e) => setContent(e.target.value)}
               placeholder="Write detailed notes, formulas, questions, or code snippets..."
               maxLength={5000}
-              className="w-full rounded-xl border border-white/[0.08] bg-[#0B1120] p-3 text-xs sm:text-sm text-white placeholder-slate-500 focus:border-indigo-500 focus:outline-none resize-y"
+              className="w-full rounded-xl border border-app bg-secondary p-3 text-xs sm:text-sm text-primary placeholder:text-muted focus:border-indigo-500 focus:outline-none resize-y"
               required
             />
           </div>
@@ -303,22 +303,22 @@ export const NoteModal: React.FC<NoteModalProps> = ({
           {/* Timestamp & Pin row */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 items-center">
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-                Timestamp <span className="text-slate-500 text-[11px]">(seconds, optional)</span>
+              <label className="block text-xs font-semibold text-secondary mb-1.5">
+                Timestamp <span className="text-muted text-[11px]">(seconds, optional)</span>
               </label>
               <div className="relative">
-                <Clock className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-500" />
+                <Clock className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted" />
                 <input
                   type="number"
                   min={0}
                   value={timestampStr}
                   onChange={(e) => setTimestampStr(e.target.value)}
                   placeholder="e.g., 145"
-                  className="w-full rounded-xl border border-white/[0.08] bg-[#0B1120] pl-8 pr-3 py-2 text-xs text-white placeholder-slate-500 focus:border-indigo-500 focus:outline-none font-mono"
+                  className="w-full rounded-xl border border-app bg-secondary pl-8 pr-3 py-2 text-xs text-primary placeholder:text-muted focus:border-indigo-500 focus:outline-none font-mono"
                 />
               </div>
               {timestampStr && !isNaN(Number(timestampStr)) && Number(timestampStr) >= 0 && (
-                <span className="text-[11px] text-slate-400 mt-1 block">
+                <span className="text-[11px] text-secondary mt-1 block">
                   Previews as: {formatVideoDuration(Number(timestampStr))}
                 </span>
               )}
@@ -330,10 +330,10 @@ export const NoteModal: React.FC<NoteModalProps> = ({
                   type="checkbox"
                   checked={isPinned}
                   onChange={(e) => setIsPinned(e.target.checked)}
-                  className="h-4 w-4 rounded border-slate-700 bg-slate-900 text-indigo-600 focus:ring-indigo-500"
+                  className="h-4 w-4 rounded border-app bg-secondary text-indigo-600 focus:ring-indigo-500"
                 />
-                <Pin className={`h-3.5 w-3.5 rotate-45 ${isPinned ? 'text-amber-400 fill-current' : 'text-slate-400'}`} />
-                <span className="text-xs font-medium text-slate-300">
+                <Pin className={`h-3.5 w-3.5 rotate-45 ${isPinned ? 'text-amber-500 fill-current' : 'text-muted'}`} />
+                <span className="text-xs font-medium text-secondary">
                   Pin to top of list
                 </span>
               </label>
@@ -342,12 +342,12 @@ export const NoteModal: React.FC<NoteModalProps> = ({
 
           {/* Tags section */}
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-              Tags <span className="text-slate-500 text-[11px]">(press Enter or Add)</span>
+            <label className="block text-xs font-semibold text-secondary mb-1.5">
+              Tags <span className="text-muted text-[11px]">(press Enter or Add)</span>
             </label>
             <div className="flex items-center gap-2">
               <div className="relative flex-1">
-                <Tag className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-500" />
+                <Tag className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted" />
                 <input
                   type="text"
                   value={tagInput}
@@ -360,14 +360,14 @@ export const NoteModal: React.FC<NoteModalProps> = ({
                   }}
                   placeholder="e.g., hooks, review, formula"
                   maxLength={30}
-                  className="w-full rounded-xl border border-white/[0.08] bg-[#0B1120] pl-8 pr-3 py-2 text-xs text-white placeholder-slate-500 focus:border-indigo-500 focus:outline-none"
+                  className="w-full rounded-xl border border-app bg-secondary pl-8 pr-3 py-2 text-xs text-primary placeholder:text-muted focus:border-indigo-500 focus:outline-none"
                 />
               </div>
               <button
                 type="button"
                 onClick={handleAddTag}
                 disabled={!tagInput.trim() || tags.length >= 10}
-                className="rounded-xl bg-[#0B1120] border border-white/[0.08] px-3.5 py-2 text-xs font-semibold text-slate-200 hover:border-white/[0.15] disabled:opacity-50"
+                className="rounded-xl bg-surface-elevated border border-app px-3.5 py-2 text-xs font-semibold text-secondary hover:border-indigo-500/30 hover:text-primary disabled:opacity-50"
               >
                 Add Tag
               </button>
@@ -378,13 +378,13 @@ export const NoteModal: React.FC<NoteModalProps> = ({
                 {tags.map((t) => (
                   <span
                     key={t}
-                    className="inline-flex items-center gap-1 rounded-full bg-indigo-500/15 border border-indigo-500/30 px-2.5 py-0.5 text-xs text-indigo-300"
+                    className="inline-flex items-center gap-1 rounded-full bg-indigo-500/15 border border-indigo-500/30 px-2.5 py-0.5 text-xs text-indigo-500"
                   >
                     #{t}
                     <button
                       type="button"
                       onClick={() => handleRemoveTag(t)}
-                      className="hover:text-white"
+                      className="hover:text-primary"
                     >
                       <X className="h-3 w-3" />
                     </button>
@@ -395,12 +395,12 @@ export const NoteModal: React.FC<NoteModalProps> = ({
           </div>
 
           {/* Modal Action Buttons */}
-          <div className="flex items-center justify-end gap-2.5 pt-4 border-t border-white/[0.06]">
+          <div className="flex items-center justify-end gap-2.5 pt-4 border-t border-subtle">
             <button
               type="button"
               onClick={onClose}
               disabled={isSubmitting}
-              className="rounded-xl border border-white/[0.08] bg-[#0B1120] px-4 py-2 text-xs font-semibold text-slate-300 hover:border-white/[0.15] hover:text-white transition-all"
+              className="rounded-xl border border-app bg-surface-elevated px-4 py-2 text-xs font-semibold text-secondary hover:border-indigo-500/30 hover:text-primary transition-all"
             >
               Cancel
             </button>

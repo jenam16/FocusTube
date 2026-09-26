@@ -9,8 +9,11 @@ import {
   ArrowRight,
   RefreshCw,
   Mail,
+  Sun,
+  Moon,
 } from 'lucide-react';
 import { useAuth } from '../hooks';
+import { useTheme } from '../hooks/ThemeContext';
 import { authService } from '../services/authService';
 import { ApiRequestError } from '../services/api';
 
@@ -23,6 +26,7 @@ type VerificationStatus =
   | 'error';
 
 export const VerifyEmailPage: React.FC = () => {
+  const { theme, toggleTheme } = useTheme();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { user, isAuthenticated, setAuthenticatedUser } = useAuth();
@@ -156,9 +160,26 @@ export const VerifyEmailPage: React.FC = () => {
   };
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-[#060913] px-4 py-12 text-slate-100 sm:px-6 lg:px-8 relative selection:bg-indigo-500/30 selection:text-white">
+    <div className="flex min-h-screen flex-col items-center justify-center bg-app px-4 py-12 text-primary sm:px-6 lg:px-8 relative selection:bg-indigo-500/30 selection:text-white transition-colors duration-200">
+      {/* Theme Toggle in top-right */}
+      <div className="absolute top-5 right-5 z-20">
+        <button
+          onClick={toggleTheme}
+          type="button"
+          className="p-2.5 rounded-xl border border-app bg-surface text-secondary hover:text-primary transition-colors cursor-pointer shadow-sm hover:shadow"
+          title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+          aria-label="Toggle theme"
+        >
+          {theme === 'dark' ? (
+            <Sun className="w-4 h-4 text-amber-400" />
+          ) : (
+            <Moon className="w-4 h-4 text-indigo-500" />
+          )}
+        </button>
+      </div>
+
       {/* Ambient background glow */}
-      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-indigo-600/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-indigo-600/10 dark:bg-indigo-600/15 rounded-full blur-3xl pointer-events-none" />
 
       <div className="w-full max-w-md space-y-6 relative z-10">
         {/* Brand Header */}
@@ -167,14 +188,14 @@ export const VerifyEmailPage: React.FC = () => {
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-500 text-white shadow-lg shadow-indigo-600/30 group-hover:scale-105 transition-transform">
               <Play className="h-5 w-5 fill-current" />
             </div>
-            <span className="text-2xl font-bold tracking-tight text-white font-heading">
-              Focus<span className="text-indigo-400">Tube</span>
+            <span className="text-2xl font-bold tracking-tight text-primary font-heading">
+              Focus<span className="text-indigo-500 dark:text-indigo-400">Tube</span>
             </span>
           </Link>
         </div>
 
         {/* Verification Card */}
-        <div className="rounded-2xl border border-white/[0.08] bg-[#0B101E] p-6 sm:p-8 shadow-2xl backdrop-blur-md">
+        <div className="rounded-2xl border border-app bg-surface p-6 sm:p-8 shadow-2xl backdrop-blur-md">
           {/* 1. LOADING STATE */}
           {status === 'loading' && (
             <div className="flex flex-col items-center text-center py-4 space-y-4">
@@ -183,10 +204,10 @@ export const VerifyEmailPage: React.FC = () => {
                 <div className="h-12 w-12 rounded-full border-2 border-indigo-500 border-t-transparent animate-spin" />
               </div>
               <div className="space-y-1">
-                <h2 className="text-xl font-semibold text-white font-heading">
+                <h2 className="text-xl font-semibold text-primary font-heading">
                   Verifying your email...
                 </h2>
-                <p className="text-xs sm:text-sm text-slate-400">
+                <p className="text-xs sm:text-sm text-secondary">
                   Please wait while we confirm your email and set up your session.
                 </p>
               </div>
@@ -196,16 +217,16 @@ export const VerifyEmailPage: React.FC = () => {
           {/* 2. SUCCESS STATE */}
           {status === 'success' && (
             <div className="flex flex-col items-center text-center py-4 space-y-4">
-              <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 shadow-lg shadow-emerald-500/10">
+              <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 dark:text-emerald-400 shadow-lg shadow-emerald-500/10">
                 <CheckCircle2 className="h-8 w-8" />
               </div>
               <div className="space-y-1.5">
-                <h2 className="text-xl font-bold text-white font-heading">
+                <h2 className="text-xl font-bold text-primary font-heading">
                   Email verified successfully!
                 </h2>
-                <p className="text-xs sm:text-sm text-slate-400">
+                <p className="text-xs sm:text-sm text-secondary">
                   You&apos;re all set. Redirecting to your dashboard in{' '}
-                  <span className="text-indigo-400 font-semibold font-mono">
+                  <span className="text-indigo-500 dark:text-indigo-400 font-semibold font-mono">
                     {redirectCountdown}s
                   </span>
                   ...
@@ -224,16 +245,16 @@ export const VerifyEmailPage: React.FC = () => {
           {/* 3. ALREADY VERIFIED STATE */}
           {status === 'already_verified' && (
             <div className="flex flex-col items-center text-center py-4 space-y-4">
-              <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 shadow-lg shadow-indigo-500/10">
+              <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-500 dark:text-indigo-400 shadow-lg shadow-indigo-500/10">
                 <CheckCircle2 className="h-8 w-8" />
               </div>
               <div className="space-y-1.5">
-                <h2 className="text-xl font-bold text-white font-heading">
+                <h2 className="text-xl font-bold text-primary font-heading">
                   Already Verified
                 </h2>
-                <p className="text-xs sm:text-sm text-slate-400">
+                <p className="text-xs sm:text-sm text-secondary">
                   Your email is already verified. Redirecting to your dashboard in{' '}
-                  <span className="text-indigo-400 font-semibold font-mono">
+                  <span className="text-indigo-500 dark:text-indigo-400 font-semibold font-mono">
                     {redirectCountdown}s
                   </span>
                   ...
@@ -252,27 +273,27 @@ export const VerifyEmailPage: React.FC = () => {
           {/* 4. EXPIRED STATE */}
           {status === 'expired' && (
             <div className="flex flex-col items-center text-center py-4 space-y-4">
-              <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-400 shadow-lg shadow-amber-500/10">
+              <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-500 dark:text-amber-400 shadow-lg shadow-amber-500/10">
                 <Clock className="h-8 w-8" />
               </div>
               <div className="space-y-1.5">
-                <h2 className="text-xl font-bold text-white font-heading">
+                <h2 className="text-xl font-bold text-primary font-heading">
                   Verification Link Expired
                 </h2>
-                <p className="text-xs sm:text-sm text-slate-400">
+                <p className="text-xs sm:text-sm text-secondary">
                   This verification link has expired. Verification links are valid
                   for 30 minutes. Please request a new verification email below.
                 </p>
               </div>
 
               {resendSuccess && (
-                <div className="w-full text-left rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-3 text-xs text-emerald-400 font-medium">
+                <div className="w-full text-left rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-3 text-xs text-emerald-600 dark:text-emerald-400 font-medium">
                   {resendSuccess}
                 </div>
               )}
 
               {resendError && (
-                <div className="w-full text-left rounded-xl border border-rose-500/30 bg-rose-500/10 p-3 text-xs text-rose-400 font-medium">
+                <div className="w-full text-left rounded-xl border border-rose-500/30 bg-rose-500/10 p-3 text-xs text-rose-600 dark:text-rose-400 font-medium">
                   {resendError}
                 </div>
               )}
@@ -281,7 +302,7 @@ export const VerifyEmailPage: React.FC = () => {
                 <div className="text-left">
                   <label
                     htmlFor="resend-email"
-                    className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1"
+                    className="block text-xs font-semibold uppercase tracking-wider text-secondary mb-1"
                   >
                     Your Account Email
                   </label>
@@ -292,7 +313,7 @@ export const VerifyEmailPage: React.FC = () => {
                     value={resendEmail}
                     onChange={(e) => setResendEmail(e.target.value)}
                     placeholder="you@example.com"
-                    className="block w-full rounded-xl border border-white/[0.08] bg-[#070B14] px-3.5 py-2.5 text-xs sm:text-sm text-white placeholder-slate-500 focus:border-indigo-500/60 focus:outline-none focus:ring-1 focus:ring-indigo-500/60"
+                    className="block w-full rounded-xl border border-app bg-secondary px-3.5 py-2.5 text-xs sm:text-sm text-primary placeholder:text-muted focus:border-indigo-500/60 focus:outline-none focus:ring-1 focus:ring-indigo-500/60"
                   />
                 </div>
                 <button
@@ -311,10 +332,10 @@ export const VerifyEmailPage: React.FC = () => {
                 </button>
               </form>
 
-              <div className="pt-2 text-center text-xs text-slate-400">
+              <div className="pt-2 text-center text-xs text-secondary">
                 <Link
                   to="/login"
-                  className="text-indigo-400 hover:text-indigo-300 transition-colors font-medium"
+                  className="text-indigo-500 dark:text-indigo-400 hover:text-indigo-600 dark:hover:text-indigo-300 transition-colors font-medium"
                 >
                   Back to Sign In
                 </Link>
@@ -325,27 +346,27 @@ export const VerifyEmailPage: React.FC = () => {
           {/* 5. INVALID OR ALREADY USED STATE */}
           {status === 'invalid' && (
             <div className="flex flex-col items-center text-center py-4 space-y-4">
-              <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-rose-500/10 border border-rose-500/20 text-rose-400 shadow-lg shadow-rose-500/10">
+              <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-rose-500/10 border border-rose-500/20 text-rose-500 dark:text-rose-400 shadow-lg shadow-rose-500/10">
                 <AlertTriangle className="h-8 w-8" />
               </div>
               <div className="space-y-1.5">
-                <h2 className="text-xl font-bold text-white font-heading">
+                <h2 className="text-xl font-bold text-primary font-heading">
                   Invalid or Used Link
                 </h2>
-                <p className="text-xs sm:text-sm text-slate-400">
+                <p className="text-xs sm:text-sm text-secondary">
                   {errorMessage ||
                     'This verification link is invalid or has already been used.'}
                 </p>
               </div>
 
               {resendSuccess && (
-                <div className="w-full text-left rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-3 text-xs text-emerald-400 font-medium">
+                <div className="w-full text-left rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-3 text-xs text-emerald-600 dark:text-emerald-400 font-medium">
                   {resendSuccess}
                 </div>
               )}
 
               {resendError && (
-                <div className="w-full text-left rounded-xl border border-rose-500/30 bg-rose-500/10 p-3 text-xs text-rose-400 font-medium">
+                <div className="w-full text-left rounded-xl border border-rose-500/30 bg-rose-500/10 p-3 text-xs text-rose-600 dark:text-rose-400 font-medium">
                   {resendError}
                 </div>
               )}
@@ -361,10 +382,10 @@ export const VerifyEmailPage: React.FC = () => {
 
                 <div className="relative py-2">
                   <div className="absolute inset-0 flex items-center">
-                    <div className="w-full border-t border-white/[0.06]" />
+                    <div className="w-full border-t border-subtle" />
                   </div>
                   <div className="relative flex justify-center text-xs uppercase">
-                    <span className="bg-[#0B101E] px-2 text-slate-500">
+                    <span className="bg-surface px-2 text-muted">
                       Need a new link?
                     </span>
                   </div>
@@ -377,12 +398,12 @@ export const VerifyEmailPage: React.FC = () => {
                     value={resendEmail}
                     onChange={(e) => setResendEmail(e.target.value)}
                     placeholder="Enter your email address"
-                    className="block w-full rounded-xl border border-white/[0.08] bg-[#070B14] px-3.5 py-2 text-xs sm:text-sm text-white placeholder-slate-500 focus:border-indigo-500/60 focus:outline-none focus:ring-1 focus:ring-indigo-500/60"
+                    className="block w-full rounded-xl border border-app bg-secondary px-3.5 py-2 text-xs sm:text-sm text-primary placeholder:text-muted focus:border-indigo-500/60 focus:outline-none focus:ring-1 focus:ring-indigo-500/60"
                   />
                   <button
                     type="submit"
                     disabled={isResending || cooldownSeconds > 0 || !resendEmail.trim()}
-                    className="flex w-full items-center justify-center gap-2 rounded-xl border border-white/[0.08] bg-[#0D1527] px-4 py-2 text-xs font-semibold text-slate-200 hover:bg-[#111c34] hover:text-white transition-all disabled:opacity-50 cursor-pointer"
+                    className="flex w-full items-center justify-center gap-2 rounded-xl border border-app bg-secondary hover:bg-surface-elevated px-4 py-2 text-xs font-semibold text-secondary hover:text-primary transition-all disabled:opacity-50 cursor-pointer"
                   >
                     <Mail className="h-3.5 w-3.5" />
                     <span>
@@ -401,14 +422,14 @@ export const VerifyEmailPage: React.FC = () => {
           {/* 6. SERVER / NETWORK ERROR STATE */}
           {status === 'error' && (
             <div className="flex flex-col items-center text-center py-4 space-y-4">
-              <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-rose-500/10 border border-rose-500/20 text-rose-400 shadow-lg shadow-rose-500/10">
+              <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-rose-500/10 border border-rose-500/20 text-rose-500 dark:text-rose-400 shadow-lg shadow-rose-500/10">
                 <AlertCircle className="h-8 w-8" />
               </div>
               <div className="space-y-1.5">
-                <h2 className="text-xl font-bold text-white font-heading">
+                <h2 className="text-xl font-bold text-primary font-heading">
                   Verification Failed
                 </h2>
-                <p className="text-xs sm:text-sm text-slate-400">
+                <p className="text-xs sm:text-sm text-secondary">
                   {errorMessage ||
                     "We couldn't verify your email right now. Please check your connection and try again."}
                 </p>
@@ -426,7 +447,7 @@ export const VerifyEmailPage: React.FC = () => {
                 )}
                 <Link
                   to="/login"
-                  className="flex w-full items-center justify-center rounded-xl border border-white/[0.08] bg-[#0D1527] px-4 py-2.5 text-sm font-semibold text-slate-300 hover:bg-[#111c34] hover:text-white transition-all"
+                  className="flex w-full items-center justify-center rounded-xl border border-app bg-secondary hover:bg-surface-elevated px-4 py-2.5 text-sm font-semibold text-secondary hover:text-primary transition-all"
                 >
                   Back to Sign In
                 </Link>

@@ -69,23 +69,23 @@ export const FocusSyllabusDrawer: React.FC<FocusSyllabusDrawerProps> = ({
       />
 
       {/* Drawer Panel */}
-      <div className="relative z-10 flex h-full w-full max-w-md flex-col border-l border-white/[0.07] bg-[#0B101E] shadow-2xl animate-in slide-in-from-right duration-200">
+      <div className="relative z-10 flex h-full w-full max-w-md flex-col border-l border-app bg-surface shadow-2xl animate-in slide-in-from-right duration-200">
         {/* Drawer Header */}
-        <div className="flex items-center justify-between border-b border-white/[0.07] px-5 py-4 bg-[#070B14]/90">
+        <div className="flex items-center justify-between border-b border-app px-5 py-4 bg-secondary">
           <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-indigo-400">
+            <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-indigo-500">
               <BookOpen className="h-3.5 w-3.5" />
               <span>Syllabus</span>
               {availableCount > 0 && (
                 <>
-                  <span className="text-slate-600">•</span>
-                  <span className="text-slate-400 font-normal">
+                  <span className="text-muted">•</span>
+                  <span className="text-secondary font-normal">
                     {completedCount}/{availableCount} completed
                   </span>
                 </>
               )}
             </div>
-            <h3 className="mt-0.5 truncate text-sm font-bold text-white font-heading" title={courseTitle}>
+            <h3 className="mt-0.5 truncate text-sm font-bold text-primary font-heading" title={courseTitle}>
               {courseTitle}
             </h3>
           </div>
@@ -93,7 +93,7 @@ export const FocusSyllabusDrawer: React.FC<FocusSyllabusDrawerProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="rounded-xl border border-white/[0.08] p-2 text-slate-400 hover:border-white/[0.15] hover:bg-white/[0.06] hover:text-white transition-colors ml-3"
+            className="rounded-xl border border-app p-2 text-secondary hover:border-indigo-500/30 hover:bg-surface-elevated hover:text-primary transition-colors ml-3"
             aria-label="Close drawer"
           >
             <X className="h-4 w-4" />
@@ -101,7 +101,7 @@ export const FocusSyllabusDrawer: React.FC<FocusSyllabusDrawerProps> = ({
         </div>
 
         {/* Video List */}
-        <div className="flex-1 overflow-y-auto p-3 space-y-1.5 divide-y divide-white/[0.04]">
+        <div className="flex-1 overflow-y-auto p-3 space-y-1.5 divide-y divide-subtle">
           {sortedVideos.map((video) => {
             const isCurrent = video._id === activeVideoId || video.youtubeVideoId === activeVideoId;
             const isAvailable = video.isAvailable !== false;
@@ -122,26 +122,26 @@ export const FocusSyllabusDrawer: React.FC<FocusSyllabusDrawerProps> = ({
                   !isAvailable
                     ? 'opacity-40 cursor-not-allowed bg-transparent'
                     : isCurrent
-                      ? 'bg-indigo-600/15 border border-indigo-500/40 text-white shadow-sm'
-                      : 'hover:bg-[#0D1527] text-slate-300'
+                      ? 'bg-indigo-600/15 border border-indigo-500/40 text-primary shadow-xs'
+                      : 'hover:bg-surface-elevated text-secondary'
                 }`}
               >
                 {/* Lesson number / check badge */}
                 <div
                   className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-xs font-bold transition-colors ${
                     !isAvailable
-                      ? 'bg-slate-800 text-slate-500'
+                      ? 'bg-surface-elevated text-muted'
                       : isCurrent
                         ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
                         : isCompleted
-                          ? 'bg-emerald-950/80 text-emerald-400 border border-emerald-700/50'
-                          : 'bg-[#0D1527] text-slate-400 border border-white/[0.08]'
+                          ? 'bg-emerald-500/15 text-emerald-500 border border-emerald-500/30'
+                          : 'bg-surface-elevated text-secondary border border-app'
                   }`}
                 >
                   {isCurrent ? (
                     <Play className="h-3.5 w-3.5 fill-current" />
                   ) : isCompleted ? (
-                    <CheckCircle2 className="h-4 w-4 text-emerald-400" />
+                    <CheckCircle2 className="h-4 w-4 text-emerald-500" />
                   ) : (
                     formatLessonNumber(video.position)
                   )}
@@ -152,22 +152,22 @@ export const FocusSyllabusDrawer: React.FC<FocusSyllabusDrawerProps> = ({
                   <p
                     className={`truncate text-xs font-medium ${
                       !isAvailable
-                        ? 'text-slate-500 line-through'
+                        ? 'text-muted line-through'
                         : isCurrent
-                          ? 'font-semibold text-indigo-400'
-                          : 'text-slate-200'
+                          ? 'font-semibold text-indigo-500'
+                          : 'text-primary'
                     }`}
                   >
                     {video.title}
                   </p>
-                  <div className="mt-0.5 flex items-center gap-2 text-[11px] text-slate-500">
+                  <div className="mt-0.5 flex items-center gap-2 text-[11px] text-muted">
                     {video.durationSeconds > 0 && (
                       <span className="font-mono">{formatVideoDuration(video.durationSeconds)}</span>
                     )}
                     {isCompleted ? (
-                      <span className="text-emerald-400 font-medium">• Completed</span>
+                      <span className="text-emerald-500 font-medium">• Completed</span>
                     ) : progress && progress.progressPercentage > 0 ? (
-                      <span className="text-indigo-400 font-medium">• {progress.progressPercentage}%</span>
+                      <span className="text-indigo-500 font-medium">• {progress.progressPercentage}%</span>
                     ) : null}
                     {!isAvailable && (
                       <span className="text-amber-500 flex items-center gap-0.5">

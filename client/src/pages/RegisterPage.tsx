@@ -1,13 +1,14 @@
 import { useState, useEffect, type FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Play, AlertCircle, Mail, CheckCircle2 } from 'lucide-react';
+import { Play, AlertCircle, Mail, CheckCircle2, Sun, Moon } from 'lucide-react';
 import { useAuth } from '../hooks';
-
+import { useTheme } from '../hooks/ThemeContext';
 import { authService } from '../services/authService';
 import { ApiRequestError } from '../services/api';
 
 export const RegisterPage: React.FC = () => {
   const { register } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
 
   const [name, setName] = useState('');
@@ -146,8 +147,26 @@ export const RegisterPage: React.FC = () => {
   };
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-[#060913] px-4 py-12 text-slate-100 sm:px-6 lg:px-8 relative selection:bg-indigo-500/30 selection:text-white">
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-indigo-600/10 rounded-full blur-3xl pointer-events-none" />
+    <div className="flex min-h-screen flex-col items-center justify-center bg-app px-4 py-12 text-primary sm:px-6 lg:px-8 relative selection:bg-indigo-500/30 selection:text-white transition-colors duration-200">
+      {/* Theme Toggle in top-right */}
+      <div className="absolute top-5 right-5 z-20">
+        <button
+          onClick={toggleTheme}
+          type="button"
+          className="p-2.5 rounded-xl border border-app bg-surface text-secondary hover:text-primary transition-colors cursor-pointer shadow-sm hover:shadow"
+          title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+          aria-label="Toggle theme"
+        >
+          {theme === 'dark' ? (
+            <Sun className="w-4 h-4 text-amber-400" />
+          ) : (
+            <Moon className="w-4 h-4 text-indigo-500" />
+          )}
+        </button>
+      </div>
+
+      {/* Ambient background glow */}
+      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-indigo-600/10 dark:bg-indigo-600/15 rounded-full blur-3xl pointer-events-none" />
 
       <div className="w-full max-w-md space-y-8 relative z-10">
         {/* Brand Header */}
@@ -156,17 +175,17 @@ export const RegisterPage: React.FC = () => {
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-500 text-white shadow-lg shadow-indigo-600/30 group-hover:scale-105 transition-transform">
               <Play className="h-5 w-5 fill-current" />
             </div>
-            <span className="text-2xl font-bold tracking-tight text-white font-heading">
-              Focus<span className="text-indigo-400">Tube</span>
+            <span className="text-2xl font-bold tracking-tight text-primary font-heading">
+              Focus<span className="text-indigo-500 dark:text-indigo-400">Tube</span>
             </span>
           </Link>
 
           {!isRegistered && (
             <>
-              <h2 className="mt-2 text-2xl font-bold tracking-tight text-white sm:text-3xl font-heading">
+              <h2 className="mt-2 text-2xl font-bold tracking-tight text-primary sm:text-3xl font-heading">
                 Create an account
               </h2>
-              <p className="mt-1 text-xs sm:text-sm text-slate-400">
+              <p className="mt-1 text-xs sm:text-sm text-secondary">
                 Start learning without distractions
               </p>
             </>
@@ -175,46 +194,46 @@ export const RegisterPage: React.FC = () => {
 
         {/* 1. CHECK YOUR EMAIL VIEW (AFTER REGISTRATION OR EXISTING UNVERIFIED) */}
         {isRegistered ? (
-          <div className="rounded-2xl border border-white/[0.08] bg-[#0B101E] p-6 sm:p-8 shadow-2xl backdrop-blur-md">
+          <div className="rounded-2xl border border-app bg-surface p-6 sm:p-8 shadow-2xl backdrop-blur-md">
             <div className="flex flex-col items-center text-center py-2 space-y-4">
-              <div className="relative flex items-center justify-center h-16 w-16 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 shadow-lg shadow-indigo-500/10">
+              <div className="relative flex items-center justify-center h-16 w-16 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-500 dark:text-indigo-400 shadow-lg shadow-indigo-500/10">
                 <Mail className="h-8 w-8" />
               </div>
 
               <div className="space-y-2">
-                <h2 className="text-2xl font-bold text-white font-heading">
+                <h2 className="text-2xl font-bold text-primary font-heading">
                   Check your email 📧
                 </h2>
 
                 {isExistingUnverified ? (
-                  <p className="text-xs sm:text-sm text-amber-300 font-medium">
+                  <p className="text-xs sm:text-sm text-amber-600 dark:text-amber-300 font-medium">
                     An account with this email already exists but hasn&apos;t been
                     verified yet.
                   </p>
                 ) : (
-                  <p className="text-xs sm:text-sm text-slate-300">
+                  <p className="text-xs sm:text-sm text-secondary">
                     We&apos;ve sent a verification link to:
                   </p>
                 )}
 
-                <div className="inline-block rounded-lg bg-[#070B14] border border-white/[0.08] px-3.5 py-1.5 font-mono text-sm font-semibold text-indigo-300">
+                <div className="inline-block rounded-lg bg-secondary border border-app px-3.5 py-1.5 font-mono text-sm font-semibold text-indigo-600 dark:text-indigo-300">
                   {registeredEmail}
                 </div>
 
                 {isDeliveryFailed ? (
                   <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-3 text-left space-y-1 mt-2">
-                    <p className="text-xs font-semibold text-amber-300">
+                    <p className="text-xs font-semibold text-amber-600 dark:text-amber-300">
                       Your account was created, but we couldn&apos;t send the
                       verification email.
                     </p>
                     {deliveryErrorMessage && deliveryErrorMessage.includes('testing emails') && (
-                      <p className="text-[11px] text-amber-200/80 leading-relaxed">
+                      <p className="text-[11px] text-amber-700/80 dark:text-amber-200/80 leading-relaxed">
                         Sandbox restriction: <code>onboarding@resend.dev</code> only delivers to your Resend account owner email.
                       </p>
                     )}
                   </div>
                 ) : (
-                  <p className="pt-1 text-xs text-slate-400 max-w-sm">
+                  <p className="pt-1 text-xs text-secondary max-w-sm">
                     {isExistingUnverified
                       ? "Didn't receive the email? Click below to request a new verification link."
                       : 'Click the link in your email to verify your account and start your focused learning journey.'}
@@ -223,14 +242,14 @@ export const RegisterPage: React.FC = () => {
               </div>
 
               {resendSuccess && (
-                <div className="w-full flex items-center gap-2 rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-3 text-xs font-medium text-emerald-400">
+                <div className="w-full flex items-center gap-2 rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-3 text-xs font-medium text-emerald-600 dark:text-emerald-400">
                   <CheckCircle2 className="h-4 w-4 shrink-0" />
                   <span>{resendSuccess}</span>
                 </div>
               )}
 
               {resendError && (
-                <div className="w-full flex items-center gap-2 rounded-xl border border-rose-500/30 bg-rose-500/10 p-3 text-xs font-medium text-rose-400">
+                <div className="w-full flex items-center gap-2 rounded-xl border border-rose-500/30 bg-rose-500/10 p-3 text-xs font-medium text-rose-600 dark:text-rose-400">
                   <AlertCircle className="h-4 w-4 shrink-0" />
                   <span>{resendError}</span>
                 </div>
@@ -255,14 +274,14 @@ export const RegisterPage: React.FC = () => {
                   </span>
                 </button>
 
-                <p className="text-[11px] text-slate-500">
+                <p className="text-[11px] text-muted">
                   You can request another email after 60 seconds.
                 </p>
 
-                <div className="pt-3 border-t border-white/[0.06] flex items-center justify-center gap-1.5 text-xs text-slate-400">
+                <div className="pt-3 border-t border-subtle flex items-center justify-center gap-1.5 text-xs text-secondary">
                   <Link
                     to="/login"
-                    className="font-semibold text-indigo-400 hover:text-indigo-300 transition-colors"
+                    className="font-semibold text-indigo-500 dark:text-indigo-400 hover:text-indigo-600 dark:hover:text-indigo-300 transition-colors"
                   >
                     Back to Sign In
                   </Link>
@@ -272,9 +291,9 @@ export const RegisterPage: React.FC = () => {
           </div>
         ) : (
           /* 2. REGISTRATION FORM VIEW */
-          <div className="rounded-2xl border border-white/[0.08] bg-[#0B101E] p-6 sm:p-8 shadow-2xl backdrop-blur-md">
+          <div className="rounded-2xl border border-app bg-surface p-6 sm:p-8 shadow-2xl backdrop-blur-md">
             {error && (
-              <div className="mb-6 flex items-center gap-3 rounded-xl border border-rose-500/30 bg-rose-500/10 p-3.5 text-xs font-semibold text-rose-400">
+              <div className="mb-6 flex items-center gap-3 rounded-xl border border-rose-500/30 bg-rose-500/10 p-3.5 text-xs font-semibold text-rose-500 dark:text-rose-400">
                 <AlertCircle className="h-4 w-4 shrink-0" />
                 <span>{error}</span>
               </div>
@@ -284,7 +303,7 @@ export const RegisterPage: React.FC = () => {
               <div>
                 <label
                   htmlFor="name"
-                  className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5"
+                  className="block text-xs font-semibold uppercase tracking-wider text-secondary mb-1.5"
                 >
                   Full Name
                 </label>
@@ -296,14 +315,14 @@ export const RegisterPage: React.FC = () => {
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="Jane Doe"
-                  className="block w-full rounded-xl border border-white/[0.08] bg-[#070B14] px-3.5 py-2.5 text-xs sm:text-sm text-white placeholder-slate-500 transition-colors focus:border-indigo-500/60 focus:outline-none focus:ring-1 focus:ring-indigo-500/60"
+                  className="block w-full rounded-xl border border-app bg-secondary px-3.5 py-2.5 text-xs sm:text-sm text-primary placeholder:text-muted transition-colors focus:border-indigo-500/60 focus:outline-none focus:ring-1 focus:ring-indigo-500/60"
                 />
               </div>
 
               <div>
                 <label
                   htmlFor="email"
-                  className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5"
+                  className="block text-xs font-semibold uppercase tracking-wider text-secondary mb-1.5"
                 >
                   Email Address
                 </label>
@@ -315,14 +334,14 @@ export const RegisterPage: React.FC = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="you@example.com"
-                  className="block w-full rounded-xl border border-white/[0.08] bg-[#070B14] px-3.5 py-2.5 text-xs sm:text-sm text-white placeholder-slate-500 transition-colors focus:border-indigo-500/60 focus:outline-none focus:ring-1 focus:ring-indigo-500/60"
+                  className="block w-full rounded-xl border border-app bg-secondary px-3.5 py-2.5 text-xs sm:text-sm text-primary placeholder:text-muted transition-colors focus:border-indigo-500/60 focus:outline-none focus:ring-1 focus:ring-indigo-500/60"
                 />
               </div>
 
               <div>
                 <label
                   htmlFor="password"
-                  className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5"
+                  className="block text-xs font-semibold uppercase tracking-wider text-secondary mb-1.5"
                 >
                   Password
                 </label>
@@ -334,14 +353,14 @@ export const RegisterPage: React.FC = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="block w-full rounded-xl border border-white/[0.08] bg-[#070B14] px-3.5 py-2.5 text-xs sm:text-sm text-white placeholder-slate-500 transition-colors focus:border-indigo-500/60 focus:outline-none focus:ring-1 focus:ring-indigo-500/60"
+                  className="block w-full rounded-xl border border-app bg-secondary px-3.5 py-2.5 text-xs sm:text-sm text-primary placeholder:text-muted transition-colors focus:border-indigo-500/60 focus:outline-none focus:ring-1 focus:ring-indigo-500/60"
                 />
               </div>
 
               <div>
                 <label
                   htmlFor="confirmPassword"
-                  className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5"
+                  className="block text-xs font-semibold uppercase tracking-wider text-secondary mb-1.5"
                 >
                   Confirm Password
                 </label>
@@ -353,24 +372,24 @@ export const RegisterPage: React.FC = () => {
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="block w-full rounded-xl border border-white/[0.08] bg-[#070B14] px-3.5 py-2.5 text-xs sm:text-sm text-white placeholder-slate-500 transition-colors focus:border-indigo-500/60 focus:outline-none focus:ring-1 focus:ring-indigo-500/60"
+                  className="block w-full rounded-xl border border-app bg-secondary px-3.5 py-2.5 text-xs sm:text-sm text-primary placeholder:text-muted transition-colors focus:border-indigo-500/60 focus:outline-none focus:ring-1 focus:ring-indigo-500/60"
                 />
               </div>
 
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="mt-3 flex w-full items-center justify-center rounded-xl bg-gradient-to-r from-indigo-500 to-indigo-600 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-indigo-500/25 transition-all hover:brightness-110 active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-[#0B101E] disabled:opacity-50 cursor-pointer"
+                className="mt-3 flex w-full items-center justify-center rounded-xl bg-gradient-to-r from-indigo-500 to-indigo-600 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-indigo-500/25 transition-all hover:brightness-110 active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-surface disabled:opacity-50 cursor-pointer"
               >
                 {isSubmitting ? 'Creating Account...' : 'Create Account'}
               </button>
             </form>
 
-            <div className="mt-6 text-center text-xs text-slate-400">
+            <div className="mt-6 text-center text-xs text-secondary">
               Already have an account?{' '}
               <Link
                 to="/login"
-                className="font-semibold text-indigo-400 hover:text-indigo-300 transition-colors"
+                className="font-semibold text-indigo-500 dark:text-indigo-400 hover:text-indigo-600 dark:hover:text-indigo-300 transition-colors"
               >
                 Sign In
               </Link>

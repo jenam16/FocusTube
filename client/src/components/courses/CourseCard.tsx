@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+﻿import { Link } from 'react-router-dom';
 import { PlaySquare, Clock, Video, User, ArrowRight } from 'lucide-react';
 import { Course } from '../../types';
 import { formatDuration } from '../../utils';
@@ -14,7 +14,7 @@ export const CourseCard = ({ course }: CourseCardProps) => {
   const isCompleted = progress >= 100;
 
   return (
-    <div className="group flex flex-col overflow-hidden rounded-2xl border border-white/[0.07] bg-[#0B101E] transition-all duration-300 hover:-translate-y-1 hover:border-indigo-500/40 hover:shadow-xl hover:shadow-indigo-950/30">
+    <div className="group flex flex-col overflow-hidden rounded-2xl border border-app bg-surface transition-all duration-300 hover:-translate-y-1 hover:border-indigo-500/40 hover:shadow-xl hover:shadow-indigo-600/10">
       {/* Thumbnail Container */}
       <Link
         to={`/courses/${course._id}`}
@@ -60,8 +60,8 @@ export const CourseCard = ({ course }: CourseCardProps) => {
       <div className="flex flex-1 flex-col justify-between p-5">
         <div>
           {course.channelName && (
-            <div className="flex items-center gap-1.5 text-xs font-medium text-slate-400">
-              <User className="h-3.5 w-3.5 text-slate-400 shrink-0" />
+            <div className="flex items-center gap-1.5 text-xs font-medium text-muted">
+              <User className="h-3.5 w-3.5 text-muted shrink-0" />
               <span className="truncate">{course.channelName}</span>
             </div>
           )}
@@ -69,24 +69,24 @@ export const CourseCard = ({ course }: CourseCardProps) => {
             to={`/courses/${course._id}`}
             className="mt-2 block focus:outline-none"
           >
-            <h3 className="line-clamp-2 text-base font-semibold text-slate-100 group-hover:text-indigo-300 transition-colors font-heading leading-snug tracking-tight">
+            <h3 className="line-clamp-2 text-base font-semibold text-primary group-hover:text-indigo-500 transition-colors font-heading leading-snug tracking-tight">
               {course.title}
             </h3>
           </Link>
           {course.description && (
-            <p className="mt-1.5 line-clamp-1 text-xs text-slate-400 leading-relaxed">
+            <p className="mt-1.5 line-clamp-1 text-xs text-secondary leading-relaxed">
               {course.description}
             </p>
           )}
         </div>
 
         {/* Progress Display */}
-        <div className="mt-5 pt-3.5 border-t border-white/[0.06]">
-          <div className="mb-1.5 flex items-center justify-between text-xs text-slate-400">
+        <div className="mt-5 pt-3.5 border-t border-subtle">
+          <div className="mb-1.5 flex items-center justify-between text-xs text-muted">
             <span className="font-medium">Progress</span>
             <span
               className={`font-semibold ${
-                isCompleted ? 'text-emerald-400' : 'text-slate-300'
+                isCompleted ? 'text-emerald-500' : 'text-primary'
               }`}
             >
               {isCompleted ? '✓ Completed' : `${progress}% complete`}
@@ -97,12 +97,12 @@ export const CourseCard = ({ course }: CourseCardProps) => {
 
         {/* Action footer */}
         <div className="mt-4 flex items-center justify-between pt-1">
-          <span className="text-[11px] font-medium text-slate-400">
+          <span className="text-[11px] font-medium text-muted">
             {course.totalVideos} Lessons · {formatDuration(course.totalDurationSeconds)}
           </span>
           <Link
             to={`/courses/${course._id}`}
-            className="inline-flex items-center gap-1.5 rounded-xl border border-white/[0.08] bg-[#0D1527] px-3 py-1.5 text-xs font-semibold text-slate-200 transition-all group-hover:border-indigo-500/40 group-hover:bg-indigo-600 group-hover:text-white shadow-xs"
+            className="inline-flex items-center gap-1.5 rounded-xl border border-app bg-secondary px-3 py-1.5 text-xs font-semibold text-secondary transition-all group-hover:border-indigo-500/40 group-hover:bg-indigo-600 group-hover:text-white shadow-xs"
           >
             <span>Open Course</span>
             <ArrowRight className="h-3.5 w-3.5" />

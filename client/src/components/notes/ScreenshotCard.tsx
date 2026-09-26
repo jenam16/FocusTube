@@ -40,10 +40,10 @@ export const ScreenshotCard: React.FC<ScreenshotCardProps> = ({
 
   return (
     <div
-      className={`group relative flex flex-col overflow-hidden rounded-2xl border transition-all duration-300 hover:shadow-xl hover:shadow-indigo-950/40 ${
+      className={`group relative flex flex-col overflow-hidden rounded-2xl border transition-all duration-300 hover:shadow-lg ${
         note.isPinned
-          ? 'border-amber-500/40 bg-[#0E1528] shadow-sm shadow-amber-500/5'
-          : 'border-white/[0.07] bg-[#0B101E] hover:border-indigo-500/40'
+          ? 'border-amber-500/40 bg-surface-elevated shadow-xs'
+          : 'border-app bg-surface hover:border-indigo-500/40'
       }`}
     >
       {/* Screenshot Image Preview Container */}
@@ -56,14 +56,14 @@ export const ScreenshotCard: React.FC<ScreenshotCardProps> = ({
             loading="lazy"
           />
         ) : (
-          <div className="flex h-full w-full items-center justify-center text-xs text-slate-500">
+          <div className="flex h-full w-full items-center justify-center text-xs text-muted">
             No image available
           </div>
         )}
 
         {/* Timestamp Pill Badge */}
         {typeof note.timestampSeconds === 'number' && (
-          <div className="absolute bottom-2.5 left-2.5 z-10 flex items-center gap-1 rounded-lg bg-black/80 backdrop-blur-md px-2 py-0.5 text-xs font-mono font-semibold text-white shadow">
+          <div className="absolute bottom-2.5 left-2.5 z-10 flex items-center gap-1 rounded-lg bg-black/80 backdrop-blur-md px-2 py-0.5 text-xs font-mono font-semibold text-white shadow-xs">
             <span>⏱</span>
             <span>{formatVideoTime(note.timestampSeconds)}</span>
           </div>
@@ -71,7 +71,7 @@ export const ScreenshotCard: React.FC<ScreenshotCardProps> = ({
 
         {/* Pin Indicator */}
         {note.isPinned && (
-          <div className="absolute top-2.5 left-2.5 z-10 flex items-center gap-1 rounded-md bg-amber-500/90 backdrop-blur-sm px-2 py-0.5 text-[10px] font-bold text-gray-950 uppercase tracking-wider shadow">
+          <div className="absolute top-2.5 left-2.5 z-10 flex items-center gap-1 rounded-md bg-amber-500/90 backdrop-blur-sm px-2 py-0.5 text-[10px] font-bold text-gray-950 uppercase tracking-wider shadow-xs">
             <Pin className="h-3 w-3 fill-current rotate-45" />
             <span>Pinned</span>
           </div>
@@ -79,7 +79,7 @@ export const ScreenshotCard: React.FC<ScreenshotCardProps> = ({
 
         {/* Hover overlay with zoom hint */}
         <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-          <span className="rounded-xl bg-black/70 backdrop-blur-sm px-3 py-1.5 text-xs font-medium text-white flex items-center gap-1.5 shadow">
+          <span className="rounded-xl bg-black/70 backdrop-blur-sm px-3 py-1.5 text-xs font-medium text-white flex items-center gap-1.5 shadow-xs">
             <ExternalLink className="h-3.5 w-3.5" />
             View Full Image
           </span>
@@ -90,17 +90,17 @@ export const ScreenshotCard: React.FC<ScreenshotCardProps> = ({
       <div className="flex flex-1 flex-col p-4 space-y-3">
         {/* Course & Lesson context */}
         <div className="space-y-0.5">
-          <p className="line-clamp-1 text-[11px] font-semibold uppercase tracking-wider text-indigo-400">
+          <p className="line-clamp-1 text-[11px] font-semibold uppercase tracking-wider text-indigo-500">
             {courseTitle}
           </p>
-          <p className="line-clamp-1 text-xs font-medium text-slate-400">
+          <p className="line-clamp-1 text-xs font-medium text-secondary">
             {videoTitle}
           </p>
         </div>
 
         {/* Title */}
         <h3
-          className="line-clamp-2 text-sm sm:text-base font-bold text-white group-hover:text-indigo-200 transition-colors cursor-pointer"
+          className="line-clamp-2 text-sm sm:text-base font-bold text-primary group-hover:text-indigo-500 transition-colors cursor-pointer"
           onClick={() => onViewImage(note)}
         >
           {note.title || 'Untitled Moment'}
@@ -108,7 +108,7 @@ export const ScreenshotCard: React.FC<ScreenshotCardProps> = ({
 
         {/* Optional text content / commentary */}
         {note.content && (
-          <p className="line-clamp-2 text-xs text-slate-300">
+          <p className="line-clamp-2 text-xs text-secondary">
             {note.content}
           </p>
         )}
@@ -119,14 +119,14 @@ export const ScreenshotCard: React.FC<ScreenshotCardProps> = ({
             {note.tags.slice(0, 4).map((tag) => (
               <span
                 key={tag}
-                className="inline-flex items-center gap-1 rounded-md bg-white/[0.04] px-2 py-0.5 text-[10px] font-medium text-slate-400 border border-white/[0.06]"
+                className="inline-flex items-center gap-1 rounded-md bg-secondary px-2 py-0.5 text-[10px] font-medium text-secondary border border-app"
               >
-                <Tag className="h-2.5 w-2.5 text-indigo-400" />
+                <Tag className="h-2.5 w-2.5 text-indigo-500" />
                 <span>{tag}</span>
               </span>
             ))}
             {note.tags.length > 4 && (
-              <span className="text-[10px] text-slate-500 self-center">
+              <span className="text-[10px] text-muted self-center">
                 +{note.tags.length - 4} more
               </span>
             )}
@@ -134,8 +134,8 @@ export const ScreenshotCard: React.FC<ScreenshotCardProps> = ({
         )}
 
         {/* Footer meta & actions */}
-        <div className="mt-auto pt-3 border-t border-white/[0.06] flex items-center justify-between gap-2">
-          <div className="flex items-center gap-1 text-[11px] text-slate-500">
+        <div className="mt-auto pt-3 border-t border-subtle flex items-center justify-between gap-2">
+          <div className="flex items-center gap-1 text-[11px] text-muted">
             <Calendar className="h-3 w-3" />
             <span>{formattedDate}</span>
           </div>
@@ -148,8 +148,8 @@ export const ScreenshotCard: React.FC<ScreenshotCardProps> = ({
                 aria-label={note.isPinned ? 'Unpin note' : 'Pin note'}
                 className={`flex h-7 w-7 items-center justify-center rounded-lg border text-xs transition-colors ${
                   note.isPinned
-                    ? 'border-amber-500/40 bg-amber-500/10 text-amber-300 hover:bg-amber-500/20'
-                    : 'border-white/[0.08] bg-[#0B1120] text-slate-400 hover:border-white/[0.15] hover:text-white'
+                    ? 'border-amber-500/40 bg-amber-500/10 text-amber-500 hover:bg-amber-500/20'
+                    : 'border-app bg-surface-elevated text-secondary hover:border-indigo-500/30 hover:text-primary'
                 }`}
               >
                 <Pin className={`h-3 w-3 rotate-45 ${note.isPinned ? 'fill-current' : ''}`} />
@@ -161,7 +161,7 @@ export const ScreenshotCard: React.FC<ScreenshotCardProps> = ({
               onClick={() => onEdit(note)}
               aria-label="Edit note"
               title="Edit Note Details"
-              className="flex h-7 px-2 items-center justify-center rounded-lg border border-white/[0.08] bg-[#0B1120] text-[11px] font-medium text-slate-300 hover:border-white/[0.15] hover:text-white transition-colors"
+              className="flex h-7 px-2 items-center justify-center rounded-lg border border-app bg-surface-elevated text-[11px] font-medium text-secondary hover:border-indigo-500/30 hover:text-primary transition-colors"
             >
               Edit
             </button>
@@ -171,7 +171,7 @@ export const ScreenshotCard: React.FC<ScreenshotCardProps> = ({
               onClick={() => onDelete(note)}
               aria-label="Delete note"
               title="Delete Note"
-              className="flex h-7 w-7 items-center justify-center rounded-lg border border-white/[0.08] bg-[#0B1120] text-slate-400 hover:border-rose-500/30 hover:bg-rose-500/10 hover:text-rose-400 transition-colors"
+              className="flex h-7 w-7 items-center justify-center rounded-lg border border-app bg-surface-elevated text-secondary hover:border-rose-500/30 hover:bg-rose-500/10 hover:text-rose-500 transition-colors"
             >
               <Trash2 className="h-3 w-3" />
             </button>

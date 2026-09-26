@@ -37,10 +37,10 @@ export const OverdueBanner: React.FC<OverdueBannerProps> = ({
             <AlertTriangle className="h-4 w-4" />
           </div>
           <div>
-            <h3 className="text-xs sm:text-sm font-bold text-amber-200">
+            <h3 className="text-xs sm:text-sm font-bold text-amber-600 dark:text-amber-200">
               Overdue Tasks ({tasks.length})
             </h3>
-            <p className="text-[11px] text-amber-400/80">
+            <p className="text-[11px] text-amber-700/80 dark:text-amber-400/80">
               These tasks passed their scheduled date without being completed.
             </p>
           </div>
@@ -49,7 +49,7 @@ export const OverdueBanner: React.FC<OverdueBannerProps> = ({
         <button
           type="button"
           onClick={() => setIsExpanded((prev) => !prev)}
-          className="rounded-lg p-1 text-amber-400 hover:bg-amber-500/20 transition-colors"
+          className="rounded-lg p-1 text-amber-600 dark:text-amber-400 hover:bg-amber-500/20 transition-colors"
           aria-label={isExpanded ? 'Collapse overdue tasks' : 'Expand overdue tasks'}
         >
           {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
@@ -73,21 +73,21 @@ export const OverdueBanner: React.FC<OverdueBannerProps> = ({
                   <button
                     type="button"
                     onClick={() => onCompleteTask(task)}
-                    className="text-amber-400 hover:text-emerald-400 transition-colors shrink-0"
+                    className="text-amber-600 dark:text-amber-400 hover:text-emerald-500 transition-colors shrink-0"
                     title="Mark as complete"
                   >
                     {task.completed ? (
-                      <CheckSquare className="h-4 w-4 text-emerald-400" />
+                      <CheckSquare className="h-4 w-4 text-emerald-500" />
                     ) : (
                       <Square className="h-4 w-4" />
                     )}
                   </button>
 
                   <div className="min-w-0 flex-1">
-                    <span className="text-xs font-semibold text-gray-100 block truncate">
+                    <span className="text-xs font-semibold text-primary block truncate">
                       {task.title}
                     </span>
-                    <div className="flex items-center gap-2 text-[10px] text-amber-300/80 mt-0.5">
+                    <div className="flex items-center gap-2 text-[10px] text-amber-700/80 dark:text-amber-300/80 mt-0.5">
                       <span>Due: {formatDate(task.date)}</span>
                       {courseObj && (
                         <span>
@@ -115,7 +115,7 @@ export const OverdueBanner: React.FC<OverdueBannerProps> = ({
                   <button
                     type="button"
                     onClick={() => onReschedule(task)}
-                    className="inline-flex items-center gap-1 rounded-lg border border-amber-500/40 bg-amber-500/20 px-2.5 py-1 text-[11px] font-semibold text-amber-200 hover:bg-amber-500/30 transition-colors"
+                    className="inline-flex items-center gap-1 rounded-lg border border-amber-500/40 bg-amber-500/20 px-2.5 py-1 text-[11px] font-semibold text-amber-700 dark:text-amber-200 hover:bg-amber-500/30 transition-colors"
                   >
                     <Calendar className="h-3 w-3" />
                     <span>Reschedule</span>

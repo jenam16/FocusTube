@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+﻿import { useMemo } from 'react';
 import { BookOpen } from 'lucide-react';
 import { VideoItem, VideoProgress } from '../../types';
 import { LessonItem } from './LessonItem';
@@ -47,7 +47,7 @@ export const LessonList = ({
 
   if (sortedVideos.length === 0) {
     return (
-      <div className="rounded-2xl border border-dashed border-white/[0.08] bg-[#111827]/40 p-10 text-center text-sm text-slate-400">
+      <div className="rounded-2xl border border-dashed border-app bg-surface p-10 text-center text-sm text-secondary shadow-xs">
         No lessons found in this course syllabus.
       </div>
     );
@@ -58,12 +58,12 @@ export const LessonList = ({
       {/* Header */}
       <div className="flex items-center justify-between px-1">
         <div className="flex items-center gap-2">
-          <BookOpen className="h-4 w-4 text-indigo-400" />
-          <h3 className="text-base font-bold text-white font-heading">Course Syllabus</h3>
+          <BookOpen className="h-4 w-4 text-indigo-500" />
+          <h3 className="text-base font-bold text-primary font-heading">Course Syllabus</h3>
         </div>
-        <div className="flex items-center gap-2 text-xs text-slate-400">
+        <div className="flex items-center gap-2 text-xs text-muted">
           {completedCount > 0 && (
-            <span className="text-emerald-400 font-semibold">
+            <span className="text-emerald-500 font-semibold">
               {completedCount}/{availableCount} completed
             </span>
           )}
@@ -77,7 +77,7 @@ export const LessonList = ({
 
       {/* Lesson List Container */}
       <div
-        className={`space-y-1.5 overflow-y-auto rounded-2xl border border-white/[0.07] bg-[#0B101E] p-2 shadow-lg shadow-black/20 ${maxHeightClass}`}
+        className={`space-y-1.5 overflow-y-auto rounded-2xl border border-app bg-surface p-2 shadow-xs ${maxHeightClass}`}
       >
         {sortedVideos.map((video) => (
           <LessonItem

@@ -15,7 +15,7 @@ import {
 
 export const LandingPage: React.FC = () => {
   return (
-    <div className="min-h-screen bg-[#0F172A] text-slate-100 flex flex-col selection:bg-indigo-500/30 selection:text-white">
+    <div className="min-h-screen bg-app text-primary flex flex-col selection:bg-indigo-500/30 selection:text-white">
       {/* 1. Sticky Minimal Navbar */}
       <LandingNavbar />
 

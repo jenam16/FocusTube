@@ -105,19 +105,19 @@ export const FocusNotesDrawer: React.FC<FocusNotesDrawerProps> = ({
         <aside
           role="dialog"
           aria-label="Focus Mode Lesson Notes"
-          className="w-screen max-w-md bg-[#0B101E] border-l border-white/[0.07] shadow-2xl flex flex-col"
+          className="w-screen max-w-md bg-surface border-l border-app shadow-2xl flex flex-col"
         >
           {/* Drawer Header */}
-          <div className="flex items-center justify-between border-b border-white/[0.07] p-4 bg-[#070B14]/90">
+          <div className="flex items-center justify-between border-b border-app p-4 bg-secondary">
             <div className="flex items-center gap-2.5 min-w-0 pr-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 shrink-0">
+              <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-indigo-500/10 text-indigo-500 border border-indigo-500/20 shrink-0">
                 <FileText className="h-4 w-4" />
               </div>
               <div className="min-w-0">
-                <h3 className="text-sm font-bold text-white truncate font-heading">
+                <h3 className="text-sm font-bold text-primary truncate font-heading">
                   Notes ({notes.length})
                 </h3>
-                <p className="text-xs text-slate-400 truncate">{videoTitle}</p>
+                <p className="text-xs text-secondary truncate">{videoTitle}</p>
               </div>
             </div>
 
@@ -135,7 +135,7 @@ export const FocusNotesDrawer: React.FC<FocusNotesDrawerProps> = ({
               <button
                 type="button"
                 onClick={onClose}
-                className="rounded-xl p-1.5 text-slate-400 hover:bg-white/[0.06] hover:text-white transition-colors"
+                className="rounded-xl p-1.5 text-secondary hover:bg-surface-elevated hover:text-primary transition-colors"
                 aria-label="Close notes drawer"
               >
                 <X className="h-5 w-5" />
@@ -157,18 +157,18 @@ export const FocusNotesDrawer: React.FC<FocusNotesDrawerProps> = ({
             )}
 
             {isLoading ? (
-              <div className="flex items-center justify-center py-10 text-xs text-slate-500">
-                <Loader2 className="h-4 w-4 animate-spin mr-2 text-indigo-400" />
+              <div className="flex items-center justify-center py-10 text-xs text-muted">
+                <Loader2 className="h-4 w-4 animate-spin mr-2 text-indigo-500" />
                 Loading notes...
               </div>
             ) : notes.length === 0 ? (
-              <div className="rounded-2xl border border-dashed border-white/[0.08] p-8 text-center space-y-2">
-                <p className="text-xs text-slate-400">No notes for this lesson yet.</p>
+              <div className="rounded-2xl border border-dashed border-app p-8 text-center space-y-2">
+                <p className="text-xs text-secondary">No notes for this lesson yet.</p>
                 {!isAddingNote && (
                   <button
                     type="button"
                     onClick={() => setIsAddingNote(true)}
-                    className="inline-flex items-center gap-1.5 text-xs font-semibold text-indigo-400 hover:text-indigo-300"
+                    className="inline-flex items-center gap-1.5 text-xs font-semibold text-indigo-500 hover:text-indigo-400"
                   >
                     <Plus className="h-3.5 w-3.5" />
                     <span>Add your first note</span>

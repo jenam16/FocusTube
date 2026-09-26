@@ -53,12 +53,12 @@ export const DateNavigator: React.FC<DateNavigatorProps> = ({
   });
 
   return (
-    <div className="flex items-center justify-between gap-3 rounded-2xl border border-white/[0.07] bg-[#0B101E] p-3 backdrop-blur-sm shadow-lg shadow-black/20">
+    <div className="flex items-center justify-between gap-3 rounded-2xl border border-app bg-surface p-3 backdrop-blur-sm shadow-sm">
       {/* Prev Day Button */}
       <button
         type="button"
         onClick={handlePrevDay}
-        className="inline-flex items-center gap-1 rounded-xl border border-white/[0.08] bg-[#0D1527] p-2 text-xs font-semibold text-slate-300 hover:border-white/[0.18] hover:text-white transition-all"
+        className="inline-flex items-center gap-1 rounded-xl border border-app bg-surface-elevated p-2 text-xs font-semibold text-secondary hover:border-indigo-500/30 hover:text-primary transition-all"
         title="Previous Day"
       >
         <ChevronLeft className="h-4 w-4" />
@@ -68,8 +68,8 @@ export const DateNavigator: React.FC<DateNavigatorProps> = ({
       <div className="flex items-center gap-2.5">
         <div className="relative flex items-center">
           <label className="flex items-center gap-2 cursor-pointer">
-            <CalendarIcon className="h-4 w-4 text-indigo-400" />
-            <span className="text-sm sm:text-base font-bold text-white hover:text-indigo-300 transition-colors font-heading">
+            <CalendarIcon className="h-4 w-4 text-indigo-500" />
+            <span className="text-sm sm:text-base font-bold text-primary hover:text-indigo-500 transition-colors font-heading">
               {displayDateText}
             </span>
             <input
@@ -85,14 +85,14 @@ export const DateNavigator: React.FC<DateNavigatorProps> = ({
         </div>
 
         {isToday ? (
-          <span className="rounded-full bg-indigo-500/15 border border-indigo-500/30 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-indigo-300">
+          <span className="rounded-full bg-indigo-500/15 border border-indigo-500/30 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-indigo-500">
             Today
           </span>
         ) : (
           <button
             type="button"
             onClick={handleTodayClick}
-            className="rounded-full bg-[#0D1527] border border-white/[0.08] hover:bg-[#131D36] px-2.5 py-0.5 text-[11px] font-semibold text-slate-300 transition-colors"
+            className="rounded-full bg-surface-elevated border border-app hover:border-indigo-500/30 px-2.5 py-0.5 text-[11px] font-semibold text-secondary hover:text-primary transition-colors"
           >
             Jump to Today
           </button>
@@ -103,7 +103,7 @@ export const DateNavigator: React.FC<DateNavigatorProps> = ({
       <button
         type="button"
         onClick={handleNextDay}
-        className="inline-flex items-center gap-1 rounded-xl border border-white/[0.08] bg-[#0D1527] p-2 text-xs font-semibold text-slate-300 hover:border-white/[0.18] hover:text-white transition-all"
+        className="inline-flex items-center gap-1 rounded-xl border border-app bg-surface-elevated p-2 text-xs font-semibold text-secondary hover:border-indigo-500/30 hover:text-primary transition-all"
         title="Next Day"
       >
         <ChevronRight className="h-4 w-4" />

@@ -36,14 +36,14 @@ export const BookmarksPage: React.FC = () => {
       {/* Header */}
       <div>
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-500/10 text-amber-400 border border-amber-500/20">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-500/10 text-amber-500 border border-amber-500/20">
             <Bookmark className="h-5 w-5 fill-current" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold tracking-tight text-white sm:text-3xl font-heading">
+            <h1 className="text-2xl font-bold tracking-tight text-primary sm:text-3xl font-heading">
               Bookmarked Lessons
             </h1>
-            <p className="text-xs sm:text-sm text-slate-400">
+            <p className="text-xs sm:text-sm text-secondary">
               Quick access to your saved lessons and key learning moments.
             </p>
           </div>
@@ -78,11 +78,11 @@ export const BookmarksPage: React.FC = () => {
             return (
               <div
                 key={b._id}
-                className="group flex flex-col justify-between rounded-2xl border border-white/[0.07] bg-[#0B101E] p-4 transition-all duration-300 hover:-translate-y-1 hover:border-indigo-500/40 hover:shadow-xl hover:shadow-indigo-950/30"
+                className="group flex flex-col justify-between rounded-2xl border border-app bg-surface p-4 transition-all duration-300 hover:-translate-y-1 hover:border-indigo-500/40 hover:shadow-lg"
               >
                 <div className="space-y-3">
                   {/* Thumbnail and Course info */}
-                  <div className="relative aspect-video w-full overflow-hidden rounded-xl border border-white/[0.08] bg-[#070B14]">
+                  <div className="relative aspect-video w-full overflow-hidden rounded-xl border border-app bg-secondary">
                     {b.course.thumbnail ? (
                       <img
                         src={b.course.thumbnail}
@@ -93,7 +93,7 @@ export const BookmarksPage: React.FC = () => {
                         loading="lazy"
                       />
                     ) : (
-                      <div className="flex h-full w-full items-center justify-center text-slate-600">
+                      <div className="flex h-full w-full items-center justify-center text-muted">
                         <PlaySquare className="h-8 w-8" />
                       </div>
                     )}
@@ -106,12 +106,12 @@ export const BookmarksPage: React.FC = () => {
                   </div>
 
                   <div>
-                    <span className="text-[11px] font-semibold text-indigo-400 line-clamp-1">
+                    <span className="text-[11px] font-semibold text-indigo-500 line-clamp-1">
                       {b.course.title}
                     </span>
                     <h3
                       className={`mt-0.5 text-sm font-semibold line-clamp-2 font-heading tracking-tight ${
-                        isAvailable ? 'text-white' : 'text-slate-500 line-through'
+                        isAvailable ? 'text-primary' : 'text-muted line-through'
                       }`}
                     >
                       {b.video.title}
@@ -119,7 +119,7 @@ export const BookmarksPage: React.FC = () => {
                   </div>
 
                   {!isAvailable && (
-                    <div className="flex items-center gap-1 text-[11px] text-amber-400">
+                    <div className="flex items-center gap-1 text-[11px] text-amber-500">
                       <AlertCircle className="h-3.5 w-3.5" />
                       <span>Video unavailable on YouTube</span>
                     </div>
@@ -127,7 +127,7 @@ export const BookmarksPage: React.FC = () => {
                 </div>
 
                 {/* Footer Buttons */}
-                <div className="mt-4 flex items-center justify-between border-t border-white/[0.06] pt-3">
+                <div className="mt-4 flex items-center justify-between border-t border-subtle pt-3">
                   {isAvailable ? (
                     <Link
                       to={`/watch/${b.course._id}/${b.video._id}`}
@@ -137,13 +137,13 @@ export const BookmarksPage: React.FC = () => {
                       <span>Watch Lesson</span>
                     </Link>
                   ) : (
-                    <span className="text-xs text-slate-500">Unavailable</span>
+                    <span className="text-xs text-muted">Unavailable</span>
                   )}
 
                   <button
                     type="button"
                     onClick={() => removeMutation.mutate(b.video._id)}
-                    className="inline-flex items-center gap-1 rounded-xl p-1.5 text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition-colors"
+                    className="inline-flex items-center gap-1 rounded-xl p-1.5 text-secondary hover:text-rose-500 hover:bg-rose-500/10 transition-colors"
                     aria-label="Remove bookmark"
                     title="Remove bookmark"
                   >

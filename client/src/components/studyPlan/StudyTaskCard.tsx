@@ -60,8 +60,8 @@ export const StudyTaskCard: React.FC<StudyTaskCardProps> = ({
     <div
       className={`group relative flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 rounded-2xl border p-3.5 transition-all ${
         task.completed
-          ? 'border-white/[0.04] bg-[#070B14]/60 opacity-60'
-          : 'border-white/[0.07] bg-[#0B101E] hover:border-white/[0.15] hover:bg-[#0D1527] shadow-sm'
+          ? 'border-subtle bg-secondary opacity-60'
+          : 'border-app bg-surface hover:border-indigo-500/30 hover:bg-surface-elevated shadow-xs'
       }`}
     >
       {/* Checkbox & Task Details */}
@@ -69,13 +69,13 @@ export const StudyTaskCard: React.FC<StudyTaskCardProps> = ({
         <button
           type="button"
           onClick={() => onToggleComplete(task)}
-          className="mt-0.5 sm:mt-0 text-slate-400 hover:text-indigo-400 transition-colors shrink-0"
+          className="mt-0.5 sm:mt-0 text-muted hover:text-indigo-500 transition-colors shrink-0"
           title={task.completed ? 'Mark as incomplete' : 'Mark as completed'}
         >
           {task.completed ? (
-            <CheckSquare className="h-5 w-5 text-emerald-400" />
+            <CheckSquare className="h-5 w-5 text-emerald-500" />
           ) : (
-            <Square className="h-5 w-5 hover:text-white" />
+            <Square className="h-5 w-5 hover:text-primary" />
           )}
         </button>
 
@@ -83,7 +83,7 @@ export const StudyTaskCard: React.FC<StudyTaskCardProps> = ({
           <div className="flex items-center gap-2 flex-wrap">
             <span
               className={`text-xs sm:text-sm font-semibold truncate ${
-                task.completed ? 'line-through text-slate-500' : 'text-slate-100'
+                task.completed ? 'line-through text-muted' : 'text-primary'
               }`}
             >
               {task.title}
@@ -101,13 +101,13 @@ export const StudyTaskCard: React.FC<StudyTaskCardProps> = ({
 
           {/* Course / Video info */}
           {courseObj && (
-            <div className="flex items-center gap-1.5 text-xs text-slate-400">
-              <BookOpen className="h-3 w-3 text-indigo-400 shrink-0" />
+            <div className="flex items-center gap-1.5 text-xs text-secondary">
+              <BookOpen className="h-3 w-3 text-indigo-500 shrink-0" />
               <span className="truncate max-w-[200px] sm:max-w-[280px]">
                 {courseObj.title}
               </span>
               {videoObj && (
-                <span className="text-slate-500 truncate">
+                <span className="text-muted truncate">
                   • L{videoObj.position}: {videoObj.title}
                 </span>
               )}
@@ -116,7 +116,7 @@ export const StudyTaskCard: React.FC<StudyTaskCardProps> = ({
 
           {/* Description if present */}
           {task.description && (
-            <p className="text-[11px] text-slate-400 line-clamp-1">
+            <p className="text-[11px] text-muted line-clamp-1">
               {task.description}
             </p>
           )}
@@ -124,7 +124,7 @@ export const StudyTaskCard: React.FC<StudyTaskCardProps> = ({
       </div>
 
       {/* Action Buttons: Learning / Focus & CRUD */}
-      <div className="flex items-center gap-1.5 self-end sm:self-auto shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-white/[0.06] w-full sm:w-auto justify-end">
+      <div className="flex items-center gap-1.5 self-end sm:self-auto shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-subtle w-full sm:w-auto justify-end">
         {/* Start Learning / Focus if video linked */}
         {courseObj && (
           <>
@@ -141,7 +141,7 @@ export const StudyTaskCard: React.FC<StudyTaskCardProps> = ({
             <button
               type="button"
               onClick={handleStartFocus}
-              className="inline-flex items-center gap-1 rounded-xl border border-indigo-500/30 bg-indigo-500/10 px-2.5 py-1.5 text-xs font-semibold text-indigo-300 hover:bg-indigo-500/20 hover:text-white transition-all"
+              className="inline-flex items-center gap-1 rounded-xl border border-indigo-500/30 bg-indigo-500/10 px-2.5 py-1.5 text-xs font-semibold text-indigo-500 hover:bg-indigo-500/20 hover:text-indigo-600 dark:text-indigo-300 dark:hover:text-white transition-all"
               title="Launch Focus Mode"
             >
               <Timer className="h-3 w-3" />
@@ -154,7 +154,7 @@ export const StudyTaskCard: React.FC<StudyTaskCardProps> = ({
         <button
           type="button"
           onClick={() => onReschedule(task)}
-          className="rounded-lg border border-white/[0.08] bg-[#0D1527] p-1.5 text-slate-400 hover:border-white/[0.18] hover:text-white transition-all"
+          className="rounded-lg border border-app bg-surface-elevated p-1.5 text-secondary hover:border-indigo-500/30 hover:text-primary transition-all"
           title="Reschedule task date"
         >
           <Calendar className="h-3.5 w-3.5" />
@@ -164,7 +164,7 @@ export const StudyTaskCard: React.FC<StudyTaskCardProps> = ({
         <button
           type="button"
           onClick={() => onEdit(task)}
-          className="rounded-lg border border-white/[0.08] bg-[#0D1527] p-1.5 text-slate-400 hover:border-white/[0.18] hover:text-white transition-all"
+          className="rounded-lg border border-app bg-surface-elevated p-1.5 text-secondary hover:border-indigo-500/30 hover:text-primary transition-all"
           title="Edit task"
         >
           <Edit2 className="h-3.5 w-3.5" />
@@ -174,7 +174,7 @@ export const StudyTaskCard: React.FC<StudyTaskCardProps> = ({
         <button
           type="button"
           onClick={() => onDelete(task)}
-          className="rounded-lg border border-white/[0.08] bg-[#0D1527] p-1.5 text-slate-400 hover:border-rose-500/40 hover:bg-rose-500/10 hover:text-rose-400 transition-all"
+          className="rounded-lg border border-app bg-surface-elevated p-1.5 text-secondary hover:border-rose-500/40 hover:bg-rose-500/10 hover:text-rose-500 transition-all"
           title="Delete task"
         >
           <Trash2 className="h-3.5 w-3.5" />

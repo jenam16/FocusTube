@@ -44,16 +44,16 @@ export const ScreenshotViewerModal: React.FC<ScreenshotViewerModalProps> = ({
       onClick={onClose}
     >
       <div
-        className="relative flex flex-col w-full max-w-4xl max-h-[90vh] overflow-hidden rounded-2xl border border-white/[0.12] bg-[#0F172A] shadow-2xl"
+        className="relative flex flex-col w-full max-w-4xl max-h-[90vh] overflow-hidden rounded-2xl border border-app bg-surface shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Modal Header */}
-        <div className="flex items-center justify-between border-b border-white/[0.08] px-5 py-3.5 bg-[#111827]">
+        <div className="flex items-center justify-between border-b border-app px-5 py-3.5 bg-secondary">
           <div className="min-w-0 flex-1 pr-4">
-            <p className="truncate text-xs font-semibold uppercase tracking-wider text-indigo-400">
+            <p className="truncate text-xs font-semibold uppercase tracking-wider text-indigo-500">
               {courseTitle} • {videoTitle}
             </p>
-            <h3 className="truncate text-base sm:text-lg font-bold text-white font-heading mt-0.5">
+            <h3 className="truncate text-base sm:text-lg font-bold text-primary font-heading mt-0.5">
               {note.title || 'Captured Moment'}
             </h3>
           </div>
@@ -64,7 +64,7 @@ export const ScreenshotViewerModal: React.FC<ScreenshotViewerModalProps> = ({
                 href={note.screenshotUrl}
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex items-center gap-1.5 rounded-xl border border-white/[0.08] bg-[#1E293B] px-3 py-1.5 text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-700 transition-colors"
+                className="inline-flex items-center gap-1.5 rounded-xl border border-app bg-surface-elevated px-3 py-1.5 text-xs font-medium text-secondary hover:text-primary hover:border-indigo-500/30 transition-colors"
                 title="Open original image in new tab"
               >
                 <ExternalLink className="h-3.5 w-3.5" />
@@ -75,7 +75,7 @@ export const ScreenshotViewerModal: React.FC<ScreenshotViewerModalProps> = ({
             <button
               type="button"
               onClick={onClose}
-              className="flex h-8 w-8 items-center justify-center rounded-xl text-slate-400 hover:bg-white/[0.08] hover:text-white transition-colors"
+              className="flex h-8 w-8 items-center justify-center rounded-xl text-secondary hover:bg-surface-elevated hover:text-primary transition-colors"
               aria-label="Close modal"
             >
               <X className="h-4 w-4" />
@@ -92,7 +92,7 @@ export const ScreenshotViewerModal: React.FC<ScreenshotViewerModalProps> = ({
               className="max-h-full max-w-full object-contain"
             />
           ) : (
-            <div className="text-slate-500 text-sm">Image not available</div>
+            <div className="text-muted text-sm">Image not available</div>
           )}
 
           {typeof note.timestampSeconds === 'number' && (
@@ -104,17 +104,17 @@ export const ScreenshotViewerModal: React.FC<ScreenshotViewerModalProps> = ({
         </div>
 
         {/* Modal Footer / Notes info */}
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 border-t border-white/[0.08] p-4 bg-[#111827]">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 border-t border-app p-4 bg-secondary">
           <div className="space-y-1.5 min-w-0 flex-1">
             {note.content && (
-              <p className="text-xs sm:text-sm text-slate-300 whitespace-pre-wrap">
+              <p className="text-xs sm:text-sm text-primary whitespace-pre-wrap">
                 {note.content}
               </p>
             )}
 
-            <div className="flex flex-wrap items-center gap-3 text-[11px] text-slate-400">
+            <div className="flex flex-wrap items-center gap-3 text-[11px] text-secondary">
               {formattedDate && (
-                <span className="flex items-center gap-1">
+                <span className="flex items-center gap-1 text-muted">
                   <Calendar className="h-3 w-3" />
                   {formattedDate}
                 </span>
@@ -125,9 +125,9 @@ export const ScreenshotViewerModal: React.FC<ScreenshotViewerModalProps> = ({
                   {note.tags.map((tag) => (
                     <span
                       key={tag}
-                      className="inline-flex items-center gap-1 rounded bg-white/[0.06] px-1.5 py-0.5 text-[10px] text-slate-300"
+                      className="inline-flex items-center gap-1 rounded bg-surface border border-app px-1.5 py-0.5 text-[10px] text-secondary"
                     >
-                      <Tag className="h-2.5 w-2.5 text-indigo-400" />
+                      <Tag className="h-2.5 w-2.5 text-indigo-500" />
                       {tag}
                     </span>
                   ))}

@@ -488,16 +488,16 @@ export const WatchPage = () => {
         />
       ) : (
         /* Top Bar: Back to Course Navigation */
-        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/[0.07] pb-4">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-app pb-4">
           <Link
             to={`/courses/${course._id}`}
-            className="inline-flex items-center gap-2 rounded-xl border border-white/[0.07] bg-[#0B101E] px-3 py-1.5 text-xs font-medium text-slate-300 transition-all hover:bg-[#0D1527] hover:border-white/[0.15] hover:text-white"
+            className="inline-flex items-center gap-2 rounded-xl border border-app bg-surface px-3 py-1.5 text-xs font-medium text-secondary transition-all hover:bg-surface-elevated hover:border-indigo-500/30 hover:text-primary"
           >
             <ArrowLeft className="h-4 w-4" />
             <span>Back to Course</span>
           </Link>
 
-          <span className="truncate text-xs font-medium text-slate-400 max-w-md">
+          <span className="truncate text-xs font-medium text-secondary max-w-md">
             {course.title}
           </span>
         </div>
@@ -515,14 +515,14 @@ export const WatchPage = () => {
         {!isFocusMode && (
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <div className="space-y-1.5">
-              <div className="flex flex-wrap items-center gap-2 text-xs font-semibold text-indigo-400">
+              <div className="flex flex-wrap items-center gap-2 text-xs font-semibold text-indigo-500">
                 <span>
                   Lesson {lessonNumber} of {totalLessons}
                 </span>
                 {currentVideo.durationSeconds > 0 && (
                   <>
-                    <span className="text-slate-600">•</span>
-                    <span className="flex items-center gap-1 text-slate-400 font-normal">
+                    <span className="text-muted">•</span>
+                    <span className="flex items-center gap-1 text-muted font-normal">
                       <Clock className="h-3 w-3" />
                       {formatVideoDuration(currentVideo.durationSeconds)}
                     </span>
@@ -530,19 +530,19 @@ export const WatchPage = () => {
                 )}
                 {currentVideoProgress?.completed ? (
                   <>
-                    <span className="text-slate-600">•</span>
+                    <span className="text-muted">•</span>
                     <CompletedBadge size="xs" />
                   </>
                 ) : currentVideoProgress && currentVideoProgress.progressPercentage > 0 ? (
                   <>
-                    <span className="text-slate-600">•</span>
-                    <span className="text-indigo-400 font-semibold lowercase">
+                    <span className="text-muted">•</span>
+                    <span className="text-indigo-500 font-semibold lowercase">
                       {currentVideoProgress.progressPercentage}% watched
                     </span>
                   </>
                 ) : null}
               </div>
-              <h1 className="text-xl font-bold tracking-tight text-white sm:text-2xl font-heading">
+              <h1 className="text-xl font-bold tracking-tight text-primary sm:text-2xl font-heading">
                 {currentVideo.title}
               </h1>
             </div>
@@ -558,10 +558,10 @@ export const WatchPage = () => {
               <button
                 type="button"
                 onClick={() => handleToggleFocusMode(true)}
-                className="inline-flex items-center gap-1.5 rounded-xl border border-indigo-500/30 bg-gradient-to-r from-indigo-500/15 to-purple-500/15 hover:from-indigo-500/25 hover:to-purple-500/25 px-3 py-1.5 text-xs font-medium text-indigo-300 hover:text-white transition-all active:scale-[0.98] shadow-xs"
+                className="inline-flex items-center gap-1.5 rounded-xl border border-indigo-500/30 bg-gradient-to-r from-indigo-500/15 to-purple-500/15 hover:from-indigo-500/25 hover:to-purple-500/25 px-3 py-1.5 text-xs font-medium text-indigo-500 hover:text-indigo-600 dark:text-indigo-300 dark:hover:text-white transition-all active:scale-[0.98] shadow-xs"
                 title="Enter Focus Mode"
               >
-                <Focus className="h-3.5 w-3.5 text-indigo-400" />
+                <Focus className="h-3.5 w-3.5 text-indigo-500" />
                 <span>Focus Mode</span>
               </button>
 
@@ -569,7 +569,7 @@ export const WatchPage = () => {
               <button
                 type="button"
                 onClick={() => setIsTheaterMode((prev) => !prev)}
-                className="hidden sm:inline-flex items-center gap-1.5 rounded-xl border border-white/[0.08] bg-[#0B101E] px-3 py-1.5 text-xs font-medium text-slate-300 hover:bg-[#0D1527] hover:border-white/[0.15] hover:text-white transition-all"
+                className="hidden sm:inline-flex items-center gap-1.5 rounded-xl border border-app bg-surface px-3 py-1.5 text-xs font-medium text-secondary hover:bg-surface-elevated hover:text-primary transition-all"
               >
                 {isTheaterMode ? (
                   <>
@@ -609,10 +609,10 @@ export const WatchPage = () => {
               getCurrentTimestamp={getCurrentTimestamp}
             />
           ) : (
-            <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-white/[0.07] bg-[#0B101E] p-12 text-center aspect-video">
+            <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-app bg-surface p-12 text-center aspect-video">
               <AlertCircle className="h-10 w-10 text-amber-500 mb-3" />
-              <h3 className="text-base font-bold text-white font-heading">Video unavailable</h3>
-              <p className="mt-1 max-w-sm text-xs text-slate-400">
+              <h3 className="text-base font-bold text-primary font-heading">Video unavailable</h3>
+              <p className="mt-1 max-w-sm text-xs text-secondary">
                 This video cannot be played because it has been removed or set to private on YouTube.
               </p>
             </div>
@@ -641,13 +641,13 @@ export const WatchPage = () => {
         ) : (
           <>
             {/* Navigation Buttons: Previous & Next Lesson (Skips unavailable) */}
-            <div className="flex items-center justify-between gap-4 rounded-2xl border border-white/[0.07] bg-[#0B101E] p-4 shadow-lg shadow-black/20">
+            <div className="flex items-center justify-between gap-4 rounded-2xl border border-app bg-surface p-4 shadow-sm">
               {/* Previous Lesson Button */}
               {previousVideo ? (
                 <button
                   type="button"
                   onClick={() => handleNavigateVideo(previousVideo._id)}
-                  className="inline-flex items-center gap-2 rounded-xl border border-white/[0.08] bg-[#0D1527] px-4 py-2 text-xs font-semibold text-slate-200 transition-all hover:border-white/[0.18] hover:bg-[#131D36] hover:text-white active:scale-95"
+                  className="inline-flex items-center gap-2 rounded-xl border border-app bg-surface-elevated px-4 py-2 text-xs font-semibold text-secondary transition-all hover:border-indigo-500/30 hover:text-primary active:scale-95"
                 >
                   <ChevronLeft className="h-4 w-4" />
                   <span>Previous Lesson</span>
@@ -656,14 +656,14 @@ export const WatchPage = () => {
                 <button
                   type="button"
                   disabled
-                  className="inline-flex items-center gap-2 rounded-xl border border-white/[0.04] bg-slate-900/30 px-4 py-2 text-xs font-semibold text-slate-600 opacity-40 cursor-not-allowed"
+                  className="inline-flex items-center gap-2 rounded-xl border border-app bg-surface-elevated/40 px-4 py-2 text-xs font-semibold text-muted opacity-40 cursor-not-allowed"
                 >
                   <ChevronLeft className="h-4 w-4" />
                   <span>Previous Lesson</span>
                 </button>
               )}
 
-              <div className="hidden sm:block text-xs text-slate-400 font-medium">
+              <div className="hidden sm:block text-xs text-secondary font-medium">
                 Lesson {lessonNumber} of {totalLessons}
               </div>
 
@@ -681,7 +681,7 @@ export const WatchPage = () => {
                 <button
                   type="button"
                   disabled
-                  className="inline-flex items-center gap-2 rounded-xl border border-white/[0.04] bg-slate-900/30 px-4 py-2 text-xs font-semibold text-slate-600 opacity-40 cursor-not-allowed"
+                  className="inline-flex items-center gap-2 rounded-xl border border-app bg-surface-elevated/40 px-4 py-2 text-xs font-semibold text-muted opacity-40 cursor-not-allowed"
                 >
                   <span>Next Lesson</span>
                   <ChevronRight className="h-4 w-4" />
@@ -698,18 +698,18 @@ export const WatchPage = () => {
             />
 
             {/* Quick Lesson Navigator / Full Syllabus Below Player */}
-            <div className="mt-8 space-y-3 rounded-2xl border border-white/[0.07] bg-[#0B101E] p-5 shadow-lg shadow-black/20">
+            <div className="mt-8 space-y-3 rounded-2xl border border-app bg-surface p-5 shadow-sm">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <Layers className="h-4 w-4 text-indigo-400" />
-                  <h3 className="text-sm font-bold text-white font-heading">All Lessons in this Course</h3>
+                  <Layers className="h-4 w-4 text-indigo-500" />
+                  <h3 className="text-sm font-bold text-primary font-heading">All Lessons in this Course</h3>
                 </div>
-                <span className="text-xs text-slate-400 font-medium">
+                <span className="text-xs text-secondary font-medium">
                   Total {formatDuration(course.totalDurationSeconds)}
                 </span>
               </div>
 
-              <div className="divide-y divide-white/[0.06] max-h-80 overflow-y-auto rounded-xl border border-white/[0.07] bg-[#060913]/90">
+              <div className="divide-y divide-subtle max-h-80 overflow-y-auto rounded-xl border border-app bg-secondary">
                 {sortedVideos.map((vid, idx) => {
                   const isCurrent = vid._id === currentVideo._id;
                   const isAvailable = vid.isAvailable !== false;
@@ -729,7 +729,7 @@ export const WatchPage = () => {
                           ? 'opacity-40 cursor-not-allowed'
                           : isCurrent
                             ? 'bg-indigo-600/10 border-l-4 border-indigo-500'
-                            : 'hover:bg-white/[0.03]'
+                            : 'hover:bg-surface-elevated'
                       }`}
                     >
                       <span
@@ -737,12 +737,12 @@ export const WatchPage = () => {
                           isCurrent
                             ? 'bg-indigo-600 text-white shadow-xs'
                             : vidProg?.completed
-                              ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/25'
-                              : 'bg-slate-800/80 text-slate-400'
+                              ? 'bg-emerald-500/15 text-emerald-500 border border-emerald-500/25'
+                              : 'bg-surface-elevated text-secondary'
                         }`}
                       >
                         {vidProg?.completed && !isCurrent ? (
-                          <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400" />
+                          <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />
                         ) : (
                           formatLessonNumber(idx)
                         )}
@@ -750,10 +750,10 @@ export const WatchPage = () => {
                       <span
                         className={`flex-1 truncate text-xs ${
                           !isAvailable
-                            ? 'text-slate-500 line-through'
+                            ? 'text-muted line-through'
                             : isCurrent
-                              ? 'font-semibold text-indigo-300'
-                              : 'text-slate-300'
+                              ? 'font-semibold text-indigo-500'
+                              : 'text-primary'
                         }`}
                       >
                         {vid.title}
@@ -767,12 +767,12 @@ export const WatchPage = () => {
                       {vidProg?.completed ? (
                         <CompletedBadge size="xs" />
                       ) : vidProg && vidProg.progressPercentage > 0 ? (
-                        <span className="shrink-0 text-[11px] text-indigo-400 font-semibold">
+                        <span className="shrink-0 text-[11px] text-indigo-500 font-semibold">
                           {vidProg.progressPercentage}%
                         </span>
                       ) : null}
                       {vid.durationSeconds > 0 && (
-                        <span className="shrink-0 text-[11px] text-slate-500 font-mono">
+                        <span className="shrink-0 text-[11px] text-muted font-mono">
                           {formatVideoDuration(vid.durationSeconds)}
                         </span>
                       )}

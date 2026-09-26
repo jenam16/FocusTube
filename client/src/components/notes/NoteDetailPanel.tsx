@@ -34,14 +34,14 @@ export const NoteDetailPanel: React.FC<NoteDetailPanelProps> = ({
 
   if (!note) {
     return (
-      <div className="flex h-full min-h-[400px] flex-col items-center justify-center rounded-2xl border border-white/[0.07] bg-[#0B101E] p-8 text-center shadow-lg shadow-black/20">
-        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/[0.04] text-slate-500 mb-3 border border-white/[0.06]">
+      <div className="flex h-full min-h-[400px] flex-col items-center justify-center rounded-2xl border border-app bg-surface p-8 text-center shadow-sm">
+        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-surface-elevated text-secondary mb-3 border border-app">
           <FileText className="h-6 w-6" />
         </div>
-        <h3 className="text-base font-semibold text-slate-300">
+        <h3 className="text-base font-semibold text-primary">
           Select a note
         </h3>
-        <p className="mt-1 text-xs text-slate-500 max-w-[260px]">
+        <p className="mt-1 text-xs text-secondary max-w-[260px]">
           Choose a note from the list to view its full details, jump to its video lesson, or make edits.
         </p>
       </div>
@@ -79,16 +79,16 @@ export const NoteDetailPanel: React.FC<NoteDetailPanelProps> = ({
   const displayTitle = note.title && note.title.trim() ? note.title.trim() : 'Untitled Note';
 
   return (
-    <div className="flex flex-col h-full rounded-2xl border border-white/[0.07] bg-[#0B101E] overflow-hidden backdrop-blur-sm shadow-xl shadow-black/20">
+    <div className="flex flex-col h-full rounded-2xl border border-app bg-surface overflow-hidden backdrop-blur-sm shadow-sm">
       {/* Top action toolbar */}
-      <div className="flex items-center justify-between gap-3 border-b border-white/[0.07] p-4 bg-[#070B14]/90">
+      <div className="flex items-center justify-between gap-3 border-b border-app p-4 bg-secondary">
         <div className="flex items-center gap-2.5 min-w-0">
-          <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 shrink-0">
+          <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-indigo-500/10 text-indigo-500 border border-indigo-500/20 shrink-0">
             <BookOpen className="h-4 w-4" />
           </div>
           <div className="min-w-0">
-            <h4 className="text-xs font-semibold text-slate-200 truncate">{courseTitle}</h4>
-            <p className="text-[11px] text-slate-500 truncate">
+            <h4 className="text-xs font-semibold text-primary truncate">{courseTitle}</h4>
+            <p className="text-[11px] text-secondary truncate">
               {videoObj?.position ? `Lesson ${videoObj.position}: ` : ''}
               {videoTitle}
             </p>
@@ -103,18 +103,18 @@ export const NoteDetailPanel: React.FC<NoteDetailPanelProps> = ({
             onClick={() => onTogglePin(note._id)}
             className={`rounded-xl border p-2 text-xs font-medium transition-all ${
               note.isPinned
-                ? 'border-amber-500/30 bg-amber-500/10 text-amber-300 hover:bg-amber-500/20'
-                : 'border-white/[0.08] bg-[#0D1527] text-slate-400 hover:text-white hover:border-white/[0.18]'
+                ? 'border-amber-500/30 bg-amber-500/10 text-amber-500 hover:bg-amber-500/20'
+                : 'border-app bg-surface-elevated text-secondary hover:text-primary hover:border-indigo-500/30'
             }`}
             title={note.isPinned ? 'Unpin note' : 'Pin note to top'}
           >
-            <Pin className={`h-4 w-4 rotate-45 ${note.isPinned ? 'fill-current text-amber-400' : ''}`} />
+            <Pin className={`h-4 w-4 rotate-45 ${note.isPinned ? 'fill-current text-amber-500' : ''}`} />
           </button>
 
           <button
             type="button"
             onClick={() => onEdit(note)}
-            className="rounded-xl border border-white/[0.08] bg-[#0D1527] p-2 text-slate-400 hover:border-white/[0.18] hover:text-white transition-all"
+            className="rounded-xl border border-app bg-surface-elevated p-2 text-secondary hover:border-indigo-500/30 hover:text-primary transition-all"
             title="Edit note"
           >
             <Edit2 className="h-4 w-4" />
@@ -123,7 +123,7 @@ export const NoteDetailPanel: React.FC<NoteDetailPanelProps> = ({
           <button
             type="button"
             onClick={() => onDelete(note)}
-            className="rounded-xl border border-white/[0.08] bg-[#0D1527] p-2 text-slate-400 hover:border-rose-500/40 hover:bg-rose-500/10 hover:text-rose-400 transition-all"
+            className="rounded-xl border border-app bg-surface-elevated p-2 text-secondary hover:border-rose-500/40 hover:bg-rose-500/10 hover:text-rose-500 transition-all"
             title="Delete note"
           >
             <Trash2 className="h-4 w-4" />
@@ -135,24 +135,24 @@ export const NoteDetailPanel: React.FC<NoteDetailPanelProps> = ({
       <div className="flex-1 overflow-y-auto p-5 space-y-4">
         {/* Watch lesson button / timestamp jump */}
         {courseId && videoId && (
-          <div className="flex items-center justify-between gap-3 rounded-2xl border border-white/[0.06] bg-[#070B14]/80 p-3.5">
+          <div className="flex items-center justify-between gap-3 rounded-2xl border border-app bg-secondary p-3.5">
             <div className="flex items-center gap-3 min-w-0">
               {note.timestampSeconds !== null && note.timestampSeconds !== undefined ? (
-                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-500/15 text-indigo-400 border border-indigo-500/30 shrink-0 font-mono text-xs font-bold">
+                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-500/15 text-indigo-500 border border-indigo-500/30 shrink-0 font-mono text-xs font-bold">
                   <Play className="h-4 w-4 fill-current" />
                 </div>
               ) : (
-                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/[0.04] text-slate-400 border border-white/[0.06] shrink-0">
+                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-surface-elevated text-secondary border border-app shrink-0">
                   <Clock className="h-4 w-4" />
                 </div>
               )}
               <div className="min-w-0">
-                <span className="text-xs font-semibold text-slate-200 block truncate">
+                <span className="text-xs font-semibold text-primary block truncate">
                   {note.timestampSeconds !== null && note.timestampSeconds !== undefined
                     ? `Timestamp: ${formatVideoDuration(note.timestampSeconds)}`
                     : 'General Video Note'}
                 </span>
-                <span className="text-[11px] text-slate-400 block truncate">
+                <span className="text-[11px] text-secondary block truncate">
                   {videoTitle}
                 </span>
               </div>
@@ -171,7 +171,7 @@ export const NoteDetailPanel: React.FC<NoteDetailPanelProps> = ({
 
         {/* Note Title */}
         <div>
-          <h2 className="text-lg font-bold tracking-tight text-white font-heading">
+          <h2 className="text-lg font-bold tracking-tight text-primary font-heading">
             {displayTitle}
           </h2>
         </div>
@@ -179,11 +179,11 @@ export const NoteDetailPanel: React.FC<NoteDetailPanelProps> = ({
         {/* Tags */}
         {note.tags && note.tags.length > 0 && (
           <div className="flex items-center gap-1.5 flex-wrap">
-            <Tag className="h-3.5 w-3.5 text-slate-500 shrink-0" />
+            <Tag className="h-3.5 w-3.5 text-muted shrink-0" />
             {note.tags.map((tag) => (
               <span
                 key={tag}
-                className="rounded-full bg-[#0B1120] border border-white/[0.08] px-2.5 py-0.5 text-xs text-slate-300"
+                className="rounded-full bg-secondary border border-app px-2.5 py-0.5 text-xs text-secondary"
               >
                 #{tag}
               </span>
@@ -192,15 +192,15 @@ export const NoteDetailPanel: React.FC<NoteDetailPanelProps> = ({
         )}
 
         {/* Note Content */}
-        <div className="rounded-2xl border border-white/[0.06] bg-[#0B1120] p-4">
-          <p className="text-sm text-slate-200 whitespace-pre-wrap leading-relaxed">
+        <div className="rounded-2xl border border-app bg-secondary p-4">
+          <p className="text-sm text-primary whitespace-pre-wrap leading-relaxed">
             {note.content}
           </p>
         </div>
       </div>
 
       {/* Footer metadata */}
-      <div className="flex items-center justify-between gap-3 border-t border-white/[0.06] px-5 py-3 text-[11px] text-slate-500 bg-[#0B1120]">
+      <div className="flex items-center justify-between gap-3 border-t border-app px-5 py-3 text-[11px] text-muted bg-secondary">
         <div className="flex items-center gap-1.5">
           <Calendar className="h-3.5 w-3.5" />
           <span>Created: {formatDate(note.createdAt)}</span>

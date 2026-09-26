@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { ChevronLeft, ChevronRight, ListVideo, FileText } from 'lucide-react';
 import { VideoItem, VideoProgress } from '../../types';
 import { formatLessonNumber, formatVideoDuration } from '../../utils';
@@ -48,34 +48,34 @@ export const FocusModeControls: React.FC<FocusModeControlsProps> = ({
   return (
     <div className="space-y-4 pt-4">
       {/* Video Details Row */}
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between border-b border-white/[0.07] pb-4">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between border-b border-subtle pb-4">
         <div className="min-w-0 flex-1 space-y-1">
-          <div className="flex flex-wrap items-center gap-2 text-xs font-semibold uppercase tracking-wider text-indigo-400">
+          <div className="flex flex-wrap items-center gap-2 text-xs font-semibold uppercase tracking-wider text-indigo-500 font-heading">
             <span>Lesson {currentIndex + 1} of {totalVideos}</span>
             {currentVideo.durationSeconds > 0 && (
               <>
-                <span className="text-slate-600">•</span>
-                <span className="text-slate-400 lowercase font-normal font-mono">
+                <span>•</span>
+                <span className="text-muted lowercase font-normal font-mono">
                   {formatVideoDuration(currentVideo.durationSeconds)}
                 </span>
               </>
             )}
             {isCompleted ? (
               <>
-                <span className="text-slate-600">•</span>
+                <span>•</span>
                 <CompletedBadge size="xs" />
               </>
             ) : progressPct > 0 ? (
               <>
-                <span className="text-slate-600">•</span>
-                <span className="text-indigo-400 lowercase font-semibold">
+                <span>•</span>
+                <span className="text-indigo-500 lowercase font-semibold">
                   {progressPct}% watched
                 </span>
               </>
             ) : null}
           </div>
 
-          <h2 className="line-clamp-2 text-lg font-bold text-white sm:text-xl font-heading tracking-tight">
+          <h2 className="line-clamp-2 text-lg font-bold text-primary sm:text-xl font-heading tracking-tight">
             {formatLessonNumber(currentVideo.position)} — {currentVideo.title}
           </h2>
         </div>
@@ -106,10 +106,10 @@ export const FocusModeControls: React.FC<FocusModeControlsProps> = ({
             <button
               type="button"
               onClick={onOpenNotes}
-              className="inline-flex items-center gap-1.5 rounded-xl border border-white/[0.07] bg-[#0B101E] px-3 py-1.5 text-xs font-medium text-slate-200 transition-all hover:border-white/[0.15] hover:bg-[#0D1527] hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 shadow-xs"
+              className="inline-flex items-center gap-1.5 rounded-xl border border-app bg-surface px-3 py-1.5 text-xs font-medium text-secondary hover:text-primary transition-all hover:bg-surface-elevated hover:border-indigo-500/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 shadow-xs cursor-pointer"
               aria-label="View lesson notes"
             >
-              <FileText className="h-3.5 w-3.5 text-indigo-400" />
+              <FileText className="h-3.5 w-3.5 text-indigo-500" />
               <span>Notes</span>
             </button>
           )}
@@ -118,10 +118,10 @@ export const FocusModeControls: React.FC<FocusModeControlsProps> = ({
             <button
               type="button"
               onClick={onOpenDrawer}
-              className="inline-flex items-center gap-1.5 rounded-xl border border-white/[0.07] bg-[#0B101E] px-3 py-1.5 text-xs font-medium text-slate-200 transition-all hover:border-white/[0.15] hover:bg-[#0D1527] hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 shadow-xs"
+              className="inline-flex items-center gap-1.5 rounded-xl border border-app bg-surface px-3 py-1.5 text-xs font-medium text-secondary hover:text-primary transition-all hover:bg-surface-elevated hover:border-indigo-500/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 shadow-xs cursor-pointer"
               aria-label="View all lessons in syllabus"
             >
-              <ListVideo className="h-3.5 w-3.5 text-indigo-400" />
+              <ListVideo className="h-3.5 w-3.5 text-indigo-500" />
               <span>Syllabus</span>
             </button>
           )}
@@ -141,10 +141,10 @@ export const FocusModeControls: React.FC<FocusModeControlsProps> = ({
           type="button"
           onClick={onPrevious}
           disabled={!hasPrevious}
-          className={`inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-semibold transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 ${
+          className={`inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-semibold transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 cursor-pointer ${
             hasPrevious
-              ? 'border border-white/[0.08] bg-[#0D1527] text-slate-200 hover:border-white/[0.18] hover:bg-[#131D36] hover:text-white active:scale-95 shadow-sm'
-              : 'border border-white/[0.04] bg-slate-900/30 text-slate-600 opacity-40 cursor-not-allowed'
+              ? 'border border-app bg-surface text-primary hover:border-indigo-500/40 hover:bg-surface-elevated active:scale-95 shadow-xs'
+              : 'border border-app bg-surface/40 text-muted opacity-40 cursor-not-allowed'
           }`}
           aria-label="Previous playable lesson"
         >
@@ -152,7 +152,7 @@ export const FocusModeControls: React.FC<FocusModeControlsProps> = ({
           <span>Previous Lesson</span>
         </button>
 
-        <span className="text-xs font-medium text-slate-400 hidden sm:inline-block">
+        <span className="text-xs font-medium text-muted hidden sm:inline-block">
           Lesson {currentIndex + 1} of {totalVideos}
         </span>
 
@@ -160,10 +160,10 @@ export const FocusModeControls: React.FC<FocusModeControlsProps> = ({
           type="button"
           onClick={onNext}
           disabled={!hasNext}
-          className={`inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-xs font-semibold transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 ${
+          className={`inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-xs font-semibold transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 cursor-pointer ${
             hasNext
-              ? 'bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white shadow-lg shadow-indigo-600/25 active:scale-95'
-              : 'border border-white/[0.04] bg-slate-900/30 text-slate-600 opacity-40 cursor-not-allowed'
+              ? 'bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white shadow-md shadow-indigo-600/25 active:scale-95'
+              : 'border border-app bg-surface/40 text-muted opacity-40 cursor-not-allowed'
           }`}
           aria-label="Next playable lesson"
         >

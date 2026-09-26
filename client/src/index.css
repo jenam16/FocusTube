@@ -1,11 +1,58 @@
-@import "tailwindcss";
+﻿@import "tailwindcss";
+
+:root {
+  --bg-app: #070B14;
+  --bg-secondary: #0C1322;
+  --bg-surface: #10182C;
+  --bg-surface-elevated: #16223B;
+  --border-app: rgba(255, 255, 255, 0.07);
+  --border-subtle: rgba(255, 255, 255, 0.04);
+  --text-primary: #F8FAFC;
+  --text-secondary: #94A3B8;
+  --text-muted: #64748B;
+  --accent-primary: #6366F1;
+  --accent-secondary: #8B5CF6;
+  --accent-cyan: #06B6D4;
+}
+
+[data-theme='light'] {
+  --bg-app: #F6F7FB;
+  --bg-secondary: #F9FAFC;
+  --bg-surface: #FFFFFF;
+  --bg-surface-elevated: #F1F4F9;
+  --border-app: rgba(15, 23, 42, 0.08);
+  --border-subtle: rgba(15, 23, 42, 0.04);
+  --text-primary: #111827;
+  --text-secondary: #64748B;
+  --text-muted: #94A3B8;
+  --accent-primary: #6366F1;
+  --accent-secondary: #8B5CF6;
+  --accent-cyan: #06B6D4;
+}
+
+@theme {
+  --color-app-bg: var(--bg-app);
+  --color-app-secondary: var(--bg-secondary);
+  --color-app-surface: var(--bg-surface);
+  --color-app-elevated: var(--bg-surface-elevated);
+  --color-app-border: var(--border-app);
+  --color-app-border-subtle: var(--border-subtle);
+  --color-app-text: var(--text-primary);
+  --color-app-muted: var(--text-secondary);
+  --color-app-subtle: var(--text-muted);
+}
 
 @layer base {
+  * {
+    border-color: var(--border-app);
+  }
+
   body {
     font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    background-color: #060913;
-    color: #F8FAFC;
-    letter-spacing: -0.011em;
+    background-color: var(--bg-app);
+    color: var(--text-primary);
+    letter-spacing: -0.012em;
+    transition: background-color 0.25s ease, color 0.25s ease;
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -13,7 +60,7 @@
     letter-spacing: -0.025em;
   }
 
-  /* Custom subtle dark scrollbars */
+  /* Custom subtle scrollbars */
   ::-webkit-scrollbar {
     width: 6px;
     height: 6px;
@@ -24,20 +71,57 @@
   }
 
   ::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(150, 150, 150, 0.2);
     border-radius: 9999px;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(150, 150, 150, 0.35);
   }
+}
+
+/* Reusable theme surface utility helpers */
+.bg-app {
+  background-color: var(--bg-app);
+}
+
+.bg-secondary {
+  background-color: var(--bg-secondary);
+}
+
+.bg-surface {
+  background-color: var(--bg-surface);
+}
+
+.bg-surface-elevated {
+  background-color: var(--bg-surface-elevated);
+}
+
+.border-app {
+  border-color: var(--border-app);
+}
+
+.border-subtle {
+  border-color: var(--border-subtle);
+}
+
+.text-primary {
+  color: var(--text-primary);
+}
+
+.text-secondary {
+  color: var(--text-secondary);
+}
+
+.text-muted {
+  color: var(--text-muted);
 }
 
 /* Subtle ambient radial glow */
 .bg-ambient-glow {
-  background: radial-gradient(circle at 50% -20%, rgba(99, 102, 241, 0.12) 0%, rgba(6, 9, 19, 0) 70%);
+  background: radial-gradient(circle at 50% -20%, rgba(99, 102, 241, 0.1) 0%, rgba(0, 0, 0, 0) 70%);
 }
 
 .bg-ambient-card {
-  background: radial-gradient(ellipse at top left, rgba(99, 102, 241, 0.06) 0%, rgba(11, 16, 30, 0.95) 70%);
+  background: radial-gradient(ellipse at top left, rgba(99, 102, 241, 0.05) 0%, var(--bg-surface) 75%);
 }
