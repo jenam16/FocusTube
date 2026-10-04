@@ -44,34 +44,50 @@ export const DateNavigator: React.FC<DateNavigatorProps> = ({
     onDateChange(todayStr);
   };
 
-  const displayDateText = currentDate.toLocaleDateString(undefined, {
-    weekday: 'short',
-    month: 'short',
+  // e.g. "Sunday, October 4"
+  const formattedDay = currentDate.toLocaleDateString(undefined, {
+    weekday: 'long',
+    month: 'long',
     day: 'numeric',
-    year: currentDate.getUTCFullYear() !== new Date().getUTCFullYear() ? 'numeric' : undefined,
     timeZone: 'UTC',
   });
 
   return (
-    <div className="flex items-center justify-between gap-3 rounded-2xl border border-app bg-surface p-3 backdrop-blur-sm shadow-sm">
-      {/* Prev Day Button */}
-      <button
-        type="button"
-        onClick={handlePrevDay}
-        className="inline-flex items-center gap-1 rounded-xl border border-app bg-surface-elevated p-2 text-xs font-semibold text-secondary hover:border-indigo-500/30 hover:text-primary transition-all"
-        title="Previous Day"
-      >
-        <ChevronLeft className="h-4 w-4" />
-      </button>
-
-      {/* Center: Formatted Date + Today Badge + Date picker */}
+    <div className="flex items-center justify-between gap-3 py-1">
+      {/* Date display & Today badge */}
       <div className="flex items-center gap-2.5">
-        <div className="relative flex items-center">
-          <label className="flex items-center gap-2 cursor-pointer">
-            <CalendarIcon className="h-4 w-4 text-indigo-500" />
-            <span className="text-sm sm:text-base font-bold text-primary hover:text-indigo-500 transition-colors font-heading">
-              {displayDateText}
-            </span>
+        <h2 className="text-sm sm:text-base font-bold text-primary font-heading tracking-tight">
+          {formattedDay}
+        </h2>
+        {isToday ? (
+          <span className="rounded-md bg-indigo-500/10 border border-indigo-500/20 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-indigo-400">
+            Today
+          </span>
+        ) : (
+          <button
+            type="button"
+            onClick={handleTodayClick}
+            className="rounded-md bg-surface border border-app hover:border-indigo-500/30 px-2 py-0.5 text-[11px] font-semibold text-secondary hover:text-primary transition-colors cursor-pointer"
+          >
+            Back to Today
+          </button>
+        )}
+      </div>
+
+      {/* Subtle compact day navigation */}
+      <div className="flex items-center gap-1">
+        <button
+          type="button"
+          onClick={handlePrevDay}
+          title="Previous day"
+          className="rounded-lg p-1.5 text-muted hover:text-primary hover:bg-surface border border-transparent hover:border-app transition-all cursor-pointer"
+        >
+          <ChevronLeft className="h-4 w-4" />
+        </button>
+
+        <div className="relative inline-flex items-center">
+          <label className="rounded-lg p-1.5 text-muted hover:text-primary hover:bg-surface border border-transparent hover:border-app transition-all cursor-pointer">
+            <CalendarIcon className="h-4 w-4" />
             <input
               type="date"
               value={currentDateStr}
@@ -84,30 +100,15 @@ export const DateNavigator: React.FC<DateNavigatorProps> = ({
           </label>
         </div>
 
-        {isToday ? (
-          <span className="rounded-full bg-indigo-500/15 border border-indigo-500/30 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-indigo-500">
-            Today
-          </span>
-        ) : (
-          <button
-            type="button"
-            onClick={handleTodayClick}
-            className="rounded-full bg-surface-elevated border border-app hover:border-indigo-500/30 px-2.5 py-0.5 text-[11px] font-semibold text-secondary hover:text-primary transition-colors"
-          >
-            Jump to Today
-          </button>
-        )}
+        <button
+          type="button"
+          onClick={handleNextDay}
+          title="Next day"
+          className="rounded-lg p-1.5 text-muted hover:text-primary hover:bg-surface border border-transparent hover:border-app transition-all cursor-pointer"
+        >
+          <ChevronRight className="h-4 w-4" />
+        </button>
       </div>
-
-      {/* Next Day Button */}
-      <button
-        type="button"
-        onClick={handleNextDay}
-        className="inline-flex items-center gap-1 rounded-xl border border-app bg-surface-elevated p-2 text-xs font-semibold text-secondary hover:border-indigo-500/30 hover:text-primary transition-all"
-        title="Next Day"
-      >
-        <ChevronRight className="h-4 w-4" />
-      </button>
     </div>
   );
 };

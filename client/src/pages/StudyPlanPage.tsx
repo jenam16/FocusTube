@@ -2,14 +2,14 @@ import React, { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   CheckCircle2,
-  ChevronRight,
-  ArrowLeft,
-  CalendarDays,
-  History as HistoryIcon,
   ChevronDown,
   ChevronUp,
   AlertTriangle,
   Loader2,
+  BookOpen,
+  CalendarDays,
+  History as HistoryIcon,
+  Plus,
 } from 'lucide-react';
 import { taskService, courseService } from '../services';
 import {
@@ -27,7 +27,47 @@ import {
   RescheduleModal,
 } from '../components/studyPlan';
 import { ProgressBar } from '../components/ProgressBar';
-import { LoadingState, EmptyState, ErrorState } from '../components';
+import { LoadingState, ErrorState } from '../components';
+
+interface CompactEmptyStateProps {
+  title: string;
+  description: string;
+  actionLabel?: string;
+  onAction?: () => void;
+  icon?: React.ComponentType<{ className?: string }>;
+}
+
+const CompactEmptyState: React.FC<CompactEmptyStateProps> = ({
+  title,
+  description,
+  actionLabel,
+  onAction,
+  icon: Icon = BookOpen,
+}) => (
+  <div className="rounded-xl border border-app bg-surface p-6 sm:p-8 text-center space-y-3 max-w-md mx-auto my-3">
+    <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+      <Icon className="h-5 w-5" />
+    </div>
+    <div className="space-y-1">
+      <h4 className="text-sm font-bold text-primary font-heading">
+        {title}
+      </h4>
+      <p className="text-xs text-muted">
+        {description}
+      </p>
+    </div>
+    {actionLabel && onAction && (
+      <button
+        type="button"
+        onClick={onAction}
+        className="inline-flex items-center gap-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 px-3.5 py-1.5 text-xs font-semibold text-white shadow-xs transition-colors cursor-pointer"
+      >
+        <Plus className="h-3.5 w-3.5" />
+        <span>{actionLabel}</span>
+      </button>
+    )}
+  </div>
+);
 
 export const StudyPlanPage: React.FC = () => {
   const queryClient = useQueryClient();
@@ -44,16 +84,20 @@ export const StudyPlanPage: React.FC = () => {
     return `${y}-${m}-${d}`;
   }, []);
 
+  // Compute tomorrow's date in YYYY-MM-DD
+  const tomorrowDateStr = useMemo(() => {
+    const now = new Date();
+    now.setUTCDate(now.getUTCDate() + 1);
+    const y = now.getUTCFullYear();
+    const m = String(now.getUTCMonth() + 1).padStart(2, '0');
+    const d = String(now.getUTCDate()).padStart(2, '0');
+    return `${y}-${m}-${d}`;
+  }, []);
+
   // Today view: selected date (defaults to today, can navigate days)
   const [selectedDateStr, setSelectedDateStr] = useState<string>(todayDateStr);
 
-  // Drilldown date for Upcoming or History
-  const [drilldownDateStr, setDrilldownDateStr] = useState<string | null>(null);
-
-  // History pagination page
-  const [historyPage, setHistoryPage] = useState(1);
-
-  // Toggle for completed section in date view
+  // Toggle for completed section in today view
   const [showCompleted, setShowCompleted] = useState(false);
 
   // Modals state
@@ -76,11 +120,7 @@ export const StudyPlanPage: React.FC = () => {
   });
   const overdueTasks = overdueData?.tasks || [];
 
-  // 3. Determine active date for date-level tasks:
-  // In 'today' tab -> selectedDateStr
-  // In 'upcoming' or 'history' with drilldown -> drilldownDateStr
-  const activeViewDate = drilldownDateStr || selectedDateStr;
-
+  // 3. Query tasks for selected date (Today view)
   const {
     data: dateTasksData,
     isLoading: isLoadingDateTasks,
@@ -88,9 +128,9 @@ export const StudyPlanPage: React.FC = () => {
     refetch: refetchDateTasks,
     isRefetching: isRefetchingDateTasks,
   } = useQuery({
-    queryKey: ['tasks-by-date', activeViewDate],
-    queryFn: () => taskService.getTasks({ date: activeViewDate }),
-    enabled: Boolean(activeTab === 'today' || drilldownDateStr),
+    queryKey: ['tasks-by-date', selectedDateStr],
+    queryFn: () => taskService.getTasks({ date: selectedDateStr }),
+    enabled: activeTab === 'today',
   });
 
   const dateTasks = useMemo(() => dateTasksData?.tasks || [], [dateTasksData?.tasks]);
@@ -101,36 +141,94 @@ export const StudyPlanPage: React.FC = () => {
   const completionPercent =
     totalDateTasks > 0 ? Math.round((completedCount / totalDateTasks) * 100) : 0;
 
-  // 4. Upcoming summary query
+  // 4. Query upcoming tasks (from tomorrow onward)
   const {
-    data: upcomingData,
+    data: upcomingTasksData,
     isLoading: isLoadingUpcoming,
+    error: upcomingError,
+    refetch: refetchUpcoming,
+    isRefetching: isRefetchingUpcoming,
   } = useQuery({
-    queryKey: ['tasks-upcoming-summary'],
-    queryFn: () => taskService.getUpcomingSummary(),
-    enabled: activeTab === 'upcoming' && !drilldownDateStr,
+    queryKey: ['tasks-upcoming', tomorrowDateStr],
+    queryFn: () => taskService.getTasks({ from: tomorrowDateStr }),
+    enabled: activeTab === 'upcoming',
   });
-  const upcomingSummaries = upcomingData?.summaries || [];
 
-  // 5. History summary query
+  const upcomingTasks = useMemo(() => upcomingTasksData?.tasks || [], [upcomingTasksData?.tasks]);
+
+  // Group upcoming tasks chronologically by date
+  const upcomingGrouped = useMemo(() => {
+    const groups: { date: string; tasks: TaskItem[] }[] = [];
+    const dateMap = new Map<string, TaskItem[]>();
+
+    for (const t of upcomingTasks) {
+      const d = t.date ? t.date.slice(0, 10) : '';
+      if (!d) continue;
+      if (!dateMap.has(d)) {
+        dateMap.set(d, []);
+      }
+      dateMap.get(d)!.push(t);
+    }
+
+    const sortedDates = Array.from(dateMap.keys()).sort();
+    for (const d of sortedDates) {
+      groups.push({ date: d, tasks: dateMap.get(d)! });
+    }
+    return groups;
+  }, [upcomingTasks]);
+
+  // 5. Query history tasks (completed tasks)
   const {
-    data: historyData,
+    data: historyTasksData,
     isLoading: isLoadingHistory,
+    error: historyError,
+    refetch: refetchHistory,
+    isRefetching: isRefetchingHistory,
   } = useQuery({
-    queryKey: ['tasks-history-summary', historyPage],
-    queryFn: () => taskService.getHistorySummary(historyPage),
-    enabled: activeTab === 'history' && !drilldownDateStr,
+    queryKey: ['tasks-history-completed'],
+    queryFn: () => taskService.getTasks({ status: 'completed' }),
+    enabled: activeTab === 'history',
   });
-  const historySummaries = historyData?.summaries || [];
-  const historyTotalPages = historyData?.totalPages || 1;
 
-  // Mutations
+  const historyTasks = useMemo(() => {
+    const list = historyTasksData?.tasks || [];
+    // Sort reverse chronological
+    return [...list].sort((a, b) => {
+      const dateA = a.completedAt || a.date || a.updatedAt;
+      const dateB = b.completedAt || b.date || b.updatedAt;
+      return new Date(dateB).getTime() - new Date(dateA).getTime();
+    });
+  }, [historyTasksData?.tasks]);
+
+  // Group history tasks by date
+  const historyGrouped = useMemo(() => {
+    const groups: { date: string; tasks: TaskItem[] }[] = [];
+    const dateMap = new Map<string, TaskItem[]>();
+
+    for (const t of historyTasks) {
+      const d = t.date ? t.date.slice(0, 10) : '';
+      if (!d) continue;
+      if (!dateMap.has(d)) {
+        dateMap.set(d, []);
+      }
+      dateMap.get(d)!.push(t);
+    }
+
+    // Sort dates descending
+    const sortedDates = Array.from(dateMap.keys()).sort((a, b) => (a < b ? 1 : -1));
+    for (const d of sortedDates) {
+      groups.push({ date: d, tasks: dateMap.get(d)! });
+    }
+    return groups;
+  }, [historyTasks]);
+
+  // Invalidate queries helper
   const invalidateAllTaskQueries = () => {
     queryClient.invalidateQueries({ queryKey: ['tasks'] });
     queryClient.invalidateQueries({ queryKey: ['tasks-by-date'] });
+    queryClient.invalidateQueries({ queryKey: ['tasks-upcoming'] });
+    queryClient.invalidateQueries({ queryKey: ['tasks-history-completed'] });
     queryClient.invalidateQueries({ queryKey: ['tasks-overdue'] });
-    queryClient.invalidateQueries({ queryKey: ['tasks-upcoming-summary'] });
-    queryClient.invalidateQueries({ queryKey: ['tasks-history-summary'] });
     queryClient.invalidateQueries({ queryKey: ['analytics'] });
   };
 
@@ -169,7 +267,6 @@ export const StudyPlanPage: React.FC = () => {
   // Handlers
   const handleTabChange = (tab: StudyPlanTab) => {
     setActiveTab(tab);
-    setDrilldownDateStr(null);
   };
 
   const handleOpenCreateModal = () => {
@@ -197,23 +294,53 @@ export const StudyPlanPage: React.FC = () => {
     setRescheduleTargetTask(task);
   };
 
-  const formatDateDisplay = (dateStr: string) => {
-    try {
-      const d = new Date(`${dateStr}T00:00:00Z`);
-      return d.toLocaleDateString(undefined, {
-        weekday: 'short',
+  const formatUpcomingDateHeader = (dateStr: string) => {
+    if (dateStr === tomorrowDateStr) {
+      return {
+        title: 'Tomorrow',
+        subtitle: new Date(`${dateStr}T00:00:00Z`).toLocaleDateString(undefined, {
+          weekday: 'short',
+          month: 'short',
+          day: 'numeric',
+          timeZone: 'UTC',
+        }),
+      };
+    }
+    const d = new Date(`${dateStr}T00:00:00Z`);
+    return {
+      title: d.toLocaleDateString(undefined, {
+        weekday: 'long',
         month: 'short',
         day: 'numeric',
         timeZone: 'UTC',
-      });
-    } catch {
-      return dateStr;
+      }),
+      subtitle: '',
+    };
+  };
+
+  const formatHistoryDateHeader = (dateStr: string) => {
+    if (dateStr === todayDateStr) {
+      return 'Today';
     }
+    const yesterday = new Date();
+    yesterday.setUTCDate(yesterday.getUTCDate() - 1);
+    const yStr = `${yesterday.getUTCFullYear()}-${String(yesterday.getUTCMonth() + 1).padStart(2, '0')}-${String(yesterday.getUTCDate()).padStart(2, '0')}`;
+    if (dateStr === yStr) {
+      return 'Yesterday';
+    }
+    const d = new Date(`${dateStr}T00:00:00Z`);
+    return d.toLocaleDateString(undefined, {
+      weekday: 'short',
+      month: 'short',
+      day: 'numeric',
+      year: d.getUTCFullYear() !== new Date().getUTCFullYear() ? 'numeric' : undefined,
+      timeZone: 'UTC',
+    });
   };
 
   return (
-    <div className="space-y-6">
-      {/* Page Header */}
+    <div className="max-w-4xl mx-auto space-y-5">
+      {/* Page Header with Segmented View Switcher & Primary CTA */}
       <StudyPlanHeader
         activeTab={activeTab}
         onTabChange={handleTabChange}
@@ -222,26 +349,12 @@ export const StudyPlanPage: React.FC = () => {
       />
 
       {/* ─────────────────────────────────────────────────────────────
-          1. TODAY VIEW (Or Drilldown view for Upcoming / History)
+          1. TODAY VIEW
       ───────────────────────────────────────────────────────────── */}
-      {(activeTab === 'today' || drilldownDateStr) && (
-        <div className="space-y-5">
-          {/* If drilldown into upcoming or history date: Back Button */}
-          {drilldownDateStr && (
-            <div className="flex items-center justify-between">
-              <button
-                type="button"
-                onClick={() => setDrilldownDateStr(null)}
-                className="inline-flex items-center gap-1.5 rounded-xl border border-white/[0.08] bg-[#0D1527] px-3.5 py-1.5 text-xs font-semibold text-slate-300 hover:border-white/[0.18] hover:bg-[#131D36] hover:text-white transition-all"
-              >
-                <ArrowLeft className="h-4 w-4" />
-                <span>Back to {activeTab === 'upcoming' ? 'Upcoming' : 'History'}</span>
-              </button>
-            </div>
-          )}
-
-          {/* Overdue Banner (Shown on Today view) */}
-          {activeTab === 'today' && !drilldownDateStr && (
+      {activeTab === 'today' && (
+        <div className="space-y-4">
+          {/* Overdue Banner (shown only on today view if overdue tasks exist) */}
+          {selectedDateStr === todayDateStr && (
             <OverdueBanner
               tasks={overdueTasks}
               onCompleteTask={handleToggleComplete}
@@ -249,29 +362,24 @@ export const StudyPlanPage: React.FC = () => {
             />
           )}
 
-          {/* Date Navigator */}
+          {/* Compact Date Navigator: "Sunday, October 4  [TODAY]" */}
           <DateNavigator
-            currentDateStr={activeViewDate}
-            onDateChange={(newDate) => {
-              if (drilldownDateStr) {
-                setDrilldownDateStr(newDate);
-              } else {
-                setSelectedDateStr(newDate);
-              }
-            }}
+            currentDateStr={selectedDateStr}
+            onDateChange={setSelectedDateStr}
           />
 
-          {/* Date Progress Bar Card */}
-          <div className="rounded-2xl border border-app bg-surface p-4 space-y-2 shadow-sm">
-            <div className="flex items-center justify-between text-xs font-semibold">
-              <span className="text-primary">
-                Daily Goal Progress
-              </span>
-              <span className="text-secondary">
-                {completedCount} of {totalDateTasks} completed ({completionPercent}%)
+          {/* Compact Daily Progress */}
+          <div className="rounded-xl border border-app bg-surface px-4 py-3 space-y-2">
+            <div className="flex items-center justify-between text-xs">
+              <span className="font-medium text-secondary">Today's progress</span>
+              <span className="font-semibold text-primary">
+                {completedCount} / {totalDateTasks} completed
+                {totalDateTasks > 0 && (
+                  <span className="ml-2 font-normal text-muted">({completionPercent}%)</span>
+                )}
               </span>
             </div>
-            <ProgressBar progress={completionPercent} size="md" />
+            <ProgressBar progress={completionPercent} size="sm" />
           </div>
 
           {/* Loading Date Tasks */}
@@ -289,23 +397,22 @@ export const StudyPlanPage: React.FC = () => {
 
           {/* Empty Date Tasks */}
           {!isLoadingDateTasks && !dateTasksError && totalDateTasks === 0 && (
-            <div className="rounded-2xl border border-app bg-surface p-8 shadow-sm">
-              <EmptyState
-                title="No tasks scheduled for this day"
-                description="Plan your learning goals or add video lessons to stay on track."
-                actionLabel="Add Study Task"
-                onAction={handleOpenCreateModal}
-              />
-            </div>
+            <CompactEmptyState
+              title="No learning tasks for today"
+              description="Plan a small learning goal and keep your progress moving."
+              actionLabel="Add Task"
+              onAction={handleOpenCreateModal}
+              icon={BookOpen}
+            />
           )}
 
-          {/* Active Tasks List */}
+          {/* Task List (Main Visual Focus) */}
           {!isLoadingDateTasks && !dateTasksError && totalDateTasks > 0 && (
             <div className="space-y-4">
-              {/* Incomplete Tasks */}
+              {/* Incomplete / To-Do Tasks */}
               {activeTasks.length > 0 ? (
-                <div className="space-y-2.5">
-                  <h3 className="text-xs font-bold uppercase tracking-wider text-secondary px-1">
+                <div className="space-y-2">
+                  <h3 className="text-xs font-semibold text-secondary uppercase tracking-wider px-1">
                     To-Do ({activeTasks.length})
                   </h3>
                   {activeTasks.map((task) => (
@@ -320,18 +427,18 @@ export const StudyPlanPage: React.FC = () => {
                   ))}
                 </div>
               ) : (
-                <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/10 p-4 text-center text-xs font-semibold text-emerald-500">
-                  🎉 All tasks for this date are completed! Excellent focus.
+                <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/10 p-3.5 text-center text-xs font-medium text-emerald-500">
+                  🎉 All learning goals for today are completed! Great consistency.
                 </div>
               )}
 
               {/* Completed Tasks (Collapsible Section) */}
               {completedTasks.length > 0 && (
-                <div className="pt-3 border-t border-subtle space-y-3">
+                <div className="pt-2 border-t border-subtle space-y-2">
                   <button
                     type="button"
                     onClick={() => setShowCompleted((prev) => !prev)}
-                    className="flex items-center justify-between w-full rounded-2xl bg-surface border border-app px-4 py-3 text-xs font-semibold text-secondary hover:bg-surface-elevated hover:text-primary transition-all shadow-xs"
+                    className="flex items-center justify-between w-full rounded-xl bg-surface border border-app px-3.5 py-2 text-xs font-medium text-secondary hover:text-primary transition-colors cursor-pointer"
                   >
                     <div className="flex items-center gap-2">
                       <CheckCircle2 className="h-4 w-4 text-emerald-500" />
@@ -340,15 +447,15 @@ export const StudyPlanPage: React.FC = () => {
                     <div className="flex items-center gap-1 text-muted">
                       <span>{showCompleted ? 'Hide' : 'Show'}</span>
                       {showCompleted ? (
-                        <ChevronUp className="h-4 w-4" />
+                        <ChevronUp className="h-3.5 w-3.5" />
                       ) : (
-                        <ChevronDown className="h-4 w-4" />
+                        <ChevronDown className="h-3.5 w-3.5" />
                       )}
                     </div>
                   </button>
 
                   {showCompleted && (
-                    <div className="space-y-2.5 pl-2">
+                    <div className="space-y-2 pl-1 sm:pl-2">
                       {completedTasks.map((task) => (
                         <StudyTaskCard
                           key={task._id}
@@ -369,167 +476,130 @@ export const StudyPlanPage: React.FC = () => {
       )}
 
       {/* ─────────────────────────────────────────────────────────────
-          2. UPCOMING VIEW (Compact Date Summaries)
+          2. UPCOMING VIEW (Chronological Learning Schedule)
       ───────────────────────────────────────────────────────────── */}
-      {activeTab === 'upcoming' && !drilldownDateStr && (
+      {activeTab === 'upcoming' && (
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-base font-bold text-primary font-heading">Upcoming Learning Schedule</h2>
-              <p className="text-xs text-secondary">
-                Tasks planned for tomorrow and the next 30 days.
-              </p>
-            </div>
+            <h2 className="text-xs font-semibold uppercase tracking-wider text-secondary">
+              Upcoming Schedule
+            </h2>
           </div>
 
           {isLoadingUpcoming && <LoadingState count={3} />}
 
-          {!isLoadingUpcoming && upcomingSummaries.length === 0 && (
-            <div className="rounded-2xl border border-app bg-surface p-8 shadow-sm">
-              <EmptyState
-                title="Nothing planned ahead yet"
-                description="Schedule learning tasks for tomorrow or upcoming days to build a consistent streak."
-                actionLabel="Schedule Upcoming Task"
-                onAction={handleOpenCreateModal}
-              />
-            </div>
+          {!isLoadingUpcoming && upcomingError && (
+            <ErrorState
+              title="Unable to load upcoming tasks"
+              message="Could not retrieve upcoming learning tasks. Please check your connection."
+              onRetry={() => refetchUpcoming()}
+              isRetrying={isRefetchingUpcoming}
+            />
           )}
 
-          {!isLoadingUpcoming && upcomingSummaries.length > 0 && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {upcomingSummaries.map((summary) => (
-                <div
-                  key={summary.date}
-                  role="button"
-                  tabIndex={0}
-                  onClick={() => setDrilldownDateStr(summary.date)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      e.preventDefault();
-                      setDrilldownDateStr(summary.date);
-                    }
-                  }}
-                  className="group rounded-2xl border border-app bg-surface p-4 hover:border-indigo-500/40 hover:bg-surface-elevated cursor-pointer transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg space-y-3"
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <CalendarDays className="h-4 w-4 text-indigo-500" />
-                      <span className="text-sm font-bold text-primary group-hover:text-indigo-500 font-heading">
-                        {formatDateDisplay(summary.date)}
-                      </span>
-                    </div>
-                    <ChevronRight className="h-4 w-4 text-muted group-hover:text-secondary transition-colors" />
-                  </div>
+          {!isLoadingUpcoming && !upcomingError && upcomingGrouped.length === 0 && (
+            <CompactEmptyState
+              title="Nothing planned ahead yet"
+              description="Schedule learning tasks for tomorrow or upcoming days to build a consistent streak."
+              actionLabel="Schedule Task"
+              onAction={handleOpenCreateModal}
+              icon={CalendarDays}
+            />
+          )}
 
-                  <div className="space-y-1.5">
-                    <div className="flex items-center justify-between text-xs text-secondary">
-                      <span>
-                        {summary.completedTasks} / {summary.totalTasks} completed
-                      </span>
-                      <span className="font-semibold text-primary">
-                        {summary.completionPercentage}%
-                      </span>
+          {!isLoadingUpcoming && !upcomingError && upcomingGrouped.length > 0 && (
+            <div className="space-y-5">
+              {upcomingGrouped.map((group) => {
+                const header = formatUpcomingDateHeader(group.date);
+                return (
+                  <div key={group.date} className="space-y-2">
+                    <div className="flex items-baseline gap-2 px-1">
+                      <h3 className="text-sm font-bold text-primary font-heading">
+                        {header.title}
+                      </h3>
+                      {header.subtitle && (
+                        <span className="text-xs text-muted">
+                          {header.subtitle}
+                        </span>
+                      )}
                     </div>
-                    <ProgressBar progress={summary.completionPercentage} size="sm" />
+                    <div className="space-y-2">
+                      {group.tasks.map((task) => (
+                        <StudyTaskCard
+                          key={task._id}
+                          task={task}
+                          onToggleComplete={handleToggleComplete}
+                          onEdit={handleOpenEditModal}
+                          onDelete={handlePromptDelete}
+                          onReschedule={handlePromptReschedule}
+                        />
+                      ))}
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>
       )}
 
       {/* ─────────────────────────────────────────────────────────────
-          3. HISTORY VIEW (Compact Historical Summaries)
+          3. HISTORY VIEW (Clean Completed Learning List)
       ───────────────────────────────────────────────────────────── */}
-      {activeTab === 'history' && !drilldownDateStr && (
+      {activeTab === 'history' && (
         <div className="space-y-4">
-          <div>
-            <h2 className="text-base font-bold text-primary font-heading">Study History</h2>
-            <p className="text-xs text-secondary">
-              Review your completed learning goals and tasks from past days.
-            </p>
+          <div className="flex items-center justify-between">
+            <h2 className="text-xs font-semibold uppercase tracking-wider text-secondary">
+              Completed Learning History
+            </h2>
+            {historyTasks.length > 0 && (
+              <span className="text-xs text-muted">
+                {historyTasks.length} task{historyTasks.length > 1 ? 's' : ''} completed
+              </span>
+            )}
           </div>
 
           {isLoadingHistory && <LoadingState count={3} />}
 
-          {!isLoadingHistory && historySummaries.length === 0 && (
-            <div className="rounded-2xl border border-app bg-surface p-8 shadow-sm">
-              <EmptyState
-                title="No history recorded yet"
-                description="Past days will appear here as you schedule and accomplish daily study goals."
-              />
-            </div>
+          {!isLoadingHistory && historyError && (
+            <ErrorState
+              title="Unable to load history"
+              message="Could not retrieve completed tasks history. Please check your connection."
+              onRetry={() => refetchHistory()}
+              isRetrying={isRefetchingHistory}
+            />
           )}
 
-          {!isLoadingHistory && historySummaries.length > 0 && (
-            <div className="space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {historySummaries.map((summary) => (
-                  <div
-                    key={summary.date}
-                    role="button"
-                    tabIndex={0}
-                    onClick={() => setDrilldownDateStr(summary.date)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault();
-                        setDrilldownDateStr(summary.date);
-                      }
-                    }}
-                    className="group rounded-2xl border border-app bg-surface p-4 hover:border-indigo-500/40 hover:bg-surface-elevated cursor-pointer transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg space-y-3"
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <HistoryIcon className="h-4 w-4 text-muted group-hover:text-indigo-500 transition-colors" />
-                        <span className="text-sm font-bold text-primary group-hover:text-indigo-500 font-heading">
-                          {formatDateDisplay(summary.date)}
-                        </span>
-                      </div>
-                      <ChevronRight className="h-4 w-4 text-muted group-hover:text-secondary transition-colors" />
-                    </div>
+          {!isLoadingHistory && !historyError && historyGrouped.length === 0 && (
+            <CompactEmptyState
+              title="No completed tasks yet"
+              description="Complete planned learning tasks and your accomplishments will appear here."
+              icon={HistoryIcon}
+            />
+          )}
 
-                    <div className="space-y-1.5">
-                      <div className="flex items-center justify-between text-xs text-secondary">
-                        <span>
-                          {summary.completedTasks} / {summary.totalTasks} completed
-                        </span>
-                        <span className="font-semibold text-primary">
-                          {summary.completionPercentage}%
-                        </span>
-                      </div>
-                      <ProgressBar progress={summary.completionPercentage} size="sm" />
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {/* History Pagination */}
-              {historyTotalPages > 1 && (
-                <div className="flex items-center justify-between rounded-2xl border border-app bg-surface p-3 text-xs text-secondary shadow-sm">
-                  <span>
-                    Page {historyPage} of {historyTotalPages}
-                  </span>
-                  <div className="flex items-center gap-2">
-                    <button
-                      type="button"
-                      disabled={historyPage <= 1}
-                      onClick={() => setHistoryPage((p) => Math.max(1, p - 1))}
-                      className="rounded-xl border border-app bg-surface-elevated px-3.5 py-1.5 hover:border-indigo-500/30 hover:text-primary disabled:opacity-40 transition-all text-secondary"
-                    >
-                      Prev
-                    </button>
-                    <button
-                      type="button"
-                      disabled={historyPage >= historyTotalPages}
-                      onClick={() => setHistoryPage((p) => Math.min(historyTotalPages, p + 1))}
-                      className="rounded-xl border border-app bg-surface-elevated px-3.5 py-1.5 hover:border-indigo-500/30 hover:text-primary disabled:opacity-40 transition-all text-secondary"
-                    >
-                      Next
-                    </button>
+          {!isLoadingHistory && !historyError && historyGrouped.length > 0 && (
+            <div className="space-y-5">
+              {historyGrouped.map((group) => (
+                <div key={group.date} className="space-y-2">
+                  <h3 className="text-xs font-semibold uppercase tracking-wider text-secondary px-1">
+                    {formatHistoryDateHeader(group.date)}
+                  </h3>
+                  <div className="space-y-2">
+                    {group.tasks.map((task) => (
+                      <StudyTaskCard
+                        key={task._id}
+                        task={task}
+                        onToggleComplete={handleToggleComplete}
+                        onEdit={handleOpenEditModal}
+                        onDelete={handlePromptDelete}
+                        onReschedule={handlePromptReschedule}
+                        showDateBadge={false}
+                      />
+                    ))}
                   </div>
                 </div>
-              )}
+              ))}
             </div>
           )}
         </div>
@@ -544,7 +614,7 @@ export const StudyPlanPage: React.FC = () => {
         onClose={() => setIsTaskModalOpen(false)}
         taskToEdit={taskToEdit}
         courses={courses}
-        defaultDateStr={activeViewDate}
+        defaultDateStr={selectedDateStr}
         onSubmitCreate={async (payload) => {
           await createMutation.mutateAsync(payload);
         }}
@@ -572,7 +642,7 @@ export const StudyPlanPage: React.FC = () => {
             role="dialog"
             aria-modal="true"
             aria-labelledby="delete-task-title"
-            className="w-full max-w-sm rounded-3xl border border-app bg-surface p-6 shadow-2xl space-y-4"
+            className="w-full max-w-sm rounded-2xl border border-app bg-surface p-6 shadow-2xl space-y-4"
           >
             <div className="flex items-center gap-3">
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-rose-500/10 text-rose-500 border border-rose-500/20">
@@ -588,7 +658,7 @@ export const StudyPlanPage: React.FC = () => {
               </div>
             </div>
 
-            <p className="text-xs text-primary line-clamp-3 bg-secondary p-3.5 rounded-2xl border border-app">
+            <p className="text-xs text-primary line-clamp-3 bg-secondary p-3 rounded-xl border border-app">
               "{taskToDelete.title}"
             </p>
 
@@ -597,7 +667,7 @@ export const StudyPlanPage: React.FC = () => {
                 type="button"
                 disabled={deleteMutation.isPending}
                 onClick={() => setTaskToDelete(null)}
-                className="rounded-xl border border-app bg-surface-elevated px-3.5 py-2 text-xs font-semibold text-secondary hover:border-indigo-500/30 hover:text-primary transition-colors"
+                className="rounded-xl border border-app bg-surface-elevated px-3.5 py-2 text-xs font-semibold text-secondary hover:text-primary transition-colors cursor-pointer"
               >
                 Cancel
               </button>
@@ -605,7 +675,7 @@ export const StudyPlanPage: React.FC = () => {
                 type="button"
                 disabled={deleteMutation.isPending}
                 onClick={() => deleteMutation.mutate(taskToDelete._id)}
-                className="inline-flex items-center gap-1.5 rounded-xl bg-rose-600 px-4 py-2 text-xs font-semibold text-white shadow-md shadow-rose-600/20 hover:bg-rose-500 disabled:opacity-50 transition-colors"
+                className="inline-flex items-center gap-1.5 rounded-xl bg-rose-600 px-4 py-2 text-xs font-semibold text-white shadow-xs hover:bg-rose-500 disabled:opacity-50 transition-colors cursor-pointer"
               >
                 {deleteMutation.isPending && (
                   <Loader2 className="h-3.5 w-3.5 animate-spin" />
