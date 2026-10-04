@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import { Play } from 'lucide-react';
 import { useAuth } from '../../hooks';
@@ -47,13 +47,6 @@ export const LandingFooter: React.FC = () => {
               className="hover:text-primary transition-colors cursor-pointer"
             >
               Features
-            </button>
-            <button
-              type="button"
-              onClick={() => scrollToSection('focus-mode')}
-              className="hover:text-primary transition-colors cursor-pointer"
-            >
-              Focus Mode
             </button>
             <button
               type="button"

@@ -143,5 +143,5 @@ When mastering this topic:
 
 To enable personalized generative AI answers to any question, please set your \`GEMINI_API_KEY\` in \`server/.env\`.
 
-In the meantime, keep up the momentum! You can use Focus Mode (press F on player) to remove all distractions and stay in the flow.`;
+In the meantime, keep up the momentum and stay in the flow!`;
 }

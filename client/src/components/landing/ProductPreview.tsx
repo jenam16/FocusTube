@@ -1,10 +1,9 @@
-﻿import React from 'react';
+import React from 'react';
 import {
   Play,
   CheckCircle2,
   Bookmark,
   Camera,
-  Focus,
   ChevronRight,
   ListVideo,
   Clock,
@@ -53,10 +52,6 @@ export const ProductPreview: React.FC = () => {
                   <div className="inline-flex items-center gap-1 rounded-lg border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-[11px] font-semibold text-amber-500">
                     <Bookmark className="h-3 w-3 fill-current" />
                     <span>Bookmarked</span>
-                  </div>
-                  <div className="inline-flex items-center gap-1 rounded-lg border border-indigo-500/30 bg-indigo-500/10 px-2 py-0.5 text-[11px] font-semibold text-indigo-500">
-                    <Focus className="h-3 w-3" />
-                    <span>Focus Mode</span>
                   </div>
                 </div>
               </div>

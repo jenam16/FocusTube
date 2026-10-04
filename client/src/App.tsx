@@ -15,7 +15,6 @@ import {
   CourseDetailPage,
   WatchPage,
   StudyPlanPage,
-  FocusPage,
   AnalyticsPage,
   BookmarksPage,
   NotesPage,
@@ -67,7 +66,6 @@ export default function App() {
                     element={<WatchPage />}
                   />
                   <Route path="/study-plan" element={<StudyPlanPage />} />
-                  <Route path="/focus" element={<FocusPage />} />
                   <Route path="/analytics" element={<AnalyticsPage />} />
                   <Route path="/bookmarks" element={<BookmarksPage />} />
                   <Route path="/notes" element={<NotesPage />} />

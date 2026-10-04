@@ -4,7 +4,6 @@ import {
   CheckSquare,
   Square,
   Play,
-  Timer,
   Edit2,
   Trash2,
   Calendar,
@@ -37,14 +36,6 @@ export const StudyTaskCard: React.FC<StudyTaskCardProps> = ({
       navigate(`/watch/${courseObj._id}/${videoObj._id}`);
     } else if (courseObj) {
       navigate(`/courses/${courseObj._id}`);
-    }
-  };
-
-  const handleStartFocus = () => {
-    if (courseObj && videoObj) {
-      navigate(`/watch/${courseObj._id}/${videoObj._id}?focus=1`);
-    } else {
-      navigate('/focus');
     }
   };
 
@@ -136,16 +127,6 @@ export const StudyTaskCard: React.FC<StudyTaskCardProps> = ({
             >
               <Play className="h-3 w-3 fill-current" />
               <span>Start Learning</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={handleStartFocus}
-              className="inline-flex items-center gap-1 rounded-xl border border-indigo-500/30 bg-indigo-500/10 px-2.5 py-1.5 text-xs font-semibold text-indigo-500 hover:bg-indigo-500/20 hover:text-indigo-600 dark:text-indigo-300 dark:hover:text-white transition-all"
-              title="Launch Focus Mode"
-            >
-              <Timer className="h-3 w-3" />
-              <span className="hidden sm:inline">Focus</span>
             </button>
           </>
         )}

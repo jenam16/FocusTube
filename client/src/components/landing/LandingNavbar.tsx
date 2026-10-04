@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Play, Menu, X, ArrowRight, Sun, Moon } from 'lucide-react';
 import { useAuth, useTheme } from '../../hooks';
@@ -44,13 +44,6 @@ export const LandingNavbar: React.FC = () => {
             className="hover:text-primary transition-colors cursor-pointer"
           >
             Features
-          </button>
-          <button
-            type="button"
-            onClick={() => scrollToSection('focus-mode')}
-            className="hover:text-primary transition-colors cursor-pointer"
-          >
-            Focus Mode
           </button>
           <button
             type="button"
@@ -146,13 +139,6 @@ export const LandingNavbar: React.FC = () => {
               className="text-left py-1.5 hover:text-primary transition-colors cursor-pointer"
             >
               Features
-            </button>
-            <button
-              type="button"
-              onClick={() => scrollToSection('focus-mode')}
-              className="text-left py-1.5 hover:text-primary transition-colors cursor-pointer"
-            >
-              Focus Mode
             </button>
             <button
               type="button"

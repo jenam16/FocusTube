@@ -16,7 +16,6 @@ export const SettingsPage: React.FC = () => {
 
   // Mock toggle states for client preferences
   const [autoplayNext, setAutoplayNext] = useState(true);
-  const [showNotesDrawer, setShowNotesDrawer] = useState(true);
   const [savePlaybackPosition, setSavePlaybackPosition] = useState(true);
   const [savedSuccess, setSavedSuccess] = useState(false);
 
@@ -181,23 +180,6 @@ export const SettingsPage: React.FC = () => {
               type="checkbox"
               checked={savePlaybackPosition}
               onChange={(e) => setSavePlaybackPosition(e.target.checked)}
-              className="h-4 w-4 rounded border-app bg-surface text-indigo-600 focus:ring-indigo-500 cursor-pointer"
-            />
-          </label>
-
-          <label className="flex items-center justify-between p-3.5 rounded-xl bg-secondary border border-app cursor-pointer hover:border-indigo-500/30 transition-colors">
-            <div className="space-y-0.5">
-              <span className="text-xs sm:text-sm font-semibold text-primary block">
-                Focus Mode Notes Drawer
-              </span>
-              <span className="text-xs text-secondary block">
-                Keep quick slide-out drawer available during full distraction-free viewing.
-              </span>
-            </div>
-            <input
-              type="checkbox"
-              checked={showNotesDrawer}
-              onChange={(e) => setShowNotesDrawer(e.target.checked)}
               className="h-4 w-4 rounded border-app bg-surface text-indigo-600 focus:ring-indigo-500 cursor-pointer"
             />
           </label>

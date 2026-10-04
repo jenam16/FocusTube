@@ -1,10 +1,9 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { NavLink, Outlet, useNavigate, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard,
   BookOpen,
   Calendar,
-  Timer,
   BarChart3,
   Bookmark,
   FileText,
@@ -17,6 +16,7 @@ import {
   User as UserIcon,
   Sun,
   Moon,
+  ChevronDown,
 } from 'lucide-react';
 import { useAuth, useTheme } from '../hooks';
 import { FocusAIPopover } from '../components';
@@ -32,7 +32,6 @@ const mainNavItems: NavItem[] = [
   { label: 'My Courses', path: '/courses', icon: BookOpen },
   { label: 'Study Material', path: '/study-materials', icon: FolderOpen },
   { label: 'Study Plan', path: '/study-plan', icon: Calendar },
-  { label: 'Focus Mode', path: '/focus', icon: Timer },
   { label: 'Analytics', path: '/analytics', icon: BarChart3 },
   { label: 'Bookmarks', path: '/bookmarks', icon: Bookmark },
   { label: 'Notes', path: '/notes', icon: FileText },
@@ -45,6 +44,47 @@ export const AppLayout: React.FC = () => {
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
+  const profileDropdownRef = useRef<HTMLDivElement | null>(null);
+
+  const getInitials = (name?: string) => {
+    if (!name) return 'U';
+    const parts = name.trim().split(/\s+/).filter(Boolean);
+    if (parts.length === 0) return 'U';
+    if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        profileDropdownRef.current &&
+        !profileDropdownRef.current.contains(event.target as Node)
+      ) {
+        setProfileDropdownOpen(false);
+      }
+    };
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setProfileDropdownOpen(false);
+      }
+    };
+
+    if (profileDropdownOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener('keydown', handleKeyDown);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [profileDropdownOpen]);
+
+  useEffect(() => {
+    setProfileDropdownOpen(false);
+  }, [location.pathname]);
 
   const handleLogout = async () => {
     try {
@@ -64,7 +104,6 @@ export const AppLayout: React.FC = () => {
     if (p.startsWith('/dashboard')) return 'Dashboard';
     if (p.startsWith('/courses')) return 'My Courses';
     if (p.startsWith('/study-plan')) return 'Study Plan';
-    if (p.startsWith('/focus')) return 'Focus Mode';
     if (p.startsWith('/analytics')) return 'Analytics';
     if (p.startsWith('/bookmarks')) return 'Bookmarks';
     if (p.startsWith('/notes')) return 'Notes & Moments';
@@ -207,13 +246,6 @@ export const AppLayout: React.FC = () => {
             <div className="flex items-center gap-2 text-xs sm:text-sm font-semibold text-primary font-heading">
               <span>{getCurrentPageLabel()}</span>
             </div>
-
-            <div className="hidden md:flex items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-3 py-1">
-              <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              <p className="text-[11px] font-semibold text-emerald-600 dark:text-emerald-300">
-                Distraction-Free Focus
-              </p>
-            </div>
           </div>
 
           <div className="flex items-center gap-3">
@@ -232,20 +264,87 @@ export const AppLayout: React.FC = () => {
               )}
             </button>
 
-            <div className="text-right hidden sm:block">
-              <p className="text-xs font-semibold text-primary font-heading">{user?.name}</p>
-              <p className="text-[11px] text-muted">{user?.email}</p>
-            </div>
+            {/* User Profile Dropdown */}
+            <div className="relative" ref={profileDropdownRef}>
+              <button
+                type="button"
+                onClick={() => setProfileDropdownOpen((prev) => !prev)}
+                aria-haspopup="true"
+                aria-expanded={profileDropdownOpen}
+                id="user-profile-menu-button"
+                className="flex items-center gap-2 rounded-xl border border-app bg-surface px-2.5 py-1.5 text-left transition-all hover:border-indigo-500/30 cursor-pointer select-none"
+              >
+                <span className="hidden sm:inline max-w-[120px] md:max-w-[160px] truncate text-xs font-semibold text-primary font-heading">
+                  {user?.name || 'User'}
+                </span>
+                <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-indigo-500/10 text-xs font-bold text-indigo-400 border border-indigo-500/20 font-heading">
+                  {getInitials(user?.name)}
+                </div>
+                <ChevronDown
+                  className={`h-3.5 w-3.5 text-muted transition-transform duration-200 ${
+                    profileDropdownOpen ? 'rotate-180 text-primary' : ''
+                  }`}
+                />
+              </button>
 
-            <button
-              type="button"
-              onClick={handleLogout}
-              disabled={isLoggingOut}
-              className="flex items-center gap-1.5 rounded-xl border border-app bg-surface px-3 py-1.5 text-xs font-medium text-secondary hover:text-primary hover:border-indigo-500/30 transition-all cursor-pointer"
-            >
-              <LogOut className="h-3.5 w-3.5" />
-              <span className="hidden sm:inline">Sign Out</span>
-            </button>
+              {/* Dropdown Menu */}
+              {profileDropdownOpen && (
+                <div
+                  role="menu"
+                  aria-orientation="vertical"
+                  aria-labelledby="user-profile-menu-button"
+                  className="absolute right-0 mt-2 w-60 sm:w-64 rounded-xl border border-app bg-surface p-2 shadow-xl shadow-black/20 z-50 animate-in fade-in zoom-in-95 duration-100"
+                >
+                  {/* Header / User Info */}
+                  <div className="flex items-center gap-2.5 px-2.5 py-2">
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-indigo-500/10 text-xs font-bold text-indigo-400 border border-indigo-500/20 font-heading">
+                      {getInitials(user?.name)}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-xs font-semibold text-primary font-heading">
+                        {user?.name || 'User'}
+                      </p>
+                      <p className="truncate text-[11px] text-muted">
+                        {user?.email || ''}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="my-1.5 border-t border-app" />
+
+                  {/* Settings Item */}
+                  <button
+                    type="button"
+                    role="menuitem"
+                    onClick={() => {
+                      setProfileDropdownOpen(false);
+                      navigate('/settings');
+                    }}
+                    className="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-xs font-medium text-secondary hover:bg-subtle hover:text-primary transition-colors cursor-pointer"
+                  >
+                    <Settings className="h-4 w-4 text-muted" />
+                    <span>Settings</span>
+                  </button>
+
+                  <div className="my-1 border-t border-app" />
+
+                  {/* Sign out Item */}
+                  <button
+                    type="button"
+                    role="menuitem"
+                    onClick={() => {
+                      setProfileDropdownOpen(false);
+                      handleLogout();
+                    }}
+                    disabled={isLoggingOut}
+                    className="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-xs font-medium text-rose-500 hover:bg-rose-500/10 transition-colors cursor-pointer disabled:opacity-50"
+                  >
+                    <LogOut className="h-4 w-4" />
+                    <span>Sign out</span>
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </header>
 

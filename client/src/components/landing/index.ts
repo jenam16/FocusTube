@@ -4,7 +4,6 @@ export * from './ProductPreview';
 export * from './ProblemSolutionSection';
 export * from './HowItWorksSection';
 export * from './CoreFeaturesSection';
-export * from './FocusModeSection';
 export * from './NotesCaptureSection';
 export * from './ProgressHabitSection';
 export * from './FinalCTASection';

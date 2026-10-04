@@ -12,11 +12,7 @@ import {
   VideoNavigation,
   LoadingState,
   ErrorState,
-  FocusModeHeader,
-  FocusModeControls,
-  FocusSyllabusDrawer,
   NotesPanel,
-  FocusNotesDrawer,
   YTPlayerInstance,
   AISummaryDrawer,
 } from '../components';
@@ -35,83 +31,8 @@ export const CourseDetailPage = () => {
 
   const [selectedVideoId, setSelectedVideoId] = useState<string | null>(null);
   const [isTheaterMode, setIsTheaterMode] = useState(false);
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [isNotesDrawerOpen, setIsNotesDrawerOpen] = useState(false);
   const [currentPlaybackSeconds, setCurrentPlaybackSeconds] = useState(0);
   const playerRef = useRef<YTPlayerInstance | null>(null);
-
-  const isFocusMode = searchParams.get('focus') === 'true';
-
-
-  const handleToggleFocusMode = useCallback(
-    (enabled?: boolean) => {
-      setSearchParams(
-        (prev) => {
-          const next = new URLSearchParams(prev);
-          const shouldEnable =
-            typeof enabled === 'boolean'
-              ? enabled
-              : next.get('focus') !== 'true';
-          if (shouldEnable) {
-            next.set('focus', 'true');
-          } else {
-            next.delete('focus');
-          }
-          return next;
-        },
-        { replace: true }
-      );
-    },
-    [setSearchParams]
-  );
-
-  // Esc key listener to exit Focus Mode
-  useEffect(() => {
-    if (!isFocusMode) return;
-
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        // If native browser/video fullscreen is active, let browser exit fullscreen first
-        if (document.fullscreenElement) {
-          return;
-        }
-        // If syllabus drawer is open, let drawer handle its own Esc
-        if (isDrawerOpen) {
-          return;
-        }
-        // If notes drawer is open, let drawer handle its own Esc
-        if (isNotesDrawerOpen) {
-          return;
-        }
-        // Do not intercept if focus is inside an input/textarea
-        const target = event.target as HTMLElement | null;
-        if (
-          target &&
-          (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA')
-        ) {
-          return;
-        }
-
-        handleToggleFocusMode(false);
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [isFocusMode, isDrawerOpen, isNotesDrawerOpen, handleToggleFocusMode]);
-
-  // Lock body scroll while Focus Mode is active
-  useEffect(() => {
-    if (isFocusMode) {
-      const originalOverflow = document.body.style.overflow;
-      document.body.style.overflow = 'hidden';
-      return () => {
-        document.body.style.overflow = originalOverflow;
-      };
-    }
-  }, [isFocusMode]);
 
   // Fetch course details & syllabus
   const { data, isLoading, error, refetch, isRefetching } = useQuery({
@@ -576,64 +497,35 @@ export const CourseDetailPage = () => {
   );
 
   return (
-    <div
-      className={
-        isFocusMode
-          ? 'fixed inset-0 z-50 flex flex-col bg-gray-950 text-gray-100 overflow-y-auto'
-          : 'space-y-8'
-      }
-    >
-      {isFocusMode ? (
-        <FocusModeHeader
-          courseTitle={course.title}
-          onExit={() => handleToggleFocusMode(false)}
-          onOpenDrawer={() => setIsDrawerOpen(true)}
-          completedVideos={progressData?.completedVideos}
-          totalVideos={sortedVideos.length}
-        />
-      ) : (
-        /* Top Breadcrumb Navigation */
-        <div>
-          <Link
-            to="/courses"
-            className="inline-flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs font-medium text-gray-400 transition-colors hover:bg-gray-800 hover:text-white"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            <span>Back to Courses</span>
-          </Link>
-        </div>
-      )}
+    <div className="space-y-8">
+      {/* Top Breadcrumb Navigation */}
+      <div>
+        <Link
+          to="/courses"
+          className="inline-flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs font-medium text-gray-400 transition-colors hover:bg-gray-800 hover:text-white"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          <span>Back to Courses</span>
+        </Link>
+      </div>
 
       {/* PHASE 4 & 7: VIDEO PLAYER + SYLLABUS SECTION */}
       <section
         aria-label="Video Player and Syllabus"
-        className={
-          isFocusMode
-            ? 'flex-1 flex flex-col justify-center px-4 py-4 sm:px-6 lg:px-8 max-w-5xl mx-auto w-full'
-            : 'space-y-6'
-        }
+        className="space-y-6"
       >
-        {/* Layout: Focus Mode (Full Width Centered) vs Theater Mode vs Default (2-Column) */}
         <div
-          className={
-            isFocusMode
-              ? 'w-full'
-              : `grid grid-cols-1 gap-6 ${
-                  isTheaterMode
-                    ? 'grid-cols-1'
-                    : 'lg:grid-cols-12 lg:items-start'
-                }`
-          }
+          className={`grid grid-cols-1 gap-6 ${
+            isTheaterMode
+              ? 'grid-cols-1'
+              : 'lg:grid-cols-12 lg:items-start'
+          }`}
         >
           {/* Player Column */}
           <div
-            className={
-              isFocusMode
-                ? 'w-full space-y-4'
-                : `space-y-4 ${
-                    isTheaterMode ? 'w-full' : 'lg:col-span-8'
-                  }`
-            }
+            className={`space-y-4 ${
+              isTheaterMode ? 'w-full' : 'lg:col-span-8'
+            }`}
           >
             {hasAnyPlayableVideos && currentVideo ? (
               <>
@@ -643,12 +535,8 @@ export const CourseDetailPage = () => {
                   videoId={currentVideo.youtubeVideoId}
                   title={currentVideo.title}
                   initialSeconds={initialSeconds}
-                  isTheaterMode={isFocusMode || isTheaterMode}
-                  onToggleTheater={
-                    isFocusMode
-                      ? undefined
-                      : () => setIsTheaterMode((prev) => !prev)
-                  }
+                  isTheaterMode={isTheaterMode}
+                  onToggleTheater={() => setIsTheaterMode((prev) => !prev)}
                   onReady={(player) => {
                     playerRef.current = player;
                   }}
@@ -657,54 +545,32 @@ export const CourseDetailPage = () => {
                 />
 
                 {/* Player Navigation and Controls */}
-                {isFocusMode ? (
-                  <FocusModeControls
-                    currentVideo={currentVideo}
-                    currentVideoProgress={currentVideoProgress}
-                    currentIndex={currentVideoIndex >= 0 ? currentVideoIndex : 0}
-                    totalVideos={sortedVideos.length}
-                    hasPrevious={Boolean(previousVideo)}
-                    hasNext={Boolean(nextVideo)}
-                    onPrevious={handlePrevious}
-                    onNext={handleNext}
-                    onOpenDrawer={() => setIsDrawerOpen(true)}
-                    onOpenNotes={() => setIsNotesDrawerOpen(true)}
-                    isBookmarked={isCurrentVideoBookmarked}
-                    onToggleBookmark={handleToggleBookmark}
-                  />
-                ) : (
-                  <VideoNavigation
-                    currentVideo={currentVideo}
-                    currentIndex={currentVideoIndex >= 0 ? currentVideoIndex : 0}
-                    totalVideos={sortedVideos.length}
-                    progress={currentVideoProgress}
-                    hasPrevious={Boolean(previousVideo)}
-                    hasNext={Boolean(nextVideo)}
-                    onPrevious={handlePrevious}
-                    onNext={handleNext}
-                    isTheaterMode={isTheaterMode}
-                    onToggleTheater={() => setIsTheaterMode((prev) => !prev)}
-                    isFocusMode={isFocusMode}
-                    onToggleFocusMode={() => handleToggleFocusMode(true)}
-                    isBookmarked={isCurrentVideoBookmarked}
-                    onToggleBookmark={handleToggleBookmark}
-                    onOpenSummary={handleOpenSummary}
-                    isGeneratingSummary={isGeneratingSummary}
-                    hasExistingSummary={hasExistingSummary}
-                  />
-                )}
+                <VideoNavigation
+                  currentVideo={currentVideo}
+                  currentIndex={currentVideoIndex >= 0 ? currentVideoIndex : 0}
+                  totalVideos={sortedVideos.length}
+                  progress={currentVideoProgress}
+                  hasPrevious={Boolean(previousVideo)}
+                  hasNext={Boolean(nextVideo)}
+                  onPrevious={handlePrevious}
+                  onNext={handleNext}
+                  isTheaterMode={isTheaterMode}
+                  onToggleTheater={() => setIsTheaterMode((prev) => !prev)}
+                  isBookmarked={isCurrentVideoBookmarked}
+                  onToggleBookmark={handleToggleBookmark}
+                  onOpenSummary={handleOpenSummary}
+                  isGeneratingSummary={isGeneratingSummary}
+                  hasExistingSummary={hasExistingSummary}
+                />
 
-                {/* Lesson Notes Panel (Normal Mode) */}
-                {!isFocusMode && (
-                  <NotesPanel
-                    courseId={course._id}
-                    videoId={currentVideo._id}
-                    currentPlaybackSeconds={currentPlaybackSeconds}
-                    onSeekTo={handleSeekTo}
-                  />
-                )}
+                {/* Lesson Notes Panel */}
+                <NotesPanel
+                  courseId={course._id}
+                  videoId={currentVideo._id}
+                  currentPlaybackSeconds={currentPlaybackSeconds}
+                  onSeekTo={handleSeekTo}
+                />
               </>
-
             ) : (
               <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-gray-800 bg-gray-900/40 p-12 text-center aspect-video">
                 <AlertCircle className="h-10 w-10 text-amber-500 mb-3" />
@@ -718,73 +584,37 @@ export const CourseDetailPage = () => {
             )}
           </div>
 
-          {/* Video List Column (Side-by-Side on Desktop when not Theater Mode & not Focus Mode) */}
-          {!isFocusMode && (
-            <div
-              className={
-                isTheaterMode
-                  ? 'w-full pt-4'
-                  : 'lg:col-span-4'
-              }
-            >
-              <LessonList
-                courseId={course._id}
-                videos={sortedVideos}
-                progressMap={localProgressMap}
-                bookmarkedVideoIds={bookmarksData?.bookmarkedVideoIds}
-                activeVideoId={currentVideo?._id}
-                onSelectVideo={handleSelectVideo}
-                maxHeightClass={isTheaterMode ? 'max-h-96' : 'lg:max-h-[620px]'}
-              />
-            </div>
-          )}
+          {/* Video List Column (Side-by-Side on Desktop when not Theater Mode) */}
+          <div
+            className={
+              isTheaterMode
+                ? 'w-full pt-4'
+                : 'lg:col-span-4'
+            }
+          >
+            <LessonList
+              courseId={course._id}
+              videos={sortedVideos}
+              progressMap={localProgressMap}
+              bookmarkedVideoIds={bookmarksData?.bookmarkedVideoIds}
+              activeVideoId={currentVideo?._id}
+              onSelectVideo={handleSelectVideo}
+              maxHeightClass={isTheaterMode ? 'max-h-96' : 'lg:max-h-[620px]'}
+            />
+          </div>
         </div>
       </section>
 
       {/* Normal View Course Info & Stats */}
-      {!isFocusMode && (
-        <>
-          <hr className="border-gray-800/80 my-8" />
-          <CourseHeader
-            course={effectiveCourse || course}
-            firstVideo={currentVideo || sortedVideos[0]}
-            completedVideos={progressData?.completedVideos}
-            totalAvailableVideos={progressData?.totalAvailableVideos}
-            courseCompleted={progressData?.courseCompleted}
-          />
-          <CourseStats course={effectiveCourse || course} />
-        </>
-      )}
-
-      {/* Focus Mode Compact Syllabus Drawer */}
-      {isFocusMode && (
-        <FocusSyllabusDrawer
-          isOpen={isDrawerOpen}
-          onClose={() => setIsDrawerOpen(false)}
-          courseTitle={course.title}
-          videos={sortedVideos}
-          progressMap={localProgressMap}
-          bookmarkedVideoIds={bookmarksData?.bookmarkedVideoIds}
-          activeVideoId={currentVideo?._id}
-          onSelectVideo={(video) => {
-            handleSelectVideo(video);
-            setIsDrawerOpen(false);
-          }}
-        />
-      )}
-
-      {/* Focus Mode Notes Drawer */}
-      {isFocusMode && currentVideo && (
-        <FocusNotesDrawer
-          isOpen={isNotesDrawerOpen}
-          onClose={() => setIsNotesDrawerOpen(false)}
-          courseId={course._id}
-          videoId={currentVideo._id}
-          videoTitle={currentVideo.title}
-          currentPlaybackSeconds={currentPlaybackSeconds}
-          onSeekTo={handleSeekTo}
-        />
-      )}
+      <hr className="border-gray-800/80 my-8" />
+      <CourseHeader
+        course={effectiveCourse || course}
+        firstVideo={currentVideo || sortedVideos[0]}
+        completedVideos={progressData?.completedVideos}
+        totalAvailableVideos={progressData?.totalAvailableVideos}
+        courseCompleted={progressData?.courseCompleted}
+      />
+      <CourseStats course={effectiveCourse || course} />
 
       {/* AI Study Summary Slide-over Drawer */}
       {currentVideo && (

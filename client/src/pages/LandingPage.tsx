@@ -6,7 +6,6 @@ import {
   ProblemSolutionSection,
   HowItWorksSection,
   CoreFeaturesSection,
-  FocusModeSection,
   NotesCaptureSection,
   ProgressHabitSection,
   FinalCTASection,
@@ -35,10 +34,7 @@ export const LandingPage: React.FC = () => {
         {/* 6. Core Features (Controlled Bento Grid) */}
         <CoreFeaturesSection />
 
-        {/* 7. Focus Mode Experience (Clean Split Layout) */}
-        <FocusModeSection />
-
-        {/* 8. Notes + Captured Moments */}
+        {/* 7. Notes + Captured Moments */}
         <NotesCaptureSection />
 
         {/* 9. Progress & Learning Habit Tracking (Minimal Metric Grid) */}

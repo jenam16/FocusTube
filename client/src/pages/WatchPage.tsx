@@ -1,5 +1,5 @@
 import { useMemo, useState, useEffect, useRef, useCallback } from 'react';
-import { useParams, useSearchParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   ArrowLeft,
@@ -11,7 +11,6 @@ import {
   Maximize,
   Minimize,
   CheckCircle2,
-  Focus,
   Bookmark,
   Sparkles,
   Loader2,
@@ -20,11 +19,7 @@ import { courseService, progressService, bookmarkService } from '../services';
 import {
   YouTubePlayer,
   CompletedBadge,
-  FocusModeHeader,
-  FocusModeControls,
-  FocusSyllabusDrawer,
   NotesPanel,
-  FocusNotesDrawer,
   BookmarkButton,
   AISummaryDrawer,
   YTPlayerInstance,
@@ -43,12 +38,9 @@ export const WatchPage = () => {
     courseId: string;
     videoId: string;
   }>();
-  const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [isTheaterMode, setIsTheaterMode] = useState(false);
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [isNotesDrawerOpen, setIsNotesDrawerOpen] = useState(false);
   const [currentPlaybackSeconds, setCurrentPlaybackSeconds] = useState(0);
   const playerRef = useRef<YTPlayerInstance | null>(null);
   const playerContainerRef = useRef<HTMLDivElement | null>(null);
@@ -63,74 +55,6 @@ export const WatchPage = () => {
     }
     return currentPlaybackSeconds;
   }, [currentPlaybackSeconds]);
-
-  const isFocusMode = searchParams.get('focus') === 'true';
-
-  const handleToggleFocusMode = useCallback(
-    (enabled?: boolean) => {
-      setSearchParams(
-        (prev) => {
-          const next = new URLSearchParams(prev);
-          const shouldEnable =
-            typeof enabled === 'boolean'
-              ? enabled
-              : next.get('focus') !== 'true';
-          if (shouldEnable) {
-            next.set('focus', 'true');
-          } else {
-            next.delete('focus');
-          }
-          return next;
-        },
-        { replace: true }
-      );
-    },
-    [setSearchParams]
-  );
-
-  // Esc key listener to exit Focus Mode
-  useEffect(() => {
-    if (!isFocusMode) return;
-
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        if (document.fullscreenElement) {
-          return;
-        }
-        if (isDrawerOpen) {
-          return;
-        }
-        if (isNotesDrawerOpen) {
-          return;
-        }
-        const target = event.target as HTMLElement | null;
-        if (
-          target &&
-          (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA')
-        ) {
-          return;
-        }
-
-        handleToggleFocusMode(false);
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [isFocusMode, isDrawerOpen, isNotesDrawerOpen, handleToggleFocusMode]);
-
-  // Lock body scroll while Focus Mode is active
-  useEffect(() => {
-    if (isFocusMode) {
-      const originalOverflow = document.body.style.overflow;
-      document.body.style.overflow = 'hidden';
-      return () => {
-        document.body.style.overflow = originalOverflow;
-      };
-    }
-  }, [isFocusMode]);
 
   // Fetch course and its videos via TanStack Query
   const { data, isLoading, error } = useQuery({
@@ -485,9 +409,7 @@ export const WatchPage = () => {
 
   const handleNavigateVideo = (targetVideoId: string) => {
     flushProgress();
-    navigate(
-      `/watch/${courseId}/${targetVideoId}${isFocusMode ? '?focus=true' : ''}`
-    );
+    navigate(`/watch/${courseId}/${targetVideoId}`);
   };
 
   // Get previous and next playable videos (skipping unavailable)
@@ -540,154 +462,120 @@ export const WatchPage = () => {
 
   return (
     <div
-      className={
-        isFocusMode
-          ? 'fixed inset-0 z-50 flex flex-col bg-gray-950 text-gray-100 overflow-y-auto'
-          : `mx-auto space-y-6 transition-all duration-300 ${
-              isTheaterMode ? 'max-w-7xl' : 'max-w-5xl'
-            }`
-      }
+      className={`mx-auto space-y-6 transition-all duration-300 ${
+        isTheaterMode ? 'max-w-7xl' : 'max-w-5xl'
+      }`}
     >
-      {/* Top Navigation: Focus Mode Header vs Standard Watch Bar */}
-      {isFocusMode ? (
-        <FocusModeHeader
-          courseTitle={course.title}
-          onExit={() => handleToggleFocusMode(false)}
-          onOpenDrawer={() => setIsDrawerOpen(true)}
-          completedVideos={progressData?.completedVideos}
-          totalVideos={sortedVideos.length}
-        />
-      ) : (
-        /* Top Bar: Back to Course Navigation */
-        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-app pb-4">
-          <Link
-            to={`/courses/${course._id}`}
-            className="inline-flex items-center gap-2 rounded-xl border border-app bg-surface px-3 py-1.5 text-xs font-medium text-secondary transition-all hover:bg-surface-elevated hover:border-indigo-500/30 hover:text-primary"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            <span>Back to Course</span>
-          </Link>
+      {/* Top Bar: Back to Course Navigation */}
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-app pb-4">
+        <Link
+          to={`/courses/${course._id}`}
+          className="inline-flex items-center gap-2 rounded-xl border border-app bg-surface px-3 py-1.5 text-xs font-medium text-secondary transition-all hover:bg-surface-elevated hover:border-indigo-500/30 hover:text-primary"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          <span>Back to Course</span>
+        </Link>
 
-          <span className="truncate text-xs font-medium text-secondary max-w-md">
-            {course.title}
-          </span>
-        </div>
-      )}
+        <span className="truncate text-xs font-medium text-secondary max-w-md">
+          {course.title}
+        </span>
+      </div>
 
       {/* Main Content Area */}
-      <div
-        className={
-          isFocusMode
-            ? 'flex-1 flex flex-col justify-center px-4 py-4 sm:px-6 lg:px-8 max-w-5xl mx-auto w-full space-y-4'
-            : 'space-y-6'
-        }
-      >
-        {/* Lesson Header Information (Standard Mode Only) */}
-        {!isFocusMode && (
-          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-            <div className="space-y-1.5">
-              <div className="flex flex-wrap items-center gap-2 text-xs font-semibold text-indigo-500">
-                <span>
-                  Lesson {lessonNumber} of {totalLessons}
-                </span>
-                {currentVideo.durationSeconds > 0 && (
-                  <>
-                    <span className="text-muted">•</span>
-                    <span className="flex items-center gap-1 text-muted font-normal">
-                      <Clock className="h-3 w-3" />
-                      {formatVideoDuration(currentVideo.durationSeconds)}
-                    </span>
-                  </>
-                )}
-                {currentVideoProgress?.completed ? (
-                  <>
-                    <span className="text-muted">•</span>
-                    <CompletedBadge size="xs" />
-                  </>
-                ) : currentVideoProgress && currentVideoProgress.progressPercentage > 0 ? (
-                  <>
-                    <span className="text-muted">•</span>
-                    <span className="text-indigo-500 font-semibold lowercase">
-                      {currentVideoProgress.progressPercentage}% watched
-                    </span>
-                  </>
-                ) : null}
-              </div>
-              <h1 className="text-xl font-bold tracking-tight text-primary sm:text-2xl font-heading">
-                {currentVideo.title}
-              </h1>
+      <div className="space-y-6">
+        {/* Lesson Header Information */}
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <div className="space-y-1.5">
+            <div className="flex flex-wrap items-center gap-2 text-xs font-semibold text-indigo-500">
+              <span>
+                Lesson {lessonNumber} of {totalLessons}
+              </span>
+              {currentVideo.durationSeconds > 0 && (
+                <>
+                  <span className="text-muted">•</span>
+                  <span className="flex items-center gap-1 text-muted font-normal">
+                    <Clock className="h-3 w-3" />
+                    {formatVideoDuration(currentVideo.durationSeconds)}
+                  </span>
+                </>
+              )}
+              {currentVideoProgress?.completed ? (
+                <>
+                  <span className="text-muted">•</span>
+                  <CompletedBadge size="xs" />
+                </>
+              ) : currentVideoProgress && currentVideoProgress.progressPercentage > 0 ? (
+                <>
+                  <span className="text-muted">•</span>
+                  <span className="text-indigo-500 font-semibold lowercase">
+                    {currentVideoProgress.progressPercentage}% watched
+                  </span>
+                </>
+              ) : null}
             </div>
-
-            <div className="flex items-center gap-2 self-start sm:self-auto shrink-0 flex-wrap">
-              {/* Bookmark Button */}
-              <BookmarkButton
-                isBookmarked={isCurrentVideoBookmarked}
-                onToggle={handleToggleBookmark}
-              />
-
-              {/* ✨ AI Summary Button */}
-              <button
-                type="button"
-                onClick={handleOpenSummary}
-                disabled={isGeneratingSummary}
-                className={`inline-flex items-center gap-1.5 rounded-xl border px-3 py-1.5 text-xs font-medium transition-all active:scale-[0.98] shadow-xs cursor-pointer ${
-                  hasExistingSummary
-                    ? 'border-indigo-500/40 bg-indigo-500/15 text-indigo-600 dark:text-indigo-300 hover:bg-indigo-500/25 shadow-indigo-500/10'
-                    : 'border-app bg-surface text-secondary hover:bg-surface-elevated hover:text-primary hover:border-indigo-500/30'
-                } ${isGeneratingSummary ? 'opacity-70 cursor-not-allowed' : ''}`}
-                title={
-                  isGeneratingSummary
-                    ? 'Generating AI Summary...'
-                    : hasExistingSummary
-                    ? 'View AI Summary'
-                    : 'Generate AI Study Summary'
-                }
-              >
-                {isGeneratingSummary ? (
-                  <>
-                    <Loader2 className="h-3.5 w-3.5 animate-spin text-indigo-500" />
-                    <span>Generating...</span>
-                  </>
-                ) : (
-                  <>
-                    <Sparkles className="h-3.5 w-3.5 text-indigo-500" />
-                    <span>AI Summary</span>
-                  </>
-                )}
-              </button>
-
-              {/* Focus Mode Trigger Button */}
-              <button
-                type="button"
-                onClick={() => handleToggleFocusMode(true)}
-                className="inline-flex items-center gap-1.5 rounded-xl border border-indigo-500/30 bg-gradient-to-r from-indigo-500/15 to-purple-500/15 hover:from-indigo-500/25 hover:to-purple-500/25 px-3 py-1.5 text-xs font-medium text-indigo-500 hover:text-indigo-600 dark:text-indigo-300 dark:hover:text-white transition-all active:scale-[0.98] shadow-xs"
-                title="Enter Focus Mode"
-              >
-                <Focus className="h-3.5 w-3.5 text-indigo-500" />
-                <span>Focus Mode</span>
-              </button>
-
-              {/* Big Screen / Theater Mode Option */}
-              <button
-                type="button"
-                onClick={() => setIsTheaterMode((prev) => !prev)}
-                className="hidden sm:inline-flex items-center gap-1.5 rounded-xl border border-app bg-surface px-3 py-1.5 text-xs font-medium text-secondary hover:bg-surface-elevated hover:text-primary transition-all"
-              >
-                {isTheaterMode ? (
-                  <>
-                    <Minimize className="h-3.5 w-3.5" />
-                    <span>Default Size</span>
-                  </>
-                ) : (
-                  <>
-                    <Maximize className="h-3.5 w-3.5" />
-                    <span>Big Screen</span>
-                  </>
-                )}
-              </button>
-            </div>
+            <h1 className="text-xl font-bold tracking-tight text-primary sm:text-2xl font-heading">
+              {currentVideo.title}
+            </h1>
           </div>
-        )}
+
+          <div className="flex items-center gap-2 self-start sm:self-auto shrink-0 flex-wrap">
+            {/* Bookmark Button */}
+            <BookmarkButton
+              isBookmarked={isCurrentVideoBookmarked}
+              onToggle={handleToggleBookmark}
+            />
+
+            {/* ✨ AI Summary Button */}
+            <button
+              type="button"
+              onClick={handleOpenSummary}
+              disabled={isGeneratingSummary}
+              className={`inline-flex items-center gap-1.5 rounded-xl border px-3 py-1.5 text-xs font-medium transition-all active:scale-[0.98] shadow-xs cursor-pointer ${
+                hasExistingSummary
+                  ? 'border-indigo-500/40 bg-indigo-500/15 text-indigo-600 dark:text-indigo-300 hover:bg-indigo-500/25 shadow-indigo-500/10'
+                  : 'border-app bg-surface text-secondary hover:bg-surface-elevated hover:text-primary hover:border-indigo-500/30'
+              } ${isGeneratingSummary ? 'opacity-70 cursor-not-allowed' : ''}`}
+              title={
+                isGeneratingSummary
+                  ? 'Generating AI Summary...'
+                  : hasExistingSummary
+                  ? 'View AI Summary'
+                  : 'Generate AI Study Summary'
+              }
+            >
+              {isGeneratingSummary ? (
+                <>
+                  <Loader2 className="h-3.5 w-3.5 animate-spin text-indigo-500" />
+                  <span>Generating...</span>
+                </>
+              ) : (
+                <>
+                  <Sparkles className="h-3.5 w-3.5 text-indigo-500" />
+                  <span>AI Summary</span>
+                </>
+              )}
+            </button>
+
+            {/* Big Screen / Theater Mode Option */}
+            <button
+              type="button"
+              onClick={() => setIsTheaterMode((prev) => !prev)}
+              className="hidden sm:inline-flex items-center gap-1.5 rounded-xl border border-app bg-surface px-3 py-1.5 text-xs font-medium text-secondary hover:bg-surface-elevated hover:text-primary transition-all"
+            >
+              {isTheaterMode ? (
+                <>
+                  <Minimize className="h-3.5 w-3.5" />
+                  <span>Default Size</span>
+                </>
+              ) : (
+                <>
+                  <Maximize className="h-3.5 w-3.5" />
+                  <span>Big Screen</span>
+                </>
+              )}
+            </button>
+          </div>
+        </div>
 
         {/* Official YouTube IFrame Player */}
         <div ref={playerContainerRef}>
@@ -699,10 +587,8 @@ export const WatchPage = () => {
               courseId={courseId}
               title={currentVideo.title}
               initialSeconds={initialSeconds}
-              isTheaterMode={isFocusMode || isTheaterMode}
-              onToggleTheater={
-                isFocusMode ? undefined : () => setIsTheaterMode((prev) => !prev)
-              }
+              isTheaterMode={isTheaterMode}
+              onToggleTheater={() => setIsTheaterMode((prev) => !prev)}
               onReady={(player) => {
                 playerRef.current = player;
               }}
@@ -721,206 +607,153 @@ export const WatchPage = () => {
           )}
         </div>
 
-        {/* Navigation / Controls Section */}
-        {isFocusMode ? (
-          <FocusModeControls
-            currentVideo={currentVideo}
-            currentVideoProgress={currentVideoProgress}
-            currentIndex={currentIndex >= 0 ? currentIndex : 0}
-            totalVideos={totalLessons}
-            hasPrevious={Boolean(previousVideo)}
-            hasNext={Boolean(nextVideo)}
-            onPrevious={() => previousVideo && handleNavigateVideo(previousVideo._id)}
-            onNext={() => nextVideo && handleNavigateVideo(nextVideo._id)}
-            onOpenDrawer={() => setIsDrawerOpen(true)}
-            onOpenNotes={() => setIsNotesDrawerOpen(true)}
-            isBookmarked={isCurrentVideoBookmarked}
-            onToggleBookmark={handleToggleBookmark}
-            courseId={courseId}
-            getCurrentTimestamp={getCurrentTimestamp}
-            playerElement={playerContainerRef.current}
-          />
-        ) : (
-          <>
-            {/* Navigation Buttons: Previous & Next Lesson (Skips unavailable) */}
-            <div className="flex items-center justify-between gap-4 rounded-2xl border border-app bg-surface p-4 shadow-sm">
-              {/* Previous Lesson Button */}
-              {previousVideo ? (
-                <button
-                  type="button"
-                  onClick={() => handleNavigateVideo(previousVideo._id)}
-                  className="inline-flex items-center gap-2 rounded-xl border border-app bg-surface-elevated px-4 py-2 text-xs font-semibold text-secondary transition-all hover:border-indigo-500/30 hover:text-primary active:scale-95"
-                >
-                  <ChevronLeft className="h-4 w-4" />
-                  <span>Previous Lesson</span>
-                </button>
-              ) : (
-                <button
-                  type="button"
-                  disabled
-                  className="inline-flex items-center gap-2 rounded-xl border border-app bg-surface-elevated/40 px-4 py-2 text-xs font-semibold text-muted opacity-40 cursor-not-allowed"
-                >
-                  <ChevronLeft className="h-4 w-4" />
-                  <span>Previous Lesson</span>
-                </button>
-              )}
+        {/* Navigation Buttons: Previous & Next Lesson (Skips unavailable) */}
+        <div className="flex items-center justify-between gap-4 rounded-2xl border border-app bg-surface p-4 shadow-sm">
+          {/* Previous Lesson Button */}
+          {previousVideo ? (
+            <button
+              type="button"
+              onClick={() => handleNavigateVideo(previousVideo._id)}
+              className="inline-flex items-center gap-2 rounded-xl border border-app bg-surface-elevated px-4 py-2 text-xs font-semibold text-secondary transition-all hover:border-indigo-500/30 hover:text-primary active:scale-95"
+            >
+              <ChevronLeft className="h-4 w-4" />
+              <span>Previous Lesson</span>
+            </button>
+          ) : (
+            <button
+              type="button"
+              disabled
+              className="inline-flex items-center gap-2 rounded-xl border border-app bg-surface-elevated/40 px-4 py-2 text-xs font-semibold text-muted opacity-40 cursor-not-allowed"
+            >
+              <ChevronLeft className="h-4 w-4" />
+              <span>Previous Lesson</span>
+            </button>
+          )}
 
-              <div className="hidden sm:block text-xs text-secondary font-medium">
-                Lesson {lessonNumber} of {totalLessons}
-              </div>
+          <div className="hidden sm:block text-xs text-secondary font-medium">
+            Lesson {lessonNumber} of {totalLessons}
+          </div>
 
-              {/* Next Lesson Button */}
-              {nextVideo ? (
-                <button
-                  type="button"
-                  onClick={() => handleNavigateVideo(nextVideo._id)}
-                  className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 px-4 py-2 text-xs font-semibold text-white shadow-md shadow-indigo-600/25 transition-all active:scale-95"
-                >
-                  <span>Next Lesson</span>
-                  <ChevronRight className="h-4 w-4" />
-                </button>
-              ) : (
-                <button
-                  type="button"
-                  disabled
-                  className="inline-flex items-center gap-2 rounded-xl border border-app bg-surface-elevated/40 px-4 py-2 text-xs font-semibold text-muted opacity-40 cursor-not-allowed"
-                >
-                  <span>Next Lesson</span>
-                  <ChevronRight className="h-4 w-4" />
-                </button>
-              )}
-            </div>
+          {/* Next Lesson Button */}
+          {nextVideo ? (
+            <button
+              type="button"
+              onClick={() => handleNavigateVideo(nextVideo._id)}
+              className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 px-4 py-2 text-xs font-semibold text-white shadow-md shadow-indigo-600/25 transition-all active:scale-95"
+            >
+              <span>Next Lesson</span>
+              <ChevronRight className="h-4 w-4" />
+            </button>
+          ) : (
+            <button
+              type="button"
+              disabled
+              className="inline-flex items-center gap-2 rounded-xl border border-app bg-surface-elevated/40 px-4 py-2 text-xs font-semibold text-muted opacity-40 cursor-not-allowed"
+            >
+              <span>Next Lesson</span>
+              <ChevronRight className="h-4 w-4" />
+            </button>
+          )}
+        </div>
 
-            {/* Lesson Notes Panel (Normal Mode) */}
-            <NotesPanel
-              courseId={course._id}
-              videoId={currentVideo._id}
-              currentPlaybackSeconds={currentPlaybackSeconds}
-              onSeekTo={handleSeekTo}
-            />
-
-            {/* Quick Lesson Navigator / Full Syllabus Below Player */}
-            <div className="mt-8 space-y-3 rounded-2xl border border-app bg-surface p-5 shadow-sm">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Layers className="h-4 w-4 text-indigo-500" />
-                  <h3 className="text-sm font-bold text-primary font-heading">All Lessons in this Course</h3>
-                </div>
-                <span className="text-xs text-secondary font-medium">
-                  Total {formatDuration(course.totalDurationSeconds)}
-                </span>
-              </div>
-
-              <div className="divide-y divide-subtle max-h-80 overflow-y-auto rounded-xl border border-app bg-secondary">
-                {sortedVideos.map((vid, idx) => {
-                  const isCurrent = vid._id === currentVideo._id;
-                  const isAvailable = vid.isAvailable !== false;
-                  const vidProg = localProgressMap[vid._id];
-                  return (
-                    <button
-                      key={vid._id}
-                      type="button"
-                      disabled={!isAvailable}
-                      onClick={() => {
-                        if (isAvailable) {
-                          handleNavigateVideo(vid._id);
-                        }
-                      }}
-                      className={`flex w-full items-center gap-3 p-3 text-left transition-colors focus:outline-none ${
-                        !isAvailable
-                          ? 'opacity-40 cursor-not-allowed'
-                          : isCurrent
-                            ? 'bg-indigo-600/10 border-l-4 border-indigo-500'
-                            : 'hover:bg-surface-elevated'
-                      }`}
-                    >
-                      <span
-                        className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-lg text-[11px] font-bold ${
-                          isCurrent
-                            ? 'bg-indigo-600 text-white shadow-xs'
-                            : vidProg?.completed
-                              ? 'bg-emerald-500/15 text-emerald-500 border border-emerald-500/25'
-                              : 'bg-surface-elevated text-secondary'
-                        }`}
-                      >
-                        {vidProg?.completed && !isCurrent ? (
-                          <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />
-                        ) : (
-                          formatLessonNumber(idx)
-                        )}
-                      </span>
-                      <span
-                        className={`flex-1 truncate text-xs ${
-                          !isAvailable
-                            ? 'text-muted line-through'
-                            : isCurrent
-                              ? 'font-semibold text-indigo-500'
-                              : 'text-primary'
-                        }`}
-                      >
-                        {vid.title}
-                      </span>
-                      {bookmarksData?.bookmarkedVideoIds?.includes(vid._id) && (
-                        <Bookmark
-                          className="h-3.5 w-3.5 fill-amber-400 text-amber-400 shrink-0"
-                          aria-label="Bookmarked lesson"
-                        />
-                      )}
-                      {vidProg?.completed ? (
-                        <CompletedBadge size="xs" />
-                      ) : vidProg && vidProg.progressPercentage > 0 ? (
-                        <span className="shrink-0 text-[11px] text-indigo-500 font-semibold">
-                          {vidProg.progressPercentage}%
-                        </span>
-                      ) : null}
-                      {vid.durationSeconds > 0 && (
-                        <span className="shrink-0 text-[11px] text-muted font-mono">
-                          {formatVideoDuration(vid.durationSeconds)}
-                        </span>
-                      )}
-                      {!isAvailable && (
-                        <span className="shrink-0 text-[10px] text-amber-500 font-medium">
-                          Unavailable
-                        </span>
-                      )}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          </>
-        )}
-      </div>
-
-      {/* Focus Mode Syllabus Slide-over Drawer */}
-      {isFocusMode && (
-        <FocusSyllabusDrawer
-          isOpen={isDrawerOpen}
-          onClose={() => setIsDrawerOpen(false)}
-          courseTitle={course.title}
-          videos={sortedVideos}
-          activeVideoId={currentVideo._id}
-          progressMap={localProgressMap}
-          bookmarkedVideoIds={bookmarksData?.bookmarkedVideoIds}
-          onSelectVideo={(video) => {
-            setIsDrawerOpen(false);
-            handleNavigateVideo(video._id);
-          }}
-        />
-      )}
-
-      {/* Focus Mode Notes Slide-over Drawer */}
-      {isFocusMode && currentVideo && (
-        <FocusNotesDrawer
-          isOpen={isNotesDrawerOpen}
-          onClose={() => setIsNotesDrawerOpen(false)}
+        {/* Lesson Notes Panel */}
+        <NotesPanel
           courseId={course._id}
           videoId={currentVideo._id}
-          videoTitle={currentVideo.title}
           currentPlaybackSeconds={currentPlaybackSeconds}
           onSeekTo={handleSeekTo}
         />
-      )}
+
+        {/* Quick Lesson Navigator / Full Syllabus Below Player */}
+        <div className="mt-8 space-y-3 rounded-2xl border border-app bg-surface p-5 shadow-sm">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Layers className="h-4 w-4 text-indigo-500" />
+              <h3 className="text-sm font-bold text-primary font-heading">All Lessons in this Course</h3>
+            </div>
+            <span className="text-xs text-secondary font-medium">
+              Total {formatDuration(course.totalDurationSeconds)}
+            </span>
+          </div>
+
+          <div className="divide-y divide-subtle max-h-80 overflow-y-auto rounded-xl border border-app bg-secondary">
+            {sortedVideos.map((vid, idx) => {
+              const isCurrent = vid._id === currentVideo._id;
+              const isAvailable = vid.isAvailable !== false;
+              const vidProg = localProgressMap[vid._id];
+              return (
+                <button
+                  key={vid._id}
+                  type="button"
+                  disabled={!isAvailable}
+                  onClick={() => {
+                    if (isAvailable) {
+                      handleNavigateVideo(vid._id);
+                    }
+                  }}
+                  className={`flex w-full items-center gap-3 p-3 text-left transition-colors focus:outline-none ${
+                    !isAvailable
+                      ? 'opacity-40 cursor-not-allowed'
+                      : isCurrent
+                        ? 'bg-indigo-600/10 border-l-4 border-indigo-500'
+                        : 'hover:bg-surface-elevated'
+                  }`}
+                >
+                  <span
+                    className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-lg text-[11px] font-bold ${
+                      isCurrent
+                        ? 'bg-indigo-600 text-white shadow-xs'
+                        : vidProg?.completed
+                          ? 'bg-emerald-500/15 text-emerald-500 border border-emerald-500/25'
+                          : 'bg-surface-elevated text-secondary'
+                    }`}
+                  >
+                    {vidProg?.completed && !isCurrent ? (
+                      <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />
+                    ) : (
+                      formatLessonNumber(idx)
+                    )}
+                  </span>
+                  <span
+                    className={`flex-1 truncate text-xs ${
+                      !isAvailable
+                        ? 'text-muted line-through'
+                        : isCurrent
+                          ? 'font-semibold text-indigo-500'
+                          : 'text-primary'
+                    }`}
+                  >
+                    {vid.title}
+                  </span>
+                  {bookmarksData?.bookmarkedVideoIds?.includes(vid._id) && (
+                    <Bookmark
+                      className="h-3.5 w-3.5 fill-amber-400 text-amber-400 shrink-0"
+                      aria-label="Bookmarked lesson"
+                    />
+                  )}
+                  {vidProg?.completed ? (
+                    <CompletedBadge size="xs" />
+                  ) : vidProg && vidProg.progressPercentage > 0 ? (
+                    <span className="shrink-0 text-[11px] text-indigo-500 font-semibold">
+                      {vidProg.progressPercentage}%
+                    </span>
+                  ) : null}
+                  {vid.durationSeconds > 0 && (
+                    <span className="shrink-0 text-[11px] text-muted font-mono">
+                      {formatVideoDuration(vid.durationSeconds)}
+                    </span>
+                  )}
+                  {!isAvailable && (
+                    <span className="shrink-0 text-[10px] text-amber-500 font-medium">
+                      Unavailable
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </div>
 
       {/* AI Study Summary Slide-over Drawer */}
       {currentVideo && (

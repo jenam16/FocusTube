@@ -1,4 +1,4 @@
-import { ChevronLeft, ChevronRight, Maximize, Minimize, Focus, Sparkles, Loader2 } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Maximize, Minimize, Sparkles, Loader2 } from 'lucide-react';
 import { VideoItem, VideoProgress } from '../../types';
 import { formatLessonNumber, formatVideoDuration } from '../../utils';
 import { CompletedBadge } from '../CompletedBadge';
@@ -15,8 +15,6 @@ interface VideoNavigationProps {
   onNext: () => void;
   isTheaterMode?: boolean;
   onToggleTheater?: () => void;
-  isFocusMode?: boolean;
-  onToggleFocusMode?: () => void;
   isBookmarked?: boolean;
   onToggleBookmark?: () => Promise<void>;
   onOpenSummary?: () => void;
@@ -35,8 +33,6 @@ export const VideoNavigation = ({
   onNext,
   isTheaterMode = false,
   onToggleTheater,
-  isFocusMode = false,
-  onToggleFocusMode,
   isBookmarked = false,
   onToggleBookmark,
   onOpenSummary,
@@ -83,7 +79,7 @@ export const VideoNavigation = ({
           </h2>
         </div>
 
-        {/* Focus Mode & Theater Mode Actions */}
+        {/* Action Controls */}
         <div className="flex items-center gap-2 self-start sm:self-auto shrink-0">
           {onToggleBookmark && (
             <BookmarkButton
@@ -123,23 +119,6 @@ export const VideoNavigation = ({
                   <span>AI Summary</span>
                 </>
               )}
-            </button>
-          )}
-
-          {onToggleFocusMode && (
-            <button
-              type="button"
-              onClick={onToggleFocusMode}
-              className={`inline-flex items-center gap-1.5 rounded-xl border px-3 py-1.5 text-xs font-semibold transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 active:scale-[0.98] cursor-pointer ${
-                isFocusMode
-                  ? 'border-indigo-500 bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
-                  : 'border-indigo-500/30 bg-indigo-500/10 text-indigo-500 hover:bg-indigo-500/20 shadow-xs'
-              }`}
-              aria-label={isFocusMode ? 'Exit Focus Mode' : 'Enter Focus Mode'}
-              title="Focus Mode (Distraction-Free Learning)"
-            >
-              <Focus className="h-3.5 w-3.5 text-indigo-500" />
-              <span>{isFocusMode ? 'Exit Focus' : 'Focus Mode'}</span>
             </button>
           )}
 

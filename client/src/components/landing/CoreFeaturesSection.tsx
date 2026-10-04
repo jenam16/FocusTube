@@ -1,8 +1,8 @@
-﻿import React from 'react';
+import React from 'react';
 import {
   ShieldCheck,
   TrendingUp,
-  Focus,
+  FolderOpen,
   CalendarCheck,
   Camera,
   Play,
@@ -69,35 +69,35 @@ export const CoreFeaturesSection: React.FC = () => {
             </div>
           </div>
 
-          {/* Bento Item 2: Focus Mode (Span 5) */}
+          {/* Bento Item 2: Study Material (Span 5) */}
           <div className="md:col-span-5 rounded-2xl border border-app bg-surface hover:border-indigo-500/40 p-6 sm:p-7 flex flex-col justify-between transition-all duration-200 hover:-translate-y-1 group shadow-xs">
             <div>
               <div className="flex items-center gap-3 mb-4">
                 <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-500/10 text-indigo-500 border border-indigo-500/20 group-hover:-translate-y-0.5 transition-transform duration-200">
-                  <Focus className="h-5 w-5" />
+                  <FolderOpen className="h-5 w-5" />
                 </div>
                 <div>
                   <h3 className="text-base sm:text-lg font-bold text-primary font-heading">
-                    Focus Mode
+                    Study Material
                   </h3>
-                  <span className="text-xs text-indigo-500 font-heading">Immersive Study</span>
+                  <span className="text-xs text-indigo-500 font-heading">Resource Library</span>
                 </div>
               </div>
               <p className="text-xs sm:text-sm text-secondary leading-relaxed">
-                Enter a dedicated learning environment designed to keep the session centered around the lesson and curriculum.
+                Save external PDF links, lecture slides, and documentation directly into an organized personal reference library.
               </p>
             </div>
 
             {/* Quick Actions Preview */}
             <div className="mt-6 pt-4 border-t border-subtle flex flex-wrap gap-2">
               <span className="rounded-lg border border-app bg-secondary px-2.5 py-1 text-[11px] text-secondary font-medium">
-                📸 Video Snapshot
+                📄 PDF Notes
               </span>
               <span className="rounded-lg border border-app bg-secondary px-2.5 py-1 text-[11px] text-secondary font-medium">
-                ⭐️ Bookmark Lesson
+                🌐 Web Docs
               </span>
               <span className="rounded-lg border border-app bg-secondary px-2.5 py-1 text-[11px] text-secondary font-medium">
-                ☰ Quick Syllabus
+                📚 Slide Decks
               </span>
             </div>
           </div>

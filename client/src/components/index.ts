@@ -8,7 +8,6 @@ export * from './ImportCourseModal';
 export * from './YouTubePlayer';
 export * from './CompletedBadge';
 export * from './courses';
-export * from './focus';
 export * from './tasks';
 export * from './notes';
 export * from './bookmarks';
