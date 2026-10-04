@@ -20,6 +20,7 @@ import {
   BookmarksPage,
   NotesPage,
   SettingsPage,
+  StudyMaterialsPage,
 } from './pages';
 
 const queryClient = new QueryClient({
@@ -70,6 +71,7 @@ export default function App() {
                   <Route path="/analytics" element={<AnalyticsPage />} />
                   <Route path="/bookmarks" element={<BookmarksPage />} />
                   <Route path="/notes" element={<NotesPage />} />
+                  <Route path="/study-materials" element={<StudyMaterialsPage />} />
                   <Route path="/settings" element={<SettingsPage />} />
                 </Route>
               </Route>

@@ -18,6 +18,9 @@ export const config = {
     apiSecret: process.env.CLOUDINARY_API_SECRET || '',
   },
   geminiApiKey: process.env.GEMINI_API_KEY || '',
+  openRouterApiKey: process.env.OPENROUTER_API_KEY || '',
+  openRouterModel:
+    process.env.OPENROUTER_MODEL || 'inclusionai/ling-3.0-flash-sante:free',
   resend: {
     apiKey: process.env.RESEND_API_KEY || '',
     fromEmail: process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev',

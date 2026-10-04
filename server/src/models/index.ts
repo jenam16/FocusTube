@@ -5,3 +5,4 @@ export * from './VideoProgress.js';
 export * from './Task.js';
 export * from './VideoNote.js';
 export * from './VideoBookmark.js';
+export * from './StudyMaterial.js';

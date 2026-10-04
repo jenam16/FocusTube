@@ -177,6 +177,11 @@ export const YouTubePlayer = ({
 
   const progressTimerRef = useRef<number | null>(null);
   const hasResumedRef = useRef(false);
+  const initialSecondsRef = useRef(initialSeconds);
+
+  useEffect(() => {
+    initialSecondsRef.current = initialSeconds;
+  }, [initialSeconds]);
 
   const onProgressRef = useRef(onProgress);
   const onStateChangeRef = useRef(onStateChange);
@@ -189,7 +194,6 @@ export const YouTubePlayer = ({
     onReadyRef.current = onReady;
     onErrorRef.current = onError;
   }, [onProgress, onStateChange, onReady, onError]);
-
 
   // Reset resume guard whenever videoId changes
   useEffect(() => {
@@ -340,12 +344,12 @@ export const YouTubePlayer = ({
         YT &&
         (state === YT.PlayerState.PLAYING || state === YT.PlayerState.BUFFERING) &&
         !hasResumedRef.current &&
-        initialSeconds > 2
+        initialSecondsRef.current > 2
       ) {
         hasResumedRef.current = true;
         try {
           if (typeof event.target.seekTo === 'function') {
-            event.target.seekTo(initialSeconds, true);
+            event.target.seekTo(initialSecondsRef.current, true);
           }
         } catch {
           // ignore
@@ -368,7 +372,7 @@ export const YouTubePlayer = ({
         onStateChangeRef.current(event);
       }
     },
-    [initialSeconds, startProgressTimer, clearProgressTimer, reportProgress]
+    [startProgressTimer, clearProgressTimer, reportProgress]
   );
 
   // Initialize or update player
@@ -382,7 +386,8 @@ export const YouTubePlayer = ({
     loadYouTubeIframeApi(() => {
       if (!playerElementRef.current) return;
 
-      const startSec = initialSeconds > 2 ? Math.floor(initialSeconds) : 0;
+      const currentSec = initialSecondsRef.current;
+      const startSec = currentSec > 2 ? Math.floor(currentSec) : 0;
 
       // If player instance exists, load the new video instead of recreating
       if (
@@ -492,7 +497,7 @@ export const YouTubePlayer = ({
         setErrorMessage('Failed to initialize video player.');
       }
     });
-  }, [videoId, initialSeconds, handlePlayerStateChange, syncPlaybackRate]);
+  }, [videoId, handlePlayerStateChange, syncPlaybackRate]);
 
   // Trigger init / update when videoId changes
   useEffect(() => {

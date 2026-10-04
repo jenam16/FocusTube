@@ -1,4 +1,4 @@
-﻿import { ChevronLeft, ChevronRight, Maximize, Minimize, Focus } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Maximize, Minimize, Focus, Sparkles, Loader2 } from 'lucide-react';
 import { VideoItem, VideoProgress } from '../../types';
 import { formatLessonNumber, formatVideoDuration } from '../../utils';
 import { CompletedBadge } from '../CompletedBadge';
@@ -19,6 +19,9 @@ interface VideoNavigationProps {
   onToggleFocusMode?: () => void;
   isBookmarked?: boolean;
   onToggleBookmark?: () => Promise<void>;
+  onOpenSummary?: () => void;
+  isGeneratingSummary?: boolean;
+  hasExistingSummary?: boolean;
 }
 
 export const VideoNavigation = ({
@@ -36,6 +39,9 @@ export const VideoNavigation = ({
   onToggleFocusMode,
   isBookmarked = false,
   onToggleBookmark,
+  onOpenSummary,
+  isGeneratingSummary = false,
+  hasExistingSummary = false,
 }: VideoNavigationProps) => {
 
   return (
@@ -85,6 +91,39 @@ export const VideoNavigation = ({
               onToggle={onToggleBookmark}
               size="md"
             />
+          )}
+
+          {onOpenSummary && (
+            <button
+              type="button"
+              onClick={onOpenSummary}
+              disabled={isGeneratingSummary}
+              className={`inline-flex items-center gap-1.5 rounded-xl border px-3 py-1.5 text-xs font-semibold transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 active:scale-[0.98] cursor-pointer ${
+                hasExistingSummary
+                  ? 'border-indigo-500/40 bg-indigo-500/15 text-indigo-600 dark:text-indigo-300 hover:bg-indigo-500/25 shadow-xs'
+                  : 'border-app bg-surface text-secondary hover:bg-surface-elevated hover:text-primary hover:border-indigo-500/30'
+              } ${isGeneratingSummary ? 'opacity-70 cursor-not-allowed' : ''}`}
+              aria-label={hasExistingSummary ? 'View AI Summary' : 'AI Summary'}
+              title={
+                isGeneratingSummary
+                  ? 'Generating AI Summary...'
+                  : hasExistingSummary
+                  ? 'View AI Summary'
+                  : 'Generate AI Study Summary'
+              }
+            >
+              {isGeneratingSummary ? (
+                <>
+                  <Loader2 className="h-3.5 w-3.5 animate-spin text-indigo-500" />
+                  <span>Generating...</span>
+                </>
+              ) : (
+                <>
+                  <Sparkles className="h-3.5 w-3.5 text-indigo-500" />
+                  <span>AI Summary</span>
+                </>
+              )}
+            </button>
           )}
 
           {onToggleFocusMode && (

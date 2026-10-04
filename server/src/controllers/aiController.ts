@@ -82,3 +82,41 @@ export const sendChatMessage = async (req: Request, res: Response): Promise<void
     });
   }
 };
+
+export const getVideoSummary = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const userId = (req as any).userId;
+    if (!userId) {
+      res.status(401).json({ success: false, message: 'Authentication required' });
+      return;
+    }
+
+    const { videoId, courseId } = req.params;
+    const resolvedCourseId =
+      courseId ||
+      (typeof req.query.courseId === 'string' ? req.query.courseId : undefined) ||
+      (typeof req.body?.courseId === 'string' ? req.body.courseId : undefined);
+
+    if (!videoId) {
+      res.status(400).json({ success: false, message: 'Video ID is required' });
+      return;
+    }
+
+    const { getOrGenerateVideoSummary } = await import('../services/videoSummaryService.js');
+    const result = await getOrGenerateVideoSummary(userId, videoId, resolvedCourseId);
+
+    res.status(200).json({
+      success: true,
+      data: result,
+    });
+  } catch (error: any) {
+    console.error('[AI Controller] Error in getVideoSummary:', error?.message || error);
+    const statusCode = typeof error.statusCode === 'number' ? error.statusCode : 500;
+    res.status(statusCode).json({
+      success: false,
+      code: error.code || 'SUMMARY_ERROR',
+      message: error.message || 'Failed to generate summary for this video.',
+    });
+  }
+};
+

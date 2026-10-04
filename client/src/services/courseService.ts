@@ -5,6 +5,7 @@ import {
   ImportCourseResponse,
   CourseDetailResponse,
   WatchVideoResponse,
+  AISummaryData,
 } from '../types';
 
 export const courseService = {
@@ -43,5 +44,21 @@ export const courseService = {
         method: 'GET',
       }
     );
+  },
+
+  async getVideoSummary(
+    courseId: string,
+    videoId: string
+  ): Promise<{ summary: AISummaryData; cached: boolean }> {
+    const res = await request<{
+      success: boolean;
+      data: {
+        summary: AISummaryData;
+        cached: boolean;
+      };
+    }>(`/courses/${courseId}/videos/${videoId}/summary`, {
+      method: 'POST',
+    });
+    return res.data;
   },
 };

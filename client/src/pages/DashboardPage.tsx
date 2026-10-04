@@ -1,4 +1,4 @@
-﻿import { useState } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
@@ -251,6 +251,16 @@ export const DashboardPage = () => {
               const isAdvancingToNext = Boolean(
                 isRecentCompleted && recentData?.nextVideo && !courseCompleted
               );
+              const targetProgress = recentData?.targetProgress;
+              const displayProgressPct = isAdvancingToNext
+                ? (targetProgress?.progressPercentage || 0)
+                : Math.min(100, Math.max(0, recent.progressPercentage));
+              const displayWatched = isAdvancingToNext
+                ? (targetProgress?.watchedSeconds || 0)
+                : recent.watchedSeconds;
+              const displayDuration = isAdvancingToNext
+                ? (targetProgress?.durationSeconds || targetVideo?.durationSeconds || 0)
+                : recent.durationSeconds;
 
               if (courseCompleted) {
                 return (
@@ -354,11 +364,7 @@ export const DashboardPage = () => {
                         <div
                           className="h-full bg-gradient-to-r from-indigo-500 to-cyan-400 transition-all duration-300"
                           style={{
-                            width: `${
-                              isAdvancingToNext
-                                ? 0
-                                : Math.min(100, Math.max(0, recent.progressPercentage))
-                            }%`,
+                            width: `${displayProgressPct}%`,
                           }}
                         />
                       </div>
@@ -403,18 +409,20 @@ export const DashboardPage = () => {
                         <div className="flex items-center justify-between text-xs text-secondary">
                           <span>
                             {isAdvancingToNext
-                              ? 'Next Lesson Ready'
-                              : `${recent.progressPercentage}% watched`}
+                              ? displayProgressPct > 0
+                                ? `${displayProgressPct}% watched`
+                                : 'Next Lesson Ready'
+                              : `${displayProgressPct}% watched`}
                           </span>
-                          {!isAdvancingToNext && recent.durationSeconds > 0 && (
+                          {displayDuration > 0 && (
                             <span className="font-mono text-[11px] text-muted">
-                              {formatVideoTime(recent.watchedSeconds)} /{' '}
-                              {formatVideoTime(recent.durationSeconds)}
+                              {formatVideoTime(displayWatched)} /{' '}
+                              {formatVideoTime(displayDuration)}
                             </span>
                           )}
                         </div>
                         <ProgressBar
-                          progress={isAdvancingToNext ? 0 : recent.progressPercentage}
+                          progress={displayProgressPct}
                           size="sm"
                         />
                       </div>

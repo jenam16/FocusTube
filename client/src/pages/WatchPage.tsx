@@ -13,6 +13,8 @@ import {
   CheckCircle2,
   Focus,
   Bookmark,
+  Sparkles,
+  Loader2,
 } from 'lucide-react';
 import { courseService, progressService, bookmarkService } from '../services';
 import {
@@ -24,9 +26,10 @@ import {
   NotesPanel,
   FocusNotesDrawer,
   BookmarkButton,
+  AISummaryDrawer,
   YTPlayerInstance,
 } from '../components';
-import { VideoProgress } from '../types';
+import { VideoProgress, AISummaryData } from '../types';
 import {
   formatDuration,
   formatLessonNumber,
@@ -137,7 +140,7 @@ export const WatchPage = () => {
   });
 
   // Fetch course progress
-  const { data: progressData } = useQuery({
+  const { data: progressData, isLoading: isProgressLoading } = useQuery({
     queryKey: ['course-progress', courseId],
     queryFn: () => progressService.getCourseProgress(courseId!),
     enabled: !!courseId,
@@ -206,6 +209,7 @@ export const WatchPage = () => {
   // Initial resume position
   const initialSeconds = useMemo(() => {
     if (!currentVideoProgress) return 0;
+    if (currentVideoProgress.completed) return 0;
     const watched = currentVideoProgress.watchedSeconds || 0;
     const duration =
       currentVideoProgress.durationSeconds ||
@@ -237,6 +241,61 @@ export const WatchPage = () => {
       queryClient.invalidateQueries({ queryKey: ['bookmarks'] });
     } catch (err) {
       console.error('Failed to toggle bookmark:', err);
+    }
+  };
+
+  // AI Summary State
+  const [isSummaryDrawerOpen, setIsSummaryDrawerOpen] = useState(false);
+  const [isGeneratingSummary, setIsGeneratingSummary] = useState(false);
+  const [summaryError, setSummaryError] = useState<string | null>(null);
+  const [activeSummary, setActiveSummary] = useState<AISummaryData | null>(null);
+
+  // Sync active summary when switching lessons
+  useEffect(() => {
+    setActiveSummary(currentVideo?.aiSummary || null);
+    setSummaryError(null);
+  }, [currentVideo?._id, currentVideo?.aiSummary]);
+
+  const hasExistingSummary = Boolean(
+    activeSummary?.summary || currentVideo?.aiSummary?.summary
+  );
+
+  const handleOpenSummary = async () => {
+    if (!currentVideo || !course) return;
+
+    // If summary is already loaded or in currentVideo, open drawer directly (no network request!)
+    if (activeSummary?.summary || currentVideo.aiSummary?.summary) {
+      if (!activeSummary && currentVideo.aiSummary) {
+        setActiveSummary(currentVideo.aiSummary);
+      }
+      setIsSummaryDrawerOpen(true);
+      return;
+    }
+
+    try {
+      setIsGeneratingSummary(true);
+      setSummaryError(null);
+      setIsSummaryDrawerOpen(true);
+
+      const res = await courseService.getVideoSummary(course._id, currentVideo._id);
+      setActiveSummary(res.summary);
+
+      // Update TanStack Query cache for the course so the video entity retains the summary
+      queryClient.setQueryData(['course', courseId], (oldData: any) => {
+        if (!oldData || !oldData.videos) return oldData;
+        return {
+          ...oldData,
+          videos: oldData.videos.map((v: any) =>
+            v._id === currentVideo._id ? { ...v, aiSummary: res.summary } : v
+          ),
+        };
+      });
+    } catch (err: any) {
+      console.error('Failed to get video summary:', err);
+      const msg = err?.message || 'Unable to generate summary. Please try again.';
+      setSummaryError(msg);
+    } finally {
+      setIsGeneratingSummary(false);
     }
   };
 
@@ -373,11 +432,13 @@ export const WatchPage = () => {
     [currentVideo, course, localProgressMap, flushProgress]
   );
 
-  // Handle video playback state change (e.g. video ended)
+  // Handle video playback state change (e.g. video paused or ended)
   const handlePlayerStateChange = useCallback(
     (event: { data?: number }) => {
       const YT = window.YT;
-      if (YT && event.data === YT.PlayerState.ENDED) {
+      if (YT && event.data === YT.PlayerState.PAUSED) {
+        flushProgress();
+      } else if (YT && event.data === YT.PlayerState.ENDED) {
         if (currentVideo && course) {
           setOptimisticProgressMap((map) => ({
             ...map,
@@ -405,9 +466,19 @@ export const WatchPage = () => {
     [currentVideo, course, flushProgress]
   );
 
-  // Flush on unmount or before switching
+  // Flush on unmount, tab switch, or navigation away
   useEffect(() => {
+    const handleVisibilityOrPageHide = () => {
+      if (document.visibilityState === 'hidden') {
+        flushProgress();
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibilityOrPageHide);
+    window.addEventListener('pagehide', handleVisibilityOrPageHide);
+
     return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityOrPageHide);
+      window.removeEventListener('pagehide', handleVisibilityOrPageHide);
       flushProgress();
     };
   }, [flushProgress]);
@@ -429,7 +500,7 @@ export const WatchPage = () => {
   }, [sortedVideos, currentVideo]);
 
 
-  if (isLoading) {
+  if (isLoading || isProgressLoading) {
     return (
       <div className="mx-auto max-w-5xl space-y-6 animate-pulse">
         <div className="h-6 w-32 rounded bg-gray-800" />
@@ -553,6 +624,37 @@ export const WatchPage = () => {
                 isBookmarked={isCurrentVideoBookmarked}
                 onToggle={handleToggleBookmark}
               />
+
+              {/* ✨ AI Summary Button */}
+              <button
+                type="button"
+                onClick={handleOpenSummary}
+                disabled={isGeneratingSummary}
+                className={`inline-flex items-center gap-1.5 rounded-xl border px-3 py-1.5 text-xs font-medium transition-all active:scale-[0.98] shadow-xs cursor-pointer ${
+                  hasExistingSummary
+                    ? 'border-indigo-500/40 bg-indigo-500/15 text-indigo-600 dark:text-indigo-300 hover:bg-indigo-500/25 shadow-indigo-500/10'
+                    : 'border-app bg-surface text-secondary hover:bg-surface-elevated hover:text-primary hover:border-indigo-500/30'
+                } ${isGeneratingSummary ? 'opacity-70 cursor-not-allowed' : ''}`}
+                title={
+                  isGeneratingSummary
+                    ? 'Generating AI Summary...'
+                    : hasExistingSummary
+                    ? 'View AI Summary'
+                    : 'Generate AI Study Summary'
+                }
+              >
+                {isGeneratingSummary ? (
+                  <>
+                    <Loader2 className="h-3.5 w-3.5 animate-spin text-indigo-500" />
+                    <span>Generating...</span>
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="h-3.5 w-3.5 text-indigo-500" />
+                    <span>AI Summary</span>
+                  </>
+                )}
+              </button>
 
               {/* Focus Mode Trigger Button */}
               <button
@@ -817,6 +919,20 @@ export const WatchPage = () => {
           videoTitle={currentVideo.title}
           currentPlaybackSeconds={currentPlaybackSeconds}
           onSeekTo={handleSeekTo}
+        />
+      )}
+
+      {/* AI Study Summary Slide-over Drawer */}
+      {currentVideo && (
+        <AISummaryDrawer
+          isOpen={isSummaryDrawerOpen}
+          onClose={() => setIsSummaryDrawerOpen(false)}
+          videoTitle={currentVideo.title}
+          summaryData={activeSummary || currentVideo.aiSummary || null}
+          isLoading={isGeneratingSummary}
+          error={summaryError}
+          onSeekTo={handleSeekTo}
+          onRetry={handleOpenSummary}
         />
       )}
     </div>

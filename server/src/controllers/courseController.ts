@@ -9,6 +9,7 @@ import {
   extractPlaylistId,
   YouTubeError,
 } from '../services/youtubeService.js';
+import { getCourseCompletionStats } from './progressController.js';
 
 export const importCourse = async (
   req: AuthenticatedRequest,
@@ -115,27 +116,11 @@ export const getCourses = async (
 
     const courses = await Course.find({ userId }).sort({ createdAt: -1 });
 
-    // Fetch all completed video progress records for this user
-    const completedProgress = await VideoProgress.find({
-      user: userId,
-      completed: true,
-    });
-
-    const completedCountByCourse = new Map<string, number>();
-    for (const p of completedProgress) {
-      const cId = p.course.toString();
-      completedCountByCourse.set(cId, (completedCountByCourse.get(cId) || 0) + 1);
-    }
-
-    // Populate live integer progress percentage for each course
+    // Populate live progress percentage for each course using standard completion stats
     const updatedCourses = await Promise.all(
       courses.map(async (course) => {
-        const completedCount = completedCountByCourse.get(course._id.toString()) || 0;
-        let progressPct = 0;
-        if (completedCount > 0) {
-          const total = course.totalVideos > 0 ? course.totalVideos : 1;
-          progressPct = Math.min(100, Math.max(1, Math.round((completedCount / total) * 100)));
-        }
+        const stats = await getCourseCompletionStats(userId, course._id);
+        const progressPct = stats.courseProgressPercentage;
 
         if (course.progressPercentage !== progressPct) {
           await Course.updateOne(
@@ -179,17 +164,9 @@ export const getCourseById = async (
       return;
     }
 
-    // Live sync progress percentage
-    const completedCount = await VideoProgress.countDocuments({
-      user: userId,
-      course: course._id,
-      completed: true,
-    });
-    let progressPct = 0;
-    if (completedCount > 0) {
-      const total = course.totalVideos > 0 ? course.totalVideos : 1;
-      progressPct = Math.min(100, Math.max(1, Math.round((completedCount / total) * 100)));
-    }
+    // Live sync progress percentage using exact same helper
+    const stats = await getCourseCompletionStats(userId, course._id);
+    const progressPct = stats.courseProgressPercentage;
     if (course.progressPercentage !== progressPct) {
       await Course.updateOne(
         { _id: course._id },

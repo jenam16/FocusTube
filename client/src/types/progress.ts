@@ -15,6 +15,13 @@ export interface VideoProgress {
   updatedAt: string;
 }
 
+export interface CourseResumeTarget {
+  videoId: string;
+  watchedSeconds: number;
+  durationSeconds: number;
+  completed: boolean;
+}
+
 export interface CourseProgressResponse {
   courseId: string;
   progress: VideoProgress[];
@@ -22,6 +29,7 @@ export interface CourseProgressResponse {
   completedVideos: number;
   totalAvailableVideos: number;
   courseCompleted: boolean;
+  resumeTarget?: CourseResumeTarget | null;
 }
 
 export interface VideoProgressResponse {
@@ -51,6 +59,7 @@ export interface RecentProgressResponse {
   } | null;
   targetVideo?: VideoItem | null;
   nextVideo?: VideoItem | null;
+  targetProgress?: VideoProgress | null;
   courseCompleted?: boolean;
   completedVideos?: number;
   totalAvailableVideos?: number;

@@ -3,7 +3,7 @@ import { useParams, useSearchParams, Link } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { ArrowLeft, AlertCircle } from 'lucide-react';
 import { courseService, progressService, bookmarkService } from '../services';
-import { VideoItem, VideoProgress } from '../types';
+import { VideoItem, VideoProgress, AISummaryData } from '../types';
 import {
   YouTubePlayer,
   CourseHeader,
@@ -18,6 +18,7 @@ import {
   NotesPanel,
   FocusNotesDrawer,
   YTPlayerInstance,
+  AISummaryDrawer,
 } from '../components';
 import {
   getFirstPlayableVideo,
@@ -120,7 +121,7 @@ export const CourseDetailPage = () => {
   });
 
   // Fetch course-level video progress
-  const { data: progressData } = useQuery({
+  const { data: progressData, isLoading: isProgressLoading } = useQuery({
     queryKey: ['course-progress', courseId],
     queryFn: () => progressService.getCourseProgress(courseId!),
     enabled: !!courseId,
@@ -173,7 +174,11 @@ export const CourseDetailPage = () => {
     return [...rawVideos].sort((a, b) => a.position - b.position);
   }, [data?.videos]);
 
-  // Declaratively derive the current video from URL query param, local selection, or first playable video
+  // Declaratively derive the current video:
+  // 1. Explicit requested video from search params (?v= or ?video=)
+  // 2. Explicit user selection from syllabus click (selectedVideoId)
+  // 3. Saved resume target from server progressData (last watched incomplete or next incomplete)
+  // 4. Default to first playable video in the playlist
   const currentVideo = useMemo(() => {
     if (sortedVideos.length === 0) return null;
 
@@ -189,27 +194,55 @@ export const CourseDetailPage = () => {
       if (target) return target;
     }
 
+    if (progressData?.resumeTarget?.videoId) {
+      const resumeVid = sortedVideos.find(
+        (v) =>
+          (v._id === progressData.resumeTarget!.videoId ||
+            v.youtubeVideoId === progressData.resumeTarget!.videoId) &&
+          v.isAvailable !== false
+      );
+      if (resumeVid) return resumeVid;
+    }
+
     // Default to first playable video in the playlist
     return getFirstPlayableVideo(sortedVideos);
-  }, [sortedVideos, searchParams, selectedVideoId]);
+  }, [sortedVideos, searchParams, selectedVideoId, progressData?.resumeTarget]);
 
   // Current video progress
   const currentVideoProgress = currentVideo
     ? localProgressMap[currentVideo._id]
     : undefined;
 
-  // Calculate resume start seconds: skip if <= 2s or >= duration - 5s
+  // Calculate resume start seconds: skip if <= 2s, >= duration - 5s, or already completed
   const initialSeconds = useMemo(() => {
-    if (!currentVideoProgress) return 0;
-    const watched = currentVideoProgress.watchedSeconds || 0;
-    const duration =
-      currentVideoProgress.durationSeconds ||
-      currentVideo?.durationSeconds ||
-      0;
-    if (watched <= 2) return 0;
-    if (duration > 0 && watched >= duration - 5) return 0;
-    return Math.floor(watched);
-  }, [currentVideoProgress, currentVideo?.durationSeconds]);
+    if (!currentVideo) return 0;
+    const prog = localProgressMap[currentVideo._id];
+    if (prog) {
+      if (prog.completed) return 0;
+      const watched = prog.watchedSeconds || 0;
+      const duration =
+        prog.durationSeconds || currentVideo.durationSeconds || 0;
+      if (watched <= 2) return 0;
+      if (duration > 0 && watched >= duration - 5) return 0;
+      return Math.floor(watched);
+    }
+    if (
+      progressData?.resumeTarget &&
+      (progressData.resumeTarget.videoId === currentVideo._id ||
+        progressData.resumeTarget.videoId === currentVideo.youtubeVideoId) &&
+      !progressData.resumeTarget.completed
+    ) {
+      const watched = progressData.resumeTarget.watchedSeconds || 0;
+      const duration =
+        progressData.resumeTarget.durationSeconds ||
+        currentVideo.durationSeconds ||
+        0;
+      if (watched <= 2) return 0;
+      if (duration > 0 && watched >= duration - 5) return 0;
+      return Math.floor(watched);
+    }
+    return 0;
+  }, [currentVideo, localProgressMap, progressData?.resumeTarget]);
 
   // Check if current video is bookmarked
   const isCurrentVideoBookmarked = useMemo(() => {
@@ -242,6 +275,61 @@ export const CourseDetailPage = () => {
       } catch (err) {
         console.error('Error seeking to timestamp:', err);
       }
+    }
+  };
+
+  // AI Summary State
+  const [isSummaryDrawerOpen, setIsSummaryDrawerOpen] = useState(false);
+  const [isGeneratingSummary, setIsGeneratingSummary] = useState(false);
+  const [summaryError, setSummaryError] = useState<string | null>(null);
+  const [activeSummary, setActiveSummary] = useState<AISummaryData | null>(null);
+
+  // Sync active summary when switching lessons
+  useEffect(() => {
+    setActiveSummary(currentVideo?.aiSummary || null);
+    setSummaryError(null);
+  }, [currentVideo?._id, currentVideo?.aiSummary]);
+
+  const hasExistingSummary = Boolean(
+    activeSummary?.summary || currentVideo?.aiSummary?.summary
+  );
+
+  const handleOpenSummary = async () => {
+    if (!currentVideo || !course) return;
+
+    // If summary is already loaded or in currentVideo, open drawer directly (no network request!)
+    if (activeSummary?.summary || currentVideo.aiSummary?.summary) {
+      if (!activeSummary && currentVideo.aiSummary) {
+        setActiveSummary(currentVideo.aiSummary);
+      }
+      setIsSummaryDrawerOpen(true);
+      return;
+    }
+
+    try {
+      setIsGeneratingSummary(true);
+      setSummaryError(null);
+      setIsSummaryDrawerOpen(true);
+
+      const res = await courseService.getVideoSummary(course._id, currentVideo._id);
+      setActiveSummary(res.summary);
+
+      // Update TanStack Query cache for the course so the video entity retains the summary
+      queryClient.setQueryData(['course', courseId], (oldData: any) => {
+        if (!oldData || !oldData.videos) return oldData;
+        return {
+          ...oldData,
+          videos: oldData.videos.map((v: any) =>
+            v._id === currentVideo._id ? { ...v, aiSummary: res.summary } : v
+          ),
+        };
+      });
+    } catch (err: any) {
+      console.error('Failed to get video summary:', err);
+      const msg = err?.message || 'Unable to generate summary. Please try again.';
+      setSummaryError(msg);
+    } finally {
+      setIsGeneratingSummary(false);
     }
   };
 
@@ -368,11 +456,13 @@ export const CourseDetailPage = () => {
     [currentVideo, course, localProgressMap, flushProgress]
   );
 
-  // Handle video playback state change (e.g. video ended)
+  // Handle video playback state change (e.g. video paused or ended)
   const handlePlayerStateChange = useCallback(
     (event: { data?: number }) => {
       const YT = window.YT;
-      if (YT && event.data === YT.PlayerState.ENDED) {
+      if (YT && event.data === YT.PlayerState.PAUSED) {
+        flushProgress();
+      } else if (YT && event.data === YT.PlayerState.ENDED) {
         if (currentVideo && course) {
           setOptimisticProgressMap((map) => ({
             ...map,
@@ -400,9 +490,19 @@ export const CourseDetailPage = () => {
     [currentVideo, course, flushProgress]
   );
 
-  // Flush on unmount
+  // Flush on unmount or tab switch / window leave
   useEffect(() => {
+    const handleVisibilityOrPageHide = () => {
+      if (document.visibilityState === 'hidden') {
+        flushProgress();
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibilityOrPageHide);
+    window.addEventListener('pagehide', handleVisibilityOrPageHide);
+
     return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityOrPageHide);
+      window.removeEventListener('pagehide', handleVisibilityOrPageHide);
       flushProgress();
     };
   }, [flushProgress]);
@@ -446,7 +546,11 @@ export const CourseDetailPage = () => {
     }
   };
 
-  if (isLoading) {
+  const requestedVideoId =
+    searchParams.get('v') || searchParams.get('video') || selectedVideoId;
+  const isResolvingInitialVideo = !requestedVideoId && isProgressLoading;
+
+  if (isLoading || isResolvingInitialVideo) {
     return <LoadingState type="details" />;
   }
 
@@ -584,6 +688,9 @@ export const CourseDetailPage = () => {
                     onToggleFocusMode={() => handleToggleFocusMode(true)}
                     isBookmarked={isCurrentVideoBookmarked}
                     onToggleBookmark={handleToggleBookmark}
+                    onOpenSummary={handleOpenSummary}
+                    isGeneratingSummary={isGeneratingSummary}
+                    hasExistingSummary={hasExistingSummary}
                   />
                 )}
 
@@ -676,6 +783,20 @@ export const CourseDetailPage = () => {
           videoTitle={currentVideo.title}
           currentPlaybackSeconds={currentPlaybackSeconds}
           onSeekTo={handleSeekTo}
+        />
+      )}
+
+      {/* AI Study Summary Slide-over Drawer */}
+      {currentVideo && (
+        <AISummaryDrawer
+          isOpen={isSummaryDrawerOpen}
+          onClose={() => setIsSummaryDrawerOpen(false)}
+          videoTitle={currentVideo.title}
+          summaryData={activeSummary || currentVideo.aiSummary || null}
+          isLoading={isGeneratingSummary}
+          error={summaryError}
+          onSeekTo={handleSeekTo}
+          onRetry={handleOpenSummary}
         />
       )}
     </div>

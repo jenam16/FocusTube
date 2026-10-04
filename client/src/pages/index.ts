@@ -15,4 +15,5 @@ export * from './VerifyEmailPage';
 export * from './ForgotPasswordPage';
 export * from './ResetPasswordPage';
 export * from './PlaceholderPage';
+export * from './StudyMaterialsPage';
 

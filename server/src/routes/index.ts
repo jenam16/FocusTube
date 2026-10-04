@@ -8,6 +8,7 @@ import analyticsRoutes from './analyticsRoutes.js';
 import noteRoutes from './noteRoutes.js';
 import bookmarkRoutes from './bookmarkRoutes.js';
 import aiRoutes from './aiRoutes.js';
+import studyMaterialRoutes from './studyMaterialRoutes.js';
 
 const router = Router();
 
@@ -27,6 +28,7 @@ router.use('/analytics', analyticsRoutes);
 router.use('/notes', noteRoutes);
 router.use('/bookmarks', bookmarkRoutes);
 router.use('/ai', aiRoutes);
+router.use('/study-materials', studyMaterialRoutes);
 
 export default router;
 

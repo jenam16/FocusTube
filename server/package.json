@@ -8,7 +8,7 @@
     "dev": "tsx watch src/server.ts",
     "build": "tsc",
     "start": "node dist/server.js",
-    "test": "tsx src/tests/verifyPhase2.ts && tsx src/tests/verifyPhase3.ts && tsx src/tests/verifyPhase4.ts && tsx src/tests/verifyPhase5.ts && tsx src/tests/verifyPhase6.ts && tsx src/tests/verifyPhase8to10.ts && tsx src/tests/verifyScreenshotNotes.ts && tsx src/tests/verifyFocusAI.ts && tsx src/tests/verifyEmailVerification.ts && tsx src/tests/verifyE2EAuthFlow.ts && tsx src/tests/verifyPasswordReset.ts",
+    "test": "tsx src/tests/verifyPhase2.ts && tsx src/tests/verifyPhase3.ts && tsx src/tests/verifyPhase4.ts && tsx src/tests/verifyPhase5.ts && tsx src/tests/verifyPhase6.ts && tsx src/tests/verifyPhase8to10.ts && tsx src/tests/verifyScreenshotNotes.ts && tsx src/tests/verifyFocusAI.ts && tsx src/tests/verifyEmailVerification.ts && tsx src/tests/verifyE2EAuthFlow.ts && tsx src/tests/verifyPasswordReset.ts && tsx src/tests/verifyAISummary.ts",
     "lint": "eslint .",
     "format": "prettier --write \"src/**/*.ts\""
   },
@@ -23,7 +23,8 @@
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "jsonwebtoken": "^9.0.3",
-    "mongoose": "^8.9.5"
+    "mongoose": "^8.9.5",
+    "youtube-transcript": "^1.3.1"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",

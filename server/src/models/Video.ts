@@ -1,5 +1,20 @@
 import mongoose, { Document, Model, Schema } from 'mongoose';
 
+export interface IAISummaryMoment {
+  startTime: number;
+  time: string;
+  title: string;
+  description: string;
+}
+
+export interface IAISummary {
+  summary: string;
+  keyConcepts: string[];
+  importantMoments: IAISummaryMoment[];
+  quickRevision: string[];
+  generatedAt: Date;
+}
+
 export interface IVideo extends Document {
   _id: mongoose.Types.ObjectId;
   courseId: mongoose.Types.ObjectId;
@@ -9,9 +24,31 @@ export interface IVideo extends Document {
   durationSeconds: number;
   position: number;
   isAvailable: boolean;
+  aiSummary?: IAISummary;
   createdAt: Date;
   updatedAt: Date;
 }
+
+const aiSummaryMomentSchema = new Schema<IAISummaryMoment>(
+  {
+    startTime: { type: Number, required: true },
+    time: { type: String, required: true },
+    title: { type: String, required: true },
+    description: { type: String, default: '' },
+  },
+  { _id: false }
+);
+
+const aiSummarySchema = new Schema<IAISummary>(
+  {
+    summary: { type: String, required: true },
+    keyConcepts: [{ type: String }],
+    importantMoments: [aiSummaryMomentSchema],
+    quickRevision: [{ type: String }],
+    generatedAt: { type: Date, default: Date.now },
+  },
+  { _id: false }
+);
 
 const videoSchema = new Schema<IVideo>(
   {
@@ -46,6 +83,10 @@ const videoSchema = new Schema<IVideo>(
     isAvailable: {
       type: Boolean,
       default: true,
+    },
+    aiSummary: {
+      type: aiSummarySchema,
+      default: undefined,
     },
   },
   {

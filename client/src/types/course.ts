@@ -13,6 +13,21 @@ export interface Course {
   updatedAt: string;
 }
 
+export interface AISummaryMoment {
+  startTime: number;
+  time: string;
+  title: string;
+  description: string;
+}
+
+export interface AISummaryData {
+  summary: string;
+  keyConcepts: string[];
+  importantMoments: AISummaryMoment[];
+  quickRevision: string[];
+  generatedAt: string;
+}
+
 export interface VideoItem {
   _id: string;
   courseId: string;
@@ -22,6 +37,7 @@ export interface VideoItem {
   durationSeconds: number;
   position: number;
   isAvailable: boolean;
+  aiSummary?: AISummaryData;
   createdAt: string;
   updatedAt: string;
 }

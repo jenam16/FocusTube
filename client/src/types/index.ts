@@ -5,3 +5,4 @@ export * from './tasks';
 export * from './notes';
 export * from './bookmarks';
 export * from './analytics';
+export * from './studyMaterial';

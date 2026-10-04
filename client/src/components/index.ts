@@ -14,4 +14,5 @@ export * from './notes';
 export * from './bookmarks';
 export * from './player';
 export * from './ai';
+export * from './studyMaterials';
 

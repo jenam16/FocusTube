@@ -63,22 +63,20 @@ export const getCourseCompletionStats = async (
     }
   }
 
-  // Course progress percentage:
-  // Simple: based on completed videos out of total available videos.
-  // Integer (never decimals). If at least 1 video completed, at least 1%.
-  let courseProgressPercentage = 0;
-  if (totalAvailableVideos > 0 && completedVideos > 0) {
-    courseProgressPercentage = Math.min(
-      100,
-      Math.max(1, Math.round((completedVideos / totalAvailableVideos) * 100))
-    );
-  }
-
   const courseCompleted =
     totalAvailableVideos > 0 && completedVideos === totalAvailableVideos;
 
+  // Course progress percentage:
+  // Based strictly on completed videos out of total available videos.
+  // Integer (never decimals). If at least 1 video completed, at least 1%.
+  let courseProgressPercentage = 0;
   if (courseCompleted) {
     courseProgressPercentage = 100;
+  } else if (totalAvailableVideos > 0 && completedVideos > 0) {
+    courseProgressPercentage = Math.min(
+      99,
+      Math.max(1, Math.round((completedVideos / totalAvailableVideos) * 100))
+    );
   }
 
   return {
@@ -129,10 +127,13 @@ export const getCourseProgress = async (
       return;
     }
 
+    const allVideos = await Video.find({ courseId: course._id }).sort({ position: 1 });
+    const availableVideos = allVideos.filter((v) => v.isAvailable !== false);
+
     const progressRecords = await VideoProgress.find({
       user: userId,
       course: course._id,
-    }).sort({ updatedAt: -1 });
+    }).sort({ lastWatchedAt: -1, updatedAt: -1 });
 
     const completionStats = await getCourseCompletionStats(userId, course._id);
 
@@ -144,9 +145,101 @@ export const getCourseProgress = async (
       );
     }
 
+    // Determine resume target
+    let resumeTarget: {
+      videoId: string;
+      watchedSeconds: number;
+      durationSeconds: number;
+      completed: boolean;
+    } | null = null;
+
+    const progressByVideoId = new Map<string, IVideoProgress>();
+    for (const record of progressRecords) {
+      progressByVideoId.set(record.video.toString(), record);
+    }
+
+    if (availableVideos.length > 0) {
+      if (progressRecords.length === 0) {
+        // No progress on this course yet -> start from Video 1 at 0:00
+        const first = availableVideos[0];
+        resumeTarget = {
+          videoId: first._id.toString(),
+          watchedSeconds: 0,
+          durationSeconds: first.durationSeconds || 0,
+          completed: false,
+        };
+      } else {
+        // The most recently watched record in this course
+        const mostRecent = progressRecords[0];
+        const mostRecentVideo = availableVideos.find(
+          (v) => v._id.toString() === mostRecent.video.toString()
+        );
+
+        if (!mostRecent.completed) {
+          // In-progress video: resume exact saved position
+          resumeTarget = {
+            videoId: mostRecent.video.toString(),
+            watchedSeconds: mostRecent.watchedSeconds || 0,
+            durationSeconds:
+              mostRecent.durationSeconds || (mostRecentVideo?.durationSeconds || 0),
+            completed: false,
+          };
+        } else {
+          // Most recent video was completed
+          if (completionStats.courseCompleted) {
+            // Whole course is 100% completed: target last video in review mode
+            const lastVid = availableVideos[availableVideos.length - 1];
+            const lastProg = progressByVideoId.get(lastVid._id.toString());
+            resumeTarget = {
+              videoId: lastVid._id.toString(),
+              watchedSeconds: 0,
+              durationSeconds: lastVid.durationSeconds || (lastProg?.durationSeconds || 0),
+              completed: true,
+            };
+          } else {
+            // Find next logical incomplete available video
+            const currentPos = mostRecentVideo ? mostRecentVideo.position : -1;
+            const subsequentIncomplete = availableVideos.find(
+              (v) =>
+                v.position > currentPos &&
+                !progressByVideoId.get(v._id.toString())?.completed
+            );
+            const nextIncomplete =
+              subsequentIncomplete ||
+              availableVideos.find(
+                (v) => !progressByVideoId.get(v._id.toString())?.completed
+              );
+
+            if (nextIncomplete) {
+              const existingProg = progressByVideoId.get(
+                nextIncomplete._id.toString()
+              );
+              resumeTarget = {
+                videoId: nextIncomplete._id.toString(),
+                watchedSeconds: existingProg?.watchedSeconds || 0,
+                durationSeconds:
+                  existingProg?.durationSeconds ||
+                  (nextIncomplete.durationSeconds || 0),
+                completed: false,
+              };
+            } else {
+              const first = availableVideos[0];
+              resumeTarget = {
+                videoId: first._id.toString(),
+                watchedSeconds: 0,
+                durationSeconds: first.durationSeconds || 0,
+                completed: false,
+              };
+            }
+          }
+        }
+      }
+    }
+
     res.status(200).json({
       courseId: course._id,
       progress: progressRecords,
+      resumeTarget,
       ...completionStats,
     });
   } catch (error) {
@@ -291,13 +384,12 @@ export const updateVideoProgress = async (
     //    OR user reached ending part (within 20s of end or >= 85% after skipping/watching)
     const isEndingPart =
       parsedDuration > 0 &&
-      (clampedWatched / parsedDuration >= 0.85 ||
-        clampedWatched >= Math.max(5, parsedDuration - 20));
+      (clampedWatched / parsedDuration >= 0.90 ||
+        (parsedDuration >= 60 && clampedWatched >= parsedDuration - 15));
 
     const isNowCompleted =
       Boolean(existingProgress?.completed) ||
       Boolean(isEnded) ||
-      (parsedDuration > 0 && clampedWatched / parsedDuration >= 0.90) ||
       isEndingPart;
 
     const finalProgressPercentage = isNowCompleted ? 100 : progressPercentage;
@@ -446,10 +538,15 @@ export const getRecentProgress = async (
       }
     }
 
+    const targetProgress = targetVideo
+      ? progressByVideoId.get(targetVideo._id.toString()) || null
+      : null;
+
     res.status(200).json({
       recent,
       targetVideo,
       nextVideo,
+      targetProgress,
       courseCompleted,
       completedVideos: completedAvailableCount,
       totalAvailableVideos: totalAvailable,

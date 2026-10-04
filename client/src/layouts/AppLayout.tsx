@@ -1,4 +1,4 @@
-﻿import { useState } from 'react';
+import { useState } from 'react';
 import { NavLink, Outlet, useNavigate, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard,
@@ -8,6 +8,7 @@ import {
   BarChart3,
   Bookmark,
   FileText,
+  FolderOpen,
   Settings,
   LogOut,
   Menu,
@@ -29,6 +30,7 @@ interface NavItem {
 const mainNavItems: NavItem[] = [
   { label: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
   { label: 'My Courses', path: '/courses', icon: BookOpen },
+  { label: 'Study Material', path: '/study-materials', icon: FolderOpen },
   { label: 'Study Plan', path: '/study-plan', icon: Calendar },
   { label: 'Focus Mode', path: '/focus', icon: Timer },
   { label: 'Analytics', path: '/analytics', icon: BarChart3 },
@@ -66,6 +68,7 @@ export const AppLayout: React.FC = () => {
     if (p.startsWith('/analytics')) return 'Analytics';
     if (p.startsWith('/bookmarks')) return 'Bookmarks';
     if (p.startsWith('/notes')) return 'Notes & Moments';
+    if (p.startsWith('/study-materials')) return 'Study Material';
     if (p.startsWith('/settings')) return 'Settings';
     if (p.startsWith('/watch')) return 'Watch Workspace';
     return 'Workspace';
