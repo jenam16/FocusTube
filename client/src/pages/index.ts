@@ -7,7 +7,6 @@ export * from './CourseDetailPage';
 export * from './WatchPage';
 export * from './NotesPage';
 export * from './BookmarksPage';
-export * from './AnalyticsPage';
 export * from './StudyPlanPage';
 export * from './SettingsPage';
 export * from './VerifyEmailPage';
@@ -15,4 +14,6 @@ export * from './ForgotPasswordPage';
 export * from './ResetPasswordPage';
 export * from './PlaceholderPage';
 export * from './StudyMaterialsPage';
-
+export * from './StudyCirclesPage';
+export * from './JoinCirclePage';
+export * from './CircleWorkspacePage';

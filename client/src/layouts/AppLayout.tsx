@@ -4,10 +4,10 @@ import {
   LayoutDashboard,
   BookOpen,
   Calendar,
-  BarChart3,
   Bookmark,
   FileText,
   FolderOpen,
+  Users,
   Settings,
   LogOut,
   Menu,
@@ -31,8 +31,8 @@ const mainNavItems: NavItem[] = [
   { label: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
   { label: 'My Courses', path: '/courses', icon: BookOpen },
   { label: 'Study Material', path: '/study-materials', icon: FolderOpen },
+  { label: 'Study Circles', path: '/study-circles', icon: Users },
   { label: 'Study Plan', path: '/study-plan', icon: Calendar },
-  { label: 'Analytics', path: '/analytics', icon: BarChart3 },
   { label: 'Bookmarks', path: '/bookmarks', icon: Bookmark },
   { label: 'Notes', path: '/notes', icon: FileText },
 ];
@@ -104,7 +104,7 @@ export const AppLayout: React.FC = () => {
     if (p.startsWith('/dashboard')) return 'Dashboard';
     if (p.startsWith('/courses')) return 'My Courses';
     if (p.startsWith('/study-plan')) return 'Study Plan';
-    if (p.startsWith('/analytics')) return 'Analytics';
+    if (p.startsWith('/study-circles')) return 'Study Circles';
     if (p.startsWith('/bookmarks')) return 'Bookmarks';
     if (p.startsWith('/notes')) return 'Notes & Moments';
     if (p.startsWith('/study-materials')) return 'Study Material';

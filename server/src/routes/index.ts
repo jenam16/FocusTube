@@ -9,6 +9,7 @@ import noteRoutes from './noteRoutes.js';
 import bookmarkRoutes from './bookmarkRoutes.js';
 import aiRoutes from './aiRoutes.js';
 import studyMaterialRoutes from './studyMaterialRoutes.js';
+import studyCircleRoutes from './studyCircleRoutes.js';
 
 const router = Router();
 
@@ -29,6 +30,7 @@ router.use('/notes', noteRoutes);
 router.use('/bookmarks', bookmarkRoutes);
 router.use('/ai', aiRoutes);
 router.use('/study-materials', studyMaterialRoutes);
+router.use('/study-circles', studyCircleRoutes);
 
 export default router;
 

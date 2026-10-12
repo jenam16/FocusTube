@@ -6,3 +6,6 @@ export * from './Task.js';
 export * from './VideoNote.js';
 export * from './VideoBookmark.js';
 export * from './StudyMaterial.js';
+export * from './StudyCircle.js';
+export * from './StudyCircleMembership.js';
+export * from './StudyCircleDiscussion.js';

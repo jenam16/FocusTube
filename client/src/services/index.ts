@@ -8,3 +8,5 @@ export * from './bookmarkService';
 export * from './analyticsService';
 export * from './aiService';
 export * from './studyMaterialService';
+export * from './studyCircleService';
+export * from './socketClient';

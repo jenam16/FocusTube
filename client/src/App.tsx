@@ -15,11 +15,13 @@ import {
   CourseDetailPage,
   WatchPage,
   StudyPlanPage,
-  AnalyticsPage,
   BookmarksPage,
   NotesPage,
   SettingsPage,
   StudyMaterialsPage,
+  StudyCirclesPage,
+  JoinCirclePage,
+  CircleWorkspacePage,
 } from './pages';
 
 const queryClient = new QueryClient({
@@ -66,7 +68,9 @@ export default function App() {
                     element={<WatchPage />}
                   />
                   <Route path="/study-plan" element={<StudyPlanPage />} />
-                  <Route path="/analytics" element={<AnalyticsPage />} />
+                  <Route path="/study-circles" element={<StudyCirclesPage />} />
+                  <Route path="/study-circles/join/:inviteCode" element={<JoinCirclePage />} />
+                  <Route path="/study-circles/:circleId" element={<CircleWorkspacePage />} />
                   <Route path="/bookmarks" element={<BookmarksPage />} />
                   <Route path="/notes" element={<NotesPage />} />
                   <Route path="/study-materials" element={<StudyMaterialsPage />} />
