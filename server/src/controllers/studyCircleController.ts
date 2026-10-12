@@ -24,6 +24,11 @@ import {
   calculateCircleProgress,
 } from '../utils/studyCircle.js';
 import { emitToCircle } from '../services/socketService.js';
+import { VideoProgress } from '../models/VideoProgress.js';
+import { getCourseCompletionStats } from './progressController.js';
+
+import { syncMemberProgressWithCourse } from '../utils/studyCircleSync.js';
+export { syncMemberProgressWithCourse };
 
 // ==========================================
 // 1. Create a Study Circle
@@ -98,6 +103,7 @@ export const createCircle = async (
 
     const playlistSnapshot: IPlaylistSnapshot = {
       sourceCourseId: course._id,
+      playlistId: course.playlistId,
       title: course.title,
       description: course.description || '',
       thumbnail: course.thumbnail || '',
@@ -136,6 +142,13 @@ export const createCircle = async (
       lastActiveAt: new Date(),
     });
 
+    // Reconcile host's existing FocusTube course progress into hostMembership
+    const syncedHostMembership = await syncMemberProgressWithCourse(
+      userId,
+      circle,
+      hostMembership
+    );
+
     const inviteUrl = `${config.frontendUrl}/study-circles/join/${rawCode}`;
 
     res.status(201).json({
@@ -143,7 +156,7 @@ export const createCircle = async (
       circle,
       inviteCode: rawCode,
       inviteUrl,
-      myMembership: hostMembership,
+      myMembership: syncedHostMembership,
     });
   } catch (error) {
     console.error('Error creating study circle:', error);
@@ -172,16 +185,74 @@ export const getMyCircles = async (
       })
       .sort({ updatedAt: -1 });
 
+    // Reconcile requesting user's progress across all their circles
+    for (const m of memberships) {
+      if (m.circleId) {
+        const c = m.circleId as unknown as IStudyCircle;
+        await syncMemberProgressWithCourse(userId, c, m);
+      }
+    }
+
+    // Query this user's personal courses once for efficient lookup
+    const userCourses = await Course.find({ userId }).select('_id playlistId');
+    const userPlaylistIds = new Set(userCourses.map((c) => c.playlistId));
+    const userCourseByPlaylistId = new Map(
+      userCourses.map((c) => [c.playlistId, c._id.toString()])
+    );
+
+    // Fetch source course playlistIds for all circles to handle snapshots that may not have stored playlistId
+    const sourceCourseIds = memberships
+      .map((m) => (m.circleId as unknown as IStudyCircle)?.sourceCourseId)
+      .filter((id) => Boolean(id));
+
+    const sourceCourses =
+      sourceCourseIds.length > 0
+        ? await Course.find({ _id: { $in: sourceCourseIds } }).select('_id playlistId')
+        : [];
+
+    const sourceCoursePlaylistMap = new Map<string, string>();
+    for (const sc of sourceCourses) {
+      if (sc.playlistId) {
+        sourceCoursePlaylistMap.set(sc._id.toString(), sc.playlistId);
+      }
+    }
+
     const circles = memberships
       .filter((m) => m.circleId !== null)
       .map((m) => {
         const c = m.circleId as unknown as IStudyCircle;
+        const isHost =
+          m.role === 'host' ||
+          (c.hostId &&
+            ((c.hostId as any)._id?.toString() === userId.toString() ||
+              (c.hostId as any).toString() === userId.toString()));
+
+        let isAddedToCourses = Boolean(isHost);
+        let personalCourseId: string | null = isHost
+          ? c.sourceCourseId?.toString() || null
+          : null;
+
+        if (!isHost) {
+          const candidateIds = [
+            c.playlistSnapshot?.playlistId,
+            c.sourceCourseId ? sourceCoursePlaylistMap.get(c.sourceCourseId.toString()) : undefined,
+            c.sourceCourseId ? `circle_snapshot_${c.sourceCourseId}` : undefined,
+            `circle_snapshot_${c._id}`,
+          ].filter((id): id is string => typeof id === 'string' && id.trim().length > 0);
+
+          const matchedPlaylistId = candidateIds.find((id) => userPlaylistIds.has(id));
+          if (matchedPlaylistId) {
+            isAddedToCourses = true;
+            personalCourseId = userCourseByPlaylistId.get(matchedPlaylistId) || null;
+          }
+        }
+
         return {
           _id: c._id,
           name: c.name,
           description: c.description,
           host: c.hostId,
-          isHost: m.role === 'host',
+          isHost,
           role: m.role,
           memberCount: c.memberCount,
           maxMembers: 5,
@@ -190,6 +261,8 @@ export const getMyCircles = async (
           totalVideos: c.playlistSnapshot?.totalVideos || 0,
           myProgressPercentage: m.progressPercentage,
           myCompletedVideosCount: m.completedVideosCount,
+          isAddedToCourses,
+          personalCourseId,
           lastActiveAt: m.lastActiveAt,
           createdAt: c.createdAt,
         };
@@ -336,6 +409,13 @@ export const joinCircle = async (
         lastActiveAt: new Date(),
       });
 
+      // Reconcile new member's existing FocusTube course progress (if any in their account)
+      const syncedMembership = await syncMemberProgressWithCourse(
+        userId,
+        circle,
+        membership
+      );
+
       // Notify other room subscribers in realtime
       emitToCircle(circle._id.toString(), 'circle:member:joined', {
         member: {
@@ -343,8 +423,8 @@ export const joinCircle = async (
           name: req.user?.name,
           avatar: req.user?.avatar,
           role: 'member',
-          progressPercentage: 0,
-          completedVideosCount: 0,
+          progressPercentage: syncedMembership.progressPercentage,
+          completedVideosCount: syncedMembership.completedVideosCount,
           lastActiveAt: new Date(),
         },
         memberCount: updatedCircle.memberCount,
@@ -353,7 +433,7 @@ export const joinCircle = async (
       res.status(201).json({
         success: true,
         circleId: circle._id,
-        membership,
+        membership: syncedMembership,
       });
     } catch (createErr) {
       // Rollback atomic memberCount increment if membership creation fails
@@ -406,11 +486,63 @@ export const getCircleDetails = async (
       return;
     }
 
+    // Reconcile requesting user's membership with their course progress
+    const syncedMembership = await syncMemberProgressWithCourse(
+      userId,
+      circle,
+      membership
+    );
+
+    const hostIdStr =
+      (circle.hostId as any)?._id?.toString() ||
+      circle.hostId?.toString();
+
+    const isHost =
+      syncedMembership.role === 'host' ||
+      (Boolean(hostIdStr) && hostIdStr === userId.toString());
+
+    let isAddedToCourses = Boolean(isHost);
+    let personalCourseId: string | null = isHost
+      ? circle.sourceCourseId ? circle.sourceCourseId.toString() : null
+      : null;
+
+    if (!isHost) {
+      const sourceCourse = circle.sourceCourseId
+        ? await Course.findById(circle.sourceCourseId).select('playlistId')
+        : null;
+
+      const candidatePlaylistIds = [
+        circle.playlistSnapshot?.playlistId,
+        sourceCourse?.playlistId,
+        circle.sourceCourseId ? `circle_snapshot_${circle.sourceCourseId}` : undefined,
+        `circle_snapshot_${circle._id}`,
+      ].filter((id): id is string => typeof id === 'string' && id.trim().length > 0);
+
+      const personalCourse = await Course.findOne({
+        userId,
+        playlistId: { $in: candidatePlaylistIds },
+      }).select('_id playlistId');
+
+      if (personalCourse) {
+        isAddedToCourses = true;
+        personalCourseId = personalCourse._id.toString();
+
+        if (!circle.playlistSnapshot?.playlistId && personalCourse.playlistId) {
+          await StudyCircle.updateOne(
+            { _id: circle._id },
+            { $set: { 'playlistSnapshot.playlistId': personalCourse.playlistId } }
+          );
+        }
+      }
+    }
+
     res.json({
       success: true,
       circle,
-      myMembership: membership,
-      isHost: membership.role === 'host',
+      myMembership: syncedMembership,
+      isHost,
+      isAddedToCourses,
+      personalCourseId,
     });
   } catch (error) {
     console.error('Error fetching circle details:', error);
@@ -441,9 +573,23 @@ export const getCircleMembers = async (
       return;
     }
 
+    const circle = await StudyCircle.findById(circleId);
+    if (!circle) {
+      res.status(404).json({ message: 'Study circle not found' });
+      return;
+    }
+
     const memberships = await StudyCircleMembership.find({ circleId })
       .populate('userId', 'name avatar')
       .sort({ role: 1, joinedAt: 1 });
+
+    // Sync each member's progress independently
+    for (const m of memberships) {
+      const memberUserId = (m.userId as any)?._id || m.userId;
+      if (memberUserId) {
+        await syncMemberProgressWithCourse(memberUserId, circle, m);
+      }
+    }
 
     const members = memberships.map((m) => {
       const u = m.userId as any;
@@ -532,6 +678,139 @@ export const updateProgress = async (
     membership.lastActiveAt = new Date();
 
     await membership.save();
+
+    // -----------------------------------------------------------------
+    // Two-Way Sync: Update FocusTube VideoProgress & Course progress
+    // -----------------------------------------------------------------
+    try {
+      const sourceCourse = circle.sourceCourseId
+        ? await Course.findById(circle.sourceCourseId)
+        : null;
+
+      const effectivePlaylistId =
+        circle.playlistSnapshot?.playlistId || sourceCourse?.playlistId;
+
+      const targetCourses: mongoose.Types.ObjectId[] = [];
+      if (sourceCourse && sourceCourse.userId.toString() === userId.toString()) {
+        targetCourses.push(sourceCourse._id);
+      } else if (effectivePlaylistId) {
+        const userCopies = await Course.find({
+          userId,
+          playlistId: effectivePlaylistId,
+        }).select('_id');
+        for (const uc of userCopies) {
+          targetCourses.push(uc._id);
+        }
+      }
+
+      // If user has no Course document yet (joined someone else's circle without importing),
+      // track VideoProgress under sourceCourseId for this user
+      if (targetCourses.length === 0 && circle.sourceCourseId) {
+        targetCourses.push(circle.sourceCourseId);
+      }
+
+      for (const courseId of targetCourses) {
+        // Find corresponding Video in this course
+        let courseVideo = await Video.findOne({
+          courseId,
+          youtubeVideoId: validVideo.youtubeVideoId,
+        });
+
+        if (!courseVideo) {
+          courseVideo = await Video.findById(validVideo.videoId);
+        }
+
+        if (courseVideo) {
+          const duration =
+            courseVideo.durationSeconds || validVideo.durationSeconds || 0;
+          const watched =
+            typeof positionSeconds === 'number' && positionSeconds >= 0
+              ? Math.min(positionSeconds, duration > 0 ? duration : positionSeconds)
+              : 0;
+
+          if (completed === true) {
+            const existing = await VideoProgress.findOne({
+              user: userId,
+              course: courseId,
+              video: courseVideo._id,
+            });
+
+            await VideoProgress.findOneAndUpdate(
+              {
+                user: userId,
+                course: courseId,
+                video: courseVideo._id,
+              },
+              {
+                $set: {
+                  watchedSeconds: watched > 0 ? watched : duration,
+                  durationSeconds: duration,
+                  progressPercentage: 100,
+                  completed: true,
+                  completedAt: existing?.completedAt || new Date(),
+                  lastWatchedAt: new Date(),
+                },
+              },
+              { upsert: true, new: true, setDefaultsOnInsert: true }
+            );
+          } else if (completed === false) {
+            await VideoProgress.findOneAndUpdate(
+              {
+                user: userId,
+                course: courseId,
+                video: courseVideo._id,
+              },
+              {
+                $set: {
+                  completed: false,
+                  completedAt: null,
+                  progressPercentage:
+                    duration > 0
+                      ? Math.min(99, Math.round((watched / duration) * 100))
+                      : 0,
+                  lastWatchedAt: new Date(),
+                },
+              }
+            );
+          } else if (typeof positionSeconds === 'number' && positionSeconds >= 0) {
+            // Update playback position
+            const pct =
+              duration > 0
+                ? Math.min(99, Math.max(0, Math.round((watched / duration) * 100)))
+                : 0;
+
+            await VideoProgress.findOneAndUpdate(
+              {
+                user: userId,
+                course: courseId,
+                video: courseVideo._id,
+              },
+              {
+                $set: {
+                  watchedSeconds: Math.round(watched * 10) / 10,
+                  durationSeconds: duration,
+                  progressPercentage: pct,
+                  lastWatchedAt: new Date(),
+                },
+              },
+              { upsert: true, new: true, setDefaultsOnInsert: true }
+            );
+          }
+
+          // If this user owns this Course, recalculate course completion stats and update Course.progressPercentage
+          const isCourseOwner = await Course.exists({ _id: courseId, userId });
+          if (isCourseOwner) {
+            const stats = await getCourseCompletionStats(userId, courseId);
+            await Course.updateOne(
+              { _id: courseId },
+              { $set: { progressPercentage: stats.courseProgressPercentage } }
+            );
+          }
+        }
+      }
+    } catch (syncErr) {
+      console.warn('[StudyCircle] Background course progress sync warning:', syncErr);
+    }
 
     // Broadcast updated progress to circle room in realtime
     emitToCircle(circleId, 'circle:progress:updated', {
@@ -967,3 +1246,237 @@ export const deleteCircle = async (
     res.status(500).json({ message: 'Failed to delete study circle' });
   }
 };
+
+// ==========================================
+// 15. Add Circle Playlist to Member's Personal Courses
+// ==========================================
+export const addCircleToCourses = async (
+  req: AuthenticatedRequest,
+  res: Response
+): Promise<void> => {
+  try {
+    const userId = req.user?._id;
+    const { circleId } = req.params;
+
+    if (!userId) {
+      res.status(401).json({ message: 'Authentication required' });
+      return;
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(circleId)) {
+      res.status(400).json({ message: 'Invalid circle ID format' });
+      return;
+    }
+
+    // Verify requester is an active member of this circle
+    const membership = await StudyCircleMembership.findOne({ circleId, userId });
+    if (!membership) {
+      res.status(403).json({
+        message: 'Access denied: you must be an active member of this circle to add its playlist',
+      });
+      return;
+    }
+
+    const circle = await StudyCircle.findById(circleId);
+    if (!circle) {
+      res.status(404).json({ message: 'Study circle not found' });
+      return;
+    }
+
+    // Host check: Host created circle from their existing course; do not duplicate
+    const hostIdStr =
+      (circle.hostId as any)?._id?.toString() ||
+      circle.hostId?.toString();
+
+    if (hostIdStr === userId.toString()) {
+      res.status(400).json({
+        success: false,
+        isHost: true,
+        alreadyAdded: true,
+        isAddedToCourses: true,
+        courseId: circle.sourceCourseId,
+        message: 'You are the host and already own the original course in your library',
+      });
+      return;
+    }
+
+    const snapshot = circle.playlistSnapshot;
+    if (!snapshot || !Array.isArray(snapshot.videos) || snapshot.videos.length === 0) {
+      res.status(400).json({ message: 'This study circle has no playlist videos to import' });
+      return;
+    }
+
+    // Determine stable playlist ID and candidates
+    const sourceCourse = circle.sourceCourseId
+      ? await Course.findById(circle.sourceCourseId).select('playlistId')
+      : null;
+
+    const candidatePlaylistIds = [
+      snapshot.playlistId,
+      sourceCourse?.playlistId,
+      circle.sourceCourseId ? `circle_snapshot_${circle.sourceCourseId}` : undefined,
+      `circle_snapshot_${circle._id}`,
+    ].filter((id): id is string => typeof id === 'string' && id.trim().length > 0);
+
+    const playlistId =
+      snapshot.playlistId ||
+      sourceCourse?.playlistId ||
+      `circle_snapshot_${circle.sourceCourseId}`;
+
+    // 1. Duplicate check: Check if user ALREADY has this course in their personal library
+    const existingCourse = await Course.findOne({
+      userId,
+      playlistId: { $in: candidatePlaylistIds },
+    });
+    if (existingCourse) {
+      // Reconcile member progress with existing course
+      await syncMemberProgressWithCourse(userId, circle, membership);
+
+      if (!circle.playlistSnapshot?.playlistId && existingCourse.playlistId) {
+        await StudyCircle.updateOne(
+          { _id: circle._id },
+          { $set: { 'playlistSnapshot.playlistId': existingCourse.playlistId } }
+        );
+      }
+
+      res.status(200).json({
+        success: true,
+        alreadyAdded: true,
+        isAddedToCourses: true,
+        courseId: existingCourse._id,
+        courseTitle: existingCourse.title,
+        progressPercentage: existingCourse.progressPercentage,
+        message: 'This course is already in your personal library',
+      });
+      return;
+    }
+
+    // 2. Create the personal Course document for this member
+    let newCourse;
+    try {
+      newCourse = await Course.create({
+        userId,
+        playlistId,
+        title: snapshot.title,
+        description: snapshot.description || '',
+        thumbnail: snapshot.thumbnail || '',
+        channelName: snapshot.channelName || '',
+        totalVideos: snapshot.totalVideos || snapshot.videos.length,
+        totalDurationSeconds: snapshot.totalDurationSeconds || 0,
+        progressPercentage: membership.progressPercentage || 0,
+      });
+    } catch (createErr: any) {
+      // Handle race condition duplicate key error (code 11000)
+      if (createErr.code === 11000) {
+        const raceCourse = await Course.findOne({
+          userId,
+          playlistId: { $in: candidatePlaylistIds },
+        });
+        if (raceCourse) {
+          res.status(200).json({
+            success: true,
+            alreadyAdded: true,
+            isAddedToCourses: true,
+            courseId: raceCourse._id,
+            courseTitle: raceCourse.title,
+            progressPercentage: raceCourse.progressPercentage,
+            message: 'This course is already in your personal library',
+          });
+          return;
+        }
+      }
+      throw createErr;
+    }
+
+    // 3. Create Video documents for this member's new course copy
+    const videoDocs = snapshot.videos.map((sv) => ({
+      courseId: newCourse._id,
+      youtubeVideoId: sv.youtubeVideoId,
+      title: sv.title,
+      thumbnail: sv.thumbnail || '',
+      durationSeconds: sv.durationSeconds || 0,
+      position: sv.position,
+      isAvailable: true,
+    }));
+
+    const createdVideos =
+      videoDocs.length > 0 ? await Video.insertMany(videoDocs) : [];
+
+    // 4. Synchronize any existing progress from Study Circle to the new course
+    const completedSnapshotIdSet = new Set<string>(membership.completedVideoIds || []);
+    const progressDocs = [];
+
+    for (const cv of createdVideos) {
+      const matchingSv = snapshot.videos.find(
+        (sv) => sv.youtubeVideoId === cv.youtubeVideoId || sv.position === cv.position
+      );
+
+      const isCompleted =
+        matchingSv && completedSnapshotIdSet.has(matchingSv.videoId);
+
+      const isCurrent =
+        matchingSv && matchingSv.videoId === membership.currentVideoId;
+
+      if (isCompleted) {
+        progressDocs.push({
+          user: userId,
+          course: newCourse._id,
+          video: cv._id,
+          watchedSeconds: cv.durationSeconds || matchingSv?.durationSeconds || 0,
+          durationSeconds: cv.durationSeconds || matchingSv?.durationSeconds || 0,
+          progressPercentage: 100,
+          completed: true,
+          completedAt: new Date(),
+          lastWatchedAt: new Date(),
+        });
+      } else if (isCurrent && membership.positionSeconds > 0) {
+        const duration = cv.durationSeconds || matchingSv?.durationSeconds || 0;
+        progressDocs.push({
+          user: userId,
+          course: newCourse._id,
+          video: cv._id,
+          watchedSeconds: membership.positionSeconds,
+          durationSeconds: duration,
+          progressPercentage:
+            duration > 0
+              ? Math.min(99, Math.round((membership.positionSeconds / duration) * 100))
+              : 0,
+          completed: false,
+          completedAt: null,
+          lastWatchedAt: new Date(),
+        });
+      }
+    }
+
+    if (progressDocs.length > 0) {
+      await VideoProgress.insertMany(progressDocs);
+    }
+
+    // Calculate official course completion statistics using getCourseCompletionStats
+    const stats = await getCourseCompletionStats(userId, newCourse._id);
+    if (newCourse.progressPercentage !== stats.courseProgressPercentage) {
+      await Course.updateOne(
+        { _id: newCourse._id },
+        { $set: { progressPercentage: stats.courseProgressPercentage } }
+      );
+      newCourse.progressPercentage = stats.courseProgressPercentage;
+    }
+
+    // Keep membership progress in sync
+    await syncMemberProgressWithCourse(userId, circle, membership);
+
+    res.status(201).json({
+      success: true,
+      alreadyAdded: false,
+      isAddedToCourses: true,
+      courseId: newCourse._id,
+      courseTitle: newCourse.title,
+      progressPercentage: newCourse.progressPercentage,
+      message: 'Course added to your personal library successfully',
+    });
+  } catch (error) {
+    console.error('Error adding study circle playlist to personal courses:', error);
+    res.status(500).json({ message: 'Failed to add course to personal library' });
+  }
+};
+

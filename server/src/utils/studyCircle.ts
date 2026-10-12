@@ -28,7 +28,8 @@ export const calculateCircleProgress = (
   completedVideos: number,
   totalVideos: number
 ): number => {
-  if (totalVideos <= 0) return 0;
+  if (totalVideos <= 0 || completedVideos <= 0) return 0;
   if (completedVideos >= totalVideos) return 100;
-  return Math.min(99, Math.max(0, Math.round((completedVideos / totalVideos) * 100)));
+  return Math.min(99, Math.max(1, Math.round((completedVideos / totalVideos) * 100)));
 };
+

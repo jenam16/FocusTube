@@ -84,20 +84,55 @@ export const studyCircleService = {
     circle: StudyCircleDetails;
     myMembership?: StudyCircleMembershipData;
     isHost: boolean;
+    isAddedToCourses?: boolean;
+    personalCourseId?: string | null;
   }> {
     const res = await request<{
       success: boolean;
       circle: StudyCircleDetails;
       myMembership?: StudyCircleMembershipData;
       isHost?: boolean;
+      isAddedToCourses?: boolean;
+      personalCourseId?: string | null;
     }>(`/study-circles/${circleId}`);
     return {
       circle: {
         ...res.circle,
         isHost: res.isHost ?? (res.myMembership?.role === 'host'),
+        isAddedToCourses: res.isAddedToCourses,
+        personalCourseId: res.personalCourseId,
       },
       myMembership: res.myMembership,
       isHost: res.isHost ?? (res.myMembership?.role === 'host'),
+      isAddedToCourses: res.isAddedToCourses,
+      personalCourseId: res.personalCourseId,
+    };
+  },
+
+  // Add circle playlist to member's personal library
+  async addToCourses(circleId: string): Promise<{
+    success: boolean;
+    alreadyAdded: boolean;
+    isAddedToCourses: boolean;
+    courseId: string;
+    courseTitle: string;
+    progressPercentage?: number;
+    message: string;
+  }> {
+    const res = await request<{
+      success: boolean;
+      alreadyAdded: boolean;
+      isAddedToCourses?: boolean;
+      courseId: string;
+      courseTitle: string;
+      progressPercentage?: number;
+      message: string;
+    }>(`/study-circles/${circleId}/add-to-courses`, {
+      method: 'POST',
+    });
+    return {
+      ...res,
+      isAddedToCourses: res.isAddedToCourses ?? true,
     };
   },
 

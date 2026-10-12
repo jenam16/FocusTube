@@ -44,6 +44,8 @@ export interface StudyCircleSummary {
   userProgressPercentage?: number;
   userCompletedVideosCount?: number;
   playlistSnapshot?: StudyCirclePlaylistSnapshot;
+  isAddedToCourses?: boolean;
+  personalCourseId?: string | null;
   lastActiveAt?: string;
   createdAt: string;
   updatedAt?: string;
@@ -74,6 +76,18 @@ export interface StudyCircleDetails {
   createdAt: string;
   updatedAt: string;
   isHost?: boolean;
+  isAddedToCourses?: boolean;
+  personalCourseId?: string | null;
+}
+
+export interface AddToCoursesResponse {
+  success: boolean;
+  alreadyAdded: boolean;
+  isAddedToCourses: boolean;
+  courseId: string;
+  courseTitle: string;
+  progressPercentage?: number;
+  message: string;
 }
 
 export interface StudyCircleMember {

@@ -1,6 +1,7 @@
 import { Response } from 'express';
 import { User, sanitizeUser } from '../models/User.js';
 import { AuthenticatedRequest } from '../middleware/auth.js';
+import { config } from '../config/index.js';
 
 export const syncUser = async (
   req: AuthenticatedRequest,
@@ -38,7 +39,7 @@ export const syncUser = async (
     await user.save();
 
     res.status(200).json({
-      user: sanitizeUser(user),
+      user: sanitizeUser(user, config.bypassEmailVerification),
       message: 'User synchronized successfully',
     });
   } catch (error) {

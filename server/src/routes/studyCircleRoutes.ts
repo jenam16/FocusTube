@@ -15,6 +15,7 @@ import {
   regenerateInviteCode,
   leaveCircle,
   deleteCircle,
+  addCircleToCourses,
 } from '../controllers/studyCircleController.js';
 
 const router = Router();
@@ -31,6 +32,7 @@ router.post('/join', authenticate, joinCircle);
 router.get('/:circleId', authenticate, getCircleDetails);
 router.get('/:circleId/members', authenticate, getCircleMembers);
 router.patch('/:circleId/progress', authenticate, updateProgress);
+router.post('/:circleId/add-to-courses', authenticate, addCircleToCourses);
 
 // Circle discussions & doubts
 router.get('/:circleId/discussions', authenticate, getDiscussions);

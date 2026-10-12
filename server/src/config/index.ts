@@ -30,7 +30,16 @@ export const config = {
     process.env.FRONTEND_URL ||
     process.env.CLIENT_URL ||
     'http://localhost:5173',
+  bypassEmailVerification:
+    process.env.NODE_ENV !== 'production' &&
+    (process.env.BYPASS_EMAIL_VERIFICATION === 'true' ||
+      process.env.BYPASS_EMAIL_VERIFICATION === '1'),
 };
+
+console.log("Email Verification Status:", {
+  bypassEnabled: config.bypassEmailVerification,
+  nodeEnv: config.nodeEnv,
+});
 
 console.log("Cloudinary Config:", {
   cloudName: process.env.CLOUDINARY_CLOUD_NAME,

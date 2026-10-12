@@ -13,6 +13,7 @@ import {
   X,
   Loader2,
   AlertCircle,
+  BookPlus,
 } from 'lucide-react';
 import { studyCircleService, courseService } from '../services';
 import { StudyCircleSummary, Course } from '../types';
@@ -59,6 +60,37 @@ export const StudyCirclesPage: React.FC = () => {
       setCircles([]);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const [addingCircleId, setAddingCircleId] = useState<string | null>(null);
+
+  const handleCardAddToCourses = async (circleId: string) => {
+    try {
+      setAddingCircleId(circleId);
+      const res = await studyCircleService.addToCourses(circleId);
+      setCircles((prev) =>
+        prev.map((c) =>
+          c._id === circleId
+            ? { ...c, isAddedToCourses: true, personalCourseId: res.courseId }
+            : c
+        )
+      );
+      await fetchCircles();
+    } catch (err: any) {
+      if (err?.data?.alreadyAdded || err?.data?.isAddedToCourses) {
+        setCircles((prev) =>
+          prev.map((c) =>
+            c._id === circleId
+              ? { ...c, isAddedToCourses: true, personalCourseId: err.data.courseId }
+              : c
+          )
+        );
+      } else {
+        alert(err?.message || 'Failed to add course to library');
+      }
+    } finally {
+      setAddingCircleId(null);
     }
   };
 
@@ -283,15 +315,22 @@ export const StudyCirclesPage: React.FC = () => {
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
 
                   {/* Top Badges */}
-                  <div className="absolute top-3 left-3 flex items-center gap-2">
+                  <div className="absolute top-3 left-3 flex items-center gap-1.5 flex-wrap">
                     {isHost ? (
                       <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-500/20 text-amber-300 border border-amber-500/30 backdrop-blur-md">
                         <Crown className="h-3 w-3" /> Host
                       </span>
                     ) : (
-                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-white/10 text-white/90 backdrop-blur-md border border-white/20">
-                        Member
-                      </span>
+                      <>
+                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-white/10 text-white/90 backdrop-blur-md border border-white/20">
+                          Member
+                        </span>
+                        {circle.isAddedToCourses && (
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 backdrop-blur-md">
+                            <Check className="h-3 w-3" /> In Library
+                          </span>
+                        )}
+                      </>
                     )}
                   </div>
 
@@ -336,6 +375,28 @@ export const StudyCirclesPage: React.FC = () => {
                       />
                     </div>
                   </div>
+
+                  {/* Add to Personal Courses CTA for Eligible Non-Host Members */}
+                  {!isHost && !circle.isAddedToCourses && (
+                    <div
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleCardAddToCourses(circle._id);
+                      }}
+                      className="p-2 rounded-xl border border-indigo-500/30 bg-indigo-500/10 hover:bg-indigo-500/20 flex items-center justify-between text-xs text-indigo-300 font-semibold cursor-pointer transition-all"
+                      title="Add this shared playlist to your personal library and continue learning from your Dashboard"
+                    >
+                      <span className="flex items-center gap-1.5">
+                        <BookPlus className="h-3.5 w-3.5 text-indigo-400" />
+                        {addingCircleId === circle._id ? 'Adding to Library...' : 'Add to My Courses'}
+                      </span>
+                      {addingCircleId === circle._id ? (
+                        <Loader2 className="h-3.5 w-3.5 animate-spin text-indigo-400" />
+                      ) : (
+                        <Plus className="h-3.5 w-3.5 text-indigo-400" />
+                      )}
+                    </div>
+                  )}
 
                   {/* Footer Action */}
                   <div className="flex items-center justify-between text-xs font-medium text-muted pt-2 group-hover:text-indigo-400 transition-colors">

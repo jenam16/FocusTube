@@ -13,6 +13,7 @@ import {
   sendVerificationEmail,
   sendPasswordResetEmail,
 } from '../services/emailService.js';
+import { config } from '../config/index.js';
 
 
 export const register = async (req: Request, res: Response): Promise<void> => {
@@ -45,7 +46,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
 
     const existingUser = await User.findOne({ email: trimmedEmail });
     if (existingUser) {
-      if (!existingUser.emailVerified) {
+      if (!existingUser.emailVerified && !config.bypassEmailVerification) {
         res.status(409).json({
           code: 'EMAIL_NOT_VERIFIED',
           message:
@@ -76,6 +77,22 @@ export const register = async (req: Request, res: Response): Promise<void> => {
       verificationTokenExpiresAt: verificationExpires,
       lastVerificationSentAt: new Date(),
     });
+
+    if (config.bypassEmailVerification) {
+      // Issue session cookie immediately for seamless local development
+      const authToken = generateToken(user._id.toString());
+      sendAuthCookie(res, authToken);
+
+      res.status(201).json({
+        code: 'REGISTRATION_SUCCESS',
+        message: 'Account created successfully (Email verification bypassed in development).',
+        user: sanitizeUser(user, true),
+        email: user.email,
+        emailVerified: true,
+        emailSent: false,
+      });
+      return;
+    }
 
     // Send verification email through Resend
     const emailResult = await sendVerificationEmail({
@@ -133,8 +150,8 @@ export const login = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    // Check if email is verified
-    if (user.emailVerified === false) {
+    // Check if email is verified (bypassed in development if configured)
+    if (user.emailVerified === false && !config.bypassEmailVerification) {
       res.status(403).json({
         code: 'EMAIL_NOT_VERIFIED',
         message: 'Please verify your email before logging in.',
@@ -147,7 +164,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     sendAuthCookie(res, token);
 
     res.status(200).json({
-      user: sanitizeUser(user),
+      user: sanitizeUser(user, config.bypassEmailVerification),
       message: 'Login successful',
     });
   } catch (error) {
@@ -248,6 +265,15 @@ export const resendVerification = async (
       return;
     }
 
+    if (config.bypassEmailVerification) {
+      res.status(200).json({
+        code: 'BYPASS_ACTIVE',
+        message: 'Email verification is currently bypassed in this development environment.',
+        email: user.email,
+      });
+      return;
+    }
+
     // Cooldown check (60 seconds)
     const COOLDOWN_MS = 60 * 1000;
     if (user.lastVerificationSentAt) {
@@ -317,7 +343,7 @@ export const getMe = async (
   }
 
   res.status(200).json({
-    user: sanitizeUser(req.user),
+    user: sanitizeUser(req.user, config.bypassEmailVerification),
   });
 };
 

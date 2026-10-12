@@ -22,6 +22,9 @@ import {
   HelpCircle,
   X,
   ListVideo,
+  BookPlus,
+  ExternalLink,
+  Plus,
 } from 'lucide-react';
 import { YouTubePlayer, YTPlayerInstance } from '../components/YouTubePlayer';
 import {
@@ -85,6 +88,13 @@ export const CircleWorkspacePage: React.FC = () => {
   const [isConfirmDeleteOpen, setIsConfirmDeleteOpen] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
 
+  // Add to My Courses State
+  const [isAddedToCourses, setIsAddedToCourses] = useState(false);
+  const [personalCourseId, setPersonalCourseId] = useState<string | null>(null);
+  const [isAddingToCourses, setIsAddingToCourses] = useState(false);
+  const [addSuccessToast, setAddSuccessToast] = useState<string | null>(null);
+  const [addErrorToast, setAddErrorToast] = useState<string | null>(null);
+
   // Fetch initial data
   const fetchData = useCallback(async () => {
     if (!circleId) return;
@@ -98,9 +108,27 @@ export const CircleWorkspacePage: React.FC = () => {
         studyCircleService.getDiscussions(circleId),
       ]);
 
-      setCircle(circleRes.circle);
+      const circleIsAdded = Boolean(
+        circleRes.isAddedToCourses ||
+        circleRes.circle?.isAddedToCourses ||
+        circleRes.isHost ||
+        circleRes.circle?.isHost
+      );
+      const personalId =
+        circleRes.personalCourseId ||
+        circleRes.circle?.personalCourseId ||
+        (circleRes.isHost ? circleRes.circle?.sourceCourseId : null) ||
+        null;
+
+      setCircle({
+        ...circleRes.circle,
+        isAddedToCourses: circleIsAdded,
+        personalCourseId: personalId,
+      });
       setMembers(Array.isArray(membersRes) ? membersRes : []);
       setDiscussions(Array.isArray(discussionsRes) ? discussionsRes : []);
+      setIsAddedToCourses(circleIsAdded);
+      setPersonalCourseId(personalId);
 
       // If membership returned, restore position and active video
       const myMembership = circleRes.myMembership;
@@ -129,6 +157,55 @@ export const CircleWorkspacePage: React.FC = () => {
       setIsLoading(false);
     }
   }, [circleId]);
+
+  const handleAddToCourses = async () => {
+    if (!circleId || isAddingToCourses || isAddedToCourses) return;
+    try {
+      setIsAddingToCourses(true);
+      setAddErrorToast(null);
+      const res = await studyCircleService.addToCourses(circleId);
+      setIsAddedToCourses(true);
+      if (res.courseId) {
+        setPersonalCourseId(res.courseId);
+      }
+      setCircle((prev) =>
+        prev
+          ? {
+              ...prev,
+              isAddedToCourses: true,
+              personalCourseId: res.courseId || prev.personalCourseId,
+            }
+          : prev
+      );
+      setAddSuccessToast(res.message || 'Course added to your personal library!');
+      setTimeout(() => setAddSuccessToast(null), 6000);
+    } catch (err: any) {
+      console.error('Failed to add course to library:', err);
+      if (err?.data?.alreadyAdded || err?.data?.isAddedToCourses) {
+        const existingCourseId = err?.data?.courseId || null;
+        setIsAddedToCourses(true);
+        if (existingCourseId) {
+          setPersonalCourseId(existingCourseId);
+        }
+        setCircle((prev) =>
+          prev
+            ? {
+                ...prev,
+                isAddedToCourses: true,
+                personalCourseId: existingCourseId || prev.personalCourseId,
+              }
+            : prev
+        );
+        setAddSuccessToast(err?.message || 'This course is already in your personal library');
+        setTimeout(() => setAddSuccessToast(null), 5000);
+      } else {
+        setAddErrorToast(err?.message || 'Failed to add course to your library');
+        setTimeout(() => setAddErrorToast(null), 5000);
+      }
+    } finally {
+      setIsAddingToCourses(false);
+    }
+  };
 
   useEffect(() => {
     fetchData();
@@ -554,7 +631,45 @@ export const CircleWorkspacePage: React.FC = () => {
         </div>
 
         {/* Action Buttons */}
-        <div className="flex items-center gap-2.5">
+        <div className="flex items-center gap-2.5 flex-wrap">
+          {/* Add to My Courses Button (Eligible Non-Host Members) */}
+          {!isHost && (
+            isAddedToCourses ? (
+              <div className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border border-emerald-500/30 bg-emerald-500/10 text-emerald-400 text-xs font-semibold">
+                <CheckCircle2 className="h-3.5 w-3.5" />
+                <span>Added to My Courses</span>
+                {personalCourseId && (
+                  <button
+                    onClick={() => navigate(`/courses/${personalCourseId}`)}
+                    className="ml-1 text-xs text-indigo-400 hover:text-indigo-300 inline-flex items-center gap-0.5 underline font-medium"
+                    title="View Course in My Courses"
+                  >
+                    View <ExternalLink className="h-3 w-3" />
+                  </button>
+                )}
+              </div>
+            ) : (
+              <button
+                onClick={handleAddToCourses}
+                disabled={isAddingToCourses}
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-xs font-semibold text-white shadow-md shadow-indigo-600/20 disabled:opacity-50 transition-all"
+                title="Add this shared playlist to your personal library and continue learning from your Dashboard"
+              >
+                {isAddingToCourses ? (
+                  <>
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                    <span>Adding...</span>
+                  </>
+                ) : (
+                  <>
+                    <BookPlus className="h-3.5 w-3.5" />
+                    <span>Add to My Courses</span>
+                  </>
+                )}
+              </button>
+            )
+          )}
+
           <button
             onClick={handleOpenInvite}
             className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl border border-app bg-card hover:bg-hover text-xs font-semibold text-primary transition-all"
@@ -582,6 +697,38 @@ export const CircleWorkspacePage: React.FC = () => {
           )}
         </div>
       </div>
+
+      {/* Success Notification Banner */}
+      {addSuccessToast && (
+        <div className="flex items-center justify-between p-3.5 rounded-xl border border-emerald-500/30 bg-emerald-500/15 text-emerald-200 text-xs font-medium animate-in fade-in duration-200">
+          <div className="flex items-center gap-2">
+            <CheckCircle2 className="h-4 w-4 text-emerald-400 shrink-0" />
+            <span>{addSuccessToast} Track your progress seamlessly across your Dashboard and Study Circle.</span>
+          </div>
+          <button
+            onClick={() => setAddSuccessToast(null)}
+            className="text-emerald-400 hover:text-emerald-200 p-1"
+          >
+            <X className="h-3.5 w-3.5" />
+          </button>
+        </div>
+      )}
+
+      {/* Error Notification Banner */}
+      {addErrorToast && (
+        <div className="flex items-center justify-between p-3.5 rounded-xl border border-red-500/30 bg-red-500/15 text-red-200 text-xs font-medium animate-in fade-in duration-200">
+          <div className="flex items-center gap-2">
+            <AlertCircle className="h-4 w-4 text-red-400 shrink-0" />
+            <span>{addErrorToast}</span>
+          </div>
+          <button
+            onClick={() => setAddErrorToast(null)}
+            className="text-red-400 hover:text-red-200 p-1"
+          >
+            <X className="h-3.5 w-3.5" />
+          </button>
+        </div>
+      )}
 
       {/* Main Grid: Player & Discussions (Left) vs Playlist & Members (Right) */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
@@ -946,6 +1093,60 @@ export const CircleWorkspacePage: React.FC = () => {
           {/* Tab 1 Content: Playlist Snapshot */}
           {activeRightTab === 'playlist' && (
             <div className="divide-y divide-app max-h-[700px] overflow-y-auto">
+              {/* Member Add-to-Courses Prompt Card */}
+              {!isHost && (
+                <div className="p-3 bg-secondary/30">
+                  {isAddedToCourses ? (
+                    <div className="p-2.5 rounded-xl border border-emerald-500/20 bg-emerald-500/10 flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <CheckCircle2 className="h-4 w-4 text-emerald-400 shrink-0" />
+                        <span className="text-xs font-semibold text-emerald-300 truncate">
+                          In Your Personal Courses
+                        </span>
+                      </div>
+                      {personalCourseId && (
+                        <button
+                          onClick={() => navigate(`/courses/${personalCourseId}`)}
+                          className="text-xs font-semibold text-indigo-400 hover:text-indigo-300 flex items-center gap-1 shrink-0"
+                        >
+                          Open Course
+                          <ExternalLink className="h-3 w-3" />
+                        </button>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="p-3 rounded-xl border border-indigo-500/30 bg-gradient-to-r from-indigo-500/10 via-purple-500/10 to-indigo-500/5 space-y-2">
+                      <div className="space-y-1">
+                        <p className="text-xs font-bold text-primary flex items-center gap-1.5">
+                          <BookPlus className="h-3.5 w-3.5 text-indigo-400" />
+                          Save to Personal Library
+                        </p>
+                        <p className="text-[11px] text-muted leading-relaxed">
+                          Add this shared playlist to your personal library and continue learning from your Dashboard.
+                        </p>
+                      </div>
+                      <button
+                        onClick={handleAddToCourses}
+                        disabled={isAddingToCourses}
+                        className="w-full inline-flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-xs font-semibold bg-indigo-600 hover:bg-indigo-500 text-white shadow-md shadow-indigo-600/20 disabled:opacity-50 transition-all"
+                      >
+                        {isAddingToCourses ? (
+                          <>
+                            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                            Adding to My Courses...
+                          </>
+                        ) : (
+                          <>
+                            <Plus className="h-3.5 w-3.5" />
+                            Add to My Courses
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
+
               {videos.map((vid, idx) => {
                 const isActive = idx === currentVideoIndex;
                 const isCompleted = completedVideoIds.has(vid.videoId);

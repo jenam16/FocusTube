@@ -109,11 +109,14 @@ const userSchema = new Schema<IUser>(
   }
 );
 
-export const sanitizeUser = (user: IUser): SanitizedUser => ({
+export const sanitizeUser = (
+  user: IUser,
+  bypassEmailVerification = false
+): SanitizedUser => ({
   id: user._id.toString(),
   name: user.name,
   email: user.email,
-  emailVerified: user.emailVerified ?? false,
+  emailVerified: bypassEmailVerification ? true : (user.emailVerified ?? false),
   avatar: user.avatar,
   dailyGoalMinutes: user.dailyGoalMinutes,
   currentStreak: user.currentStreak,

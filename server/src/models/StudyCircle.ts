@@ -11,6 +11,7 @@ export interface ISnapshotVideo {
 
 export interface IPlaylistSnapshot {
   sourceCourseId: mongoose.Types.ObjectId;
+  playlistId?: string;
   title: string;
   description: string;
   thumbnail: string;
@@ -52,6 +53,7 @@ const playlistSnapshotSchema = new Schema<IPlaylistSnapshot>(
       ref: 'Course',
       required: true,
     },
+    playlistId: { type: String, default: '' },
     title: { type: String, required: true, trim: true },
     description: { type: String, default: '' },
     thumbnail: { type: String, default: '' },

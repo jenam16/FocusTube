@@ -4,6 +4,10 @@ import { AuthenticatedRequest } from '../middleware/auth.js';
 import { Course } from '../models/Course.js';
 import { Video, IVideo } from '../models/Video.js';
 import { VideoProgress, IVideoProgress } from '../models/VideoProgress.js';
+import { StudyCircle } from '../models/StudyCircle.js';
+import { StudyCircleMembership } from '../models/StudyCircleMembership.js';
+import { syncMemberProgressWithCourse } from '../utils/studyCircleSync.js';
+import { emitToCircle } from '../services/socketService.js';
 
 export interface CourseCompletionStats {
   courseProgressPercentage: number;
@@ -430,6 +434,40 @@ export const updateVideoProgress = async (
       { _id: course._id },
       { $set: { progressPercentage: completionStats.courseProgressPercentage } }
     );
+
+    // Reconcile and broadcast to any Study Circle memberships this user has for this course
+    try {
+      const relatedCircles = await StudyCircle.find({
+        $or: [
+          { sourceCourseId: course._id },
+          { 'playlistSnapshot.sourceCourseId': course._id },
+          ...(course.playlistId
+            ? [{ 'playlistSnapshot.playlistId': course.playlistId }]
+            : []),
+        ],
+      });
+
+      for (const circle of relatedCircles) {
+        const membership = await StudyCircleMembership.findOne({
+          circleId: circle._id,
+          userId,
+        });
+
+        if (membership) {
+          await syncMemberProgressWithCourse(userId, circle, membership);
+          emitToCircle(circle._id.toString(), 'circle:progress:updated', {
+            userId: userId.toString(),
+            currentVideoId: membership.currentVideoId,
+            positionSeconds: membership.positionSeconds,
+            completedVideosCount: membership.completedVideosCount,
+            progressPercentage: membership.progressPercentage,
+            lastActiveAt: membership.lastActiveAt,
+          });
+        }
+      }
+    } catch (circleSyncErr) {
+      console.warn('[Progress] Study circle sync warning:', circleSyncErr);
+    }
 
     res.status(200).json({
       progress: updatedProgress,
